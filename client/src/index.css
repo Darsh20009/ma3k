@@ -26,22 +26,30 @@
   --ring: hsl(202.8169, 89.1213%, 53.1373%);
   --radius: 1.3rem;
 
-  /* Custom colors for Ma3k brand */
+  /* Enhanced Ma3k brand colors with creative gradients */
   --brand-primary: hsl(203.8863, 88.2845%, 53.1373%);
   --brand-success: hsl(159.7826, 100%, 36.0784%);
   --brand-accent: hsl(42.0290, 92.8251%, 56.2745%);
+  --brand-purple: hsl(270, 70%, 50%);
+  --brand-pink: hsl(320, 85%, 60%);
+  --brand-orange: hsl(25, 95%, 55%);
+  
   --brand-primary-50: hsl(214, 100%, 97%);
   --brand-primary-100: hsl(214, 95%, 93%);
   --brand-primary-600: hsl(203, 89%, 48%);
   --brand-primary-700: hsl(203, 89%, 43%);
   --brand-success-50: hsl(166, 76%, 97%);
   --brand-success-100: hsl(167, 85%, 89%);
+  --brand-success-400: hsl(160, 84%, 45%);
   --brand-success-500: hsl(160, 84%, 39%);
   --brand-success-600: hsl(158, 64%, 52%);
   --brand-accent-50: hsl(49, 100%, 96%);
   --brand-accent-100: hsl(48, 96%, 89%);
   --brand-accent-500: hsl(43, 96%, 56%);
   --brand-accent-600: hsl(32, 95%, 44%);
+  --brand-purple-500: hsl(270, 70%, 50%);
+  --brand-pink-500: hsl(320, 85%, 60%);
+  --brand-orange-500: hsl(25, 95%, 55%);
 
   /* Typography */
   --font-tajawal: 'Tajawal', sans-serif;
@@ -92,7 +100,31 @@
       hsl(203.8863, 88.2845%, 53.1373%) 0%, 
       hsl(159.7826, 100%, 36.0784%) 25%,
       hsl(270, 70%, 50%) 50%,
-      hsl(42.0290, 92.8251%, 56.2745%) 100%);
+      hsl(42.0290, 92.8251%, 56.2745%) 75%,
+      hsl(320, 85%, 60%) 100%);
+    background-size: 400% 400%;
+    animation: gradient-flow 8s ease infinite;
+  }
+  
+  .creative-gradient {
+    background: linear-gradient(45deg, 
+      hsl(203, 89%, 53%) 0%,
+      hsl(270, 70%, 50%) 20%,
+      hsl(320, 85%, 60%) 40%,
+      hsl(25, 95%, 55%) 60%,
+      hsl(159, 100%, 36%) 80%,
+      hsl(42, 96%, 56%) 100%);
+    background-size: 600% 600%;
+    animation: creative-flow 12s ease infinite;
+  }
+  
+  .service-gradient {
+    background: linear-gradient(135deg,
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(16, 185, 129, 0.1) 25%,
+      rgba(139, 69, 193, 0.1) 50%,
+      rgba(251, 191, 36, 0.1) 75%,
+      rgba(236, 72, 153, 0.1) 100%);
   }
 
   .dark-gradient {
@@ -108,6 +140,27 @@
       0 0 20px hsl(203.8863, 88.2845%, 53.1373%),
       0 0 40px hsl(203.8863, 88.2845%, 53.1373%),
       0 0 80px hsl(203.8863, 88.2845%, 53.1373%);
+  }
+  
+  .multi-glow {
+    box-shadow: 
+      0 0 10px hsl(203, 89%, 53%),
+      0 0 20px hsl(159, 100%, 36%),
+      0 0 30px hsl(270, 70%, 50%),
+      0 0 40px hsl(42, 96%, 56%);
+  }
+  
+  .floating-card {
+    transform: perspective(1000px) rotateX(0deg);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .floating-card:hover {
+    transform: perspective(1000px) rotateX(5deg) translateY(-10px);
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.3),
+      0 0 30px rgba(59, 130, 246, 0.3),
+      0 0 50px rgba(16, 185, 129, 0.2);
   }
 
   .cyber-grid {
@@ -138,7 +191,7 @@
     font-family: var(--font-tajawal);
   }
 
-  /* Animation keyframes */
+  /* Enhanced Animation keyframes */
   @keyframes fadeInUp {
     0% {
       opacity: 0;
@@ -160,6 +213,48 @@
       transform: translateY(0);
     }
   }
+  
+  @keyframes gradient-flow {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  
+  @keyframes creative-flow {
+    0%, 100% {
+      background-position: 0% 0%;
+    }
+    25% {
+      background-position: 100% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    75% {
+      background-position: 0% 100%;
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 5px var(--brand-primary), 0 0 10px var(--brand-primary), 0 0 15px var(--brand-primary);
+    }
+    50% {
+      box-shadow: 0 0 10px var(--brand-primary), 0 0 20px var(--brand-primary), 0 0 30px var(--brand-primary);
+    }
+  }
 
   .animate-fade-in-up {
     animation: fadeInUp 0.8s ease-out;
@@ -175,6 +270,43 @@
 
   .animate-pulse-slow {
     animation: pulse 3s infinite;
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  
+  .creative-hover {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .creative-hover:hover {
+    transform: translateY(-5px) scale(1.05);
+  }
+  
+  .glass-morphism {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .tech-border {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(45deg, var(--brand-primary), var(--brand-success), var(--brand-accent)) border-box;
+  }
+  
+  .section-divider {
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-success), var(--brand-accent));
+    border-radius: 2px;
+    margin: 0 auto;
   }
 }
 

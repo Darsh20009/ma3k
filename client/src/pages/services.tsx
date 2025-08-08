@@ -13,7 +13,7 @@ export default function Services() {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
-  const { data: services = [] } = useQuery({
+  const { data: services = [] } = useQuery<Service[]>({
     queryKey: ["/api/services"],
   });
 
@@ -22,7 +22,7 @@ export default function Services() {
     setIsOrderModalOpen(true);
   };
 
-  const groupedServices = services.reduce((acc: Record<string, Service[]>, service: Service) => {
+  const groupedServices = (services as Service[]).reduce((acc: Record<string, Service[]>, service: Service) => {
     if (!acc[service.category]) {
       acc[service.category] = [];
     }
@@ -33,46 +33,74 @@ export default function Services() {
   const categories = Object.keys(groupedServices);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <section className="bg-primary-600 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">خدماتنا المتميزة</h1>
-          <p className="text-xl opacity-90">
-            نقدم مجموعة شاملة من الخدمات الرقمية بأسعار تنافسية وجودة عالية
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
+      {/* Enhanced Creative Header */}
+      <section className="creative-gradient text-white py-20 relative overflow-hidden">
+        <div className="absolute inset-0 cyber-grid opacity-10"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <div className="animate-fade-in-down">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent">خدماتنا المتميزة</h1>
+            <div className="section-divider mb-6"></div>
+            <p className="text-xl md:text-2xl opacity-90 max-w-4xl mx-auto leading-relaxed">
+              🚀 نقدم مجموعة شاملة من الخدمات الرقمية الإبداعية بأسعار تنافسية وجودة عالمية
+            </p>
+          </div>
+          <div className="mt-8 animate-float">
+            <div className="inline-block px-6 py-3 glass-morphism rounded-full">
+              <span className="text-lg font-semibold">✨ أكثر من 500 مشروع ناجح ✨</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Services */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      {/* Enhanced Services Section */}
+      <section className="py-20 relative">
+        <div className="absolute inset-0 service-gradient"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 animate-fade-in-up">🎯 اختر خدمتك المثالية</h2>
+            <div className="section-divider mb-6"></div>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">استكشف مجموعتنا الشاملة من الخدمات الرقمية المصممة خصيصاً لتحقيق أهدافك</p>
+          </div>
+          
           <Tabs defaultValue={categories[0]} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-12">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-12 glass-morphism p-2 rounded-2xl">
               {categories.map((category) => (
-                <TabsTrigger key={category} value={category} className="text-sm">
+                <TabsTrigger 
+                  key={category} 
+                  value={category} 
+                  className="text-sm font-medium rounded-xl transition-all duration-300 hover:scale-105 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+                >
                   {category.split(' ')[0]}
                 </TabsTrigger>
               ))}
             </TabsList>
 
             {categories.map((category) => (
-              <TabsContent key={category} value={category}>
-                <div className="mb-8">
-                  <h2 className="text-3xl font-bold text-gray-800 mb-4 flex items-center">
-                    <i className={`fas fa-${getCategoryIcon(category)} ml-3 text-primary-500`}></i>
+              <TabsContent key={category} value={category} className="animate-fade-in-up">
+                <div className="mb-12 text-center">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full glass-morphism mb-6 animate-glow-pulse">
+                    <i className={`fas fa-${getCategoryIcon(category)} text-3xl text-blue-500`}></i>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
                     {category}
                   </h2>
+                  <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto"></div>
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {groupedServices[category]?.map((service, index) => (
-                    <ServiceCard
-                      key={service.id}
-                      service={service}
-                      onOrder={handleOrderService}
-                      variant={getServiceVariant(index)}
-                    />
+                  {groupedServices[category]?.map((service: Service, index: number) => (
+                    <div 
+                      key={service.id} 
+                      className="animate-fade-in-up floating-card"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <ServiceCard
+                        service={service}
+                        onOrder={handleOrderService}
+                        variant={getServiceVariant(index)}
+                      />
+                    </div>
                   ))}
                 </div>
               </TabsContent>
@@ -81,12 +109,14 @@ export default function Services() {
         </div>
       </section>
 
-      {/* Payment Methods */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
+      {/* Enhanced Payment Methods */}
+      <section className="py-20 bg-gradient-to-br from-white via-blue-50 to-purple-50 relative overflow-hidden">
+        <div className="absolute inset-0 cyber-grid opacity-5"></div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">طرق الدفع المتاحة</h2>
-            <p className="text-xl text-gray-600">ادفع بالطريقة التي تناسبك</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 animate-fade-in-up">💳 طرق الدفع الآمنة</h2>
+            <div className="section-divider mb-6"></div>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">🔒 اختر طريقة الدفع المناسبة لك من بين خياراتنا الآمنة والمتنوعة</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -135,11 +165,16 @@ export default function Services() {
               </Card>
             </div>
 
-            <Card className="bg-primary-50 border-primary-200">
+            <Card className="glass-morphism border-2 border-blue-200 tech-border animate-glow-pulse">
               <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-primary-800 mb-4">بعد إتمام الدفع</h3>
-                <p className="text-primary-700 mb-4">
-                  الرجاء إرسال صورة/سند التحويل (Receipt) عبر واتساب:
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-blue-600 text-white mb-4">
+                    <i className="fas fa-check-circle text-2xl"></i>
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">✅ خطوات ما بعد الدفع</h3>
+                </div>
+                <p className="text-gray-700 mb-6 text-lg text-center">
+                  📤 الرجاء إرسال صورة/سند التحويل (Receipt) عبر واتساب:
                 </p>
 
                 <Card className="bg-white border mb-6">
@@ -167,16 +202,23 @@ export default function Services() {
                       );
                       window.open(WHATSAPP_URL(message), "_blank");
                     }}
-                    className="bg-success-500 text-white px-8 py-4 text-lg font-semibold hover:bg-success-600"
+                    className="bg-gradient-to-r from-green-500 to-green-600 text-white px-10 py-5 text-lg font-bold rounded-2xl hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-300 multi-glow animate-pulse-slow"
                   >
-                    <i className="fab fa-whatsapp ml-3 text-2xl"></i>
-                    أرسل سند التحويل الآن
+                    <i className="fab fa-whatsapp ml-3 text-2xl animate-bounce-slow"></i>
+                    🚀 أرسل سند التحويل الآن
                   </Button>
                 </div>
 
-                <p className="text-center text-primary-600 mt-4 text-sm">
-                  سنؤكد الدفع خلال 1-24 ساعة ونرسل الفاتورة الرقمية فور التحقق
-                </p>
+                <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
+                  <p className="text-center text-gray-700 text-lg font-medium">
+                    ⚡ سنؤكد الدفع خلال 1-24 ساعة ونرسل الفاتورة الرقمية فور التحقق
+                  </p>
+                  <div className="flex justify-center mt-3">
+                    <span className="inline-block px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                      🎯 ضمان الرد السريع
+                    </span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
