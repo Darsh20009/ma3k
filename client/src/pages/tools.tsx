@@ -12,6 +12,14 @@ export default function Tools() {
       featured: true,
     },
     {
+      id: "invoice-generator",
+      title: "مولد الفواتير الإبداعي",
+      description: "إنشاء فواتير HTML احترافية بتصاميم متنوعة ومتقدمة",
+      icon: "fas fa-file-invoice",
+      color: "text-accent-500",
+      featured: true,
+    },
+    {
       id: "logo-generator",
       title: "مولد الشعارات",
       description: "إنشاء شعارات احترافية بأدوات متقدمة",
@@ -104,10 +112,20 @@ export default function Tools() {
                       متاح قريباً
                     </div>
                   ) : tool.featured ? (
-                    <div className="text-primary-600 font-semibold">
-                      <i className="fas fa-arrow-down ml-2"></i>
-                      متاح أدناه
-                    </div>
+                    tool.id === "invoice-generator" ? (
+                      <a 
+                        href="/invoices" 
+                        className="inline-block bg-accent text-white px-4 py-2 rounded-lg font-semibold hover:bg-accent/80 transition-colors"
+                      >
+                        <i className="fas fa-external-link-alt ml-2"></i>
+                        فتح الأداة
+                      </a>
+                    ) : (
+                      <div className="text-primary-600 font-semibold">
+                        <i className="fas fa-arrow-down ml-2"></i>
+                        متاح أدناه
+                      </div>
+                    )
                   ) : null}
                 </CardContent>
               </Card>

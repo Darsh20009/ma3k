@@ -4,24 +4,25 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(210, 25%, 7.8431%);
-  --card: hsl(180, 6.6667%, 97.0588%);
-  --card-foreground: hsl(210, 25%, 7.8431%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(210, 25%, 7.8431%);
+  /* Dark Mode as Default */
+  --background: hsl(215, 28%, 7%);
+  --foreground: hsl(210, 20%, 98%);
+  --card: hsl(215, 25%, 12%);
+  --card-foreground: hsl(210, 20%, 95%);
+  --popover: hsl(215, 28%, 7%);
+  --popover-foreground: hsl(210, 20%, 98%);
   --primary: hsl(203.8863, 88.2845%, 53.1373%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(210, 25%, 7.8431%);
-  --secondary-foreground: hsl(0, 0%, 100%);
-  --muted: hsl(240, 1.9608%, 90%);
-  --muted-foreground: hsl(210, 25%, 7.8431%);
-  --accent: hsl(211.5789, 51.3514%, 92.7451%);
-  --accent-foreground: hsl(203.8863, 88.2845%, 53.1373%);
+  --secondary: hsl(217, 19%, 27%);
+  --secondary-foreground: hsl(210, 20%, 98%);
+  --muted: hsl(217, 13%, 18%);
+  --muted-foreground: hsl(215, 8%, 50%);
+  --accent: hsl(217, 19%, 27%);
+  --accent-foreground: hsl(210, 20%, 98%);
   --destructive: hsl(356.3033, 90.5579%, 54.3137%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(201.4286, 30.4348%, 90.9804%);
-  --input: hsl(200, 23.0769%, 97.4510%);
+  --border: hsl(217, 13%, 18%);
+  --input: hsl(217, 13%, 18%);
   --ring: hsl(202.8169, 89.1213%, 53.1373%);
   --radius: 1.3rem;
 
@@ -76,6 +77,8 @@
   body {
     @apply font-tajawal antialiased bg-background text-foreground;
     font-family: var(--font-tajawal);
+    background: linear-gradient(135deg, hsl(215, 28%, 7%) 0%, hsl(217, 19%, 12%) 100%);
+    min-height: 100vh;
   }
 
   html {
@@ -85,7 +88,33 @@
 
 @layer utilities {
   .gradient-bg {
-    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-success) 100%);
+    background: linear-gradient(135deg, 
+      hsl(203.8863, 88.2845%, 53.1373%) 0%, 
+      hsl(159.7826, 100%, 36.0784%) 25%,
+      hsl(270, 70%, 50%) 50%,
+      hsl(42.0290, 92.8251%, 56.2745%) 100%);
+  }
+
+  .dark-gradient {
+    background: linear-gradient(135deg, 
+      hsl(215, 28%, 7%) 0%, 
+      hsl(217, 19%, 12%) 25%,
+      hsl(220, 25%, 15%) 50%,
+      hsl(215, 28%, 7%) 100%);
+  }
+
+  .neon-glow {
+    box-shadow: 
+      0 0 20px hsl(203.8863, 88.2845%, 53.1373%),
+      0 0 40px hsl(203.8863, 88.2845%, 53.1373%),
+      0 0 80px hsl(203.8863, 88.2845%, 53.1373%);
+  }
+
+  .cyber-grid {
+    background-image: 
+      linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
   .glass-effect {
@@ -149,14 +178,141 @@
   }
 }
 
-/* Invoice styles */
+/* Invoice styles - Dark Theme */
 .invoice {
   font-family: var(--font-tajawal);
-  max-width: 700px;
+  max-width: 800px;
+  padding: 30px;
+  background: linear-gradient(135deg, hsl(215, 25%, 12%) 0%, hsl(217, 19%, 15%) 100%);
+  border: 2px solid hsl(203.8863, 88.2845%, 53.1373%);
+  border-radius: 20px;
+  color: hsl(210, 20%, 98%);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.invoice::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.invoice-header {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.invoice-logo {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, hsl(203.8863, 88.2845%, 53.1373%), hsl(159.7826, 100%, 36.0784%));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+.invoice-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, hsl(203.8863, 88.2845%, 53.1373%), hsl(159.7826, 100%, 36.0784%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.invoice-number {
+  font-size: 1.2rem;
+  color: hsl(215, 8%, 70%);
+  font-weight: 600;
+}
+
+.invoice-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 30px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.invoice-section {
+  background: rgba(255, 255, 255, 0.05);
   padding: 20px;
-  border: 1px solid hsl(201.4286, 30.4348%, 90.9804%);
-  border-radius: 8px;
+  border-radius: 15px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.invoice-section h3 {
+  color: hsl(203.8863, 88.2845%, 53.1373%);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.invoice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.invoice-total {
+  background: linear-gradient(135deg, hsl(203.8863, 88.2845%, 53.1373%), hsl(159.7826, 100%, 36.0784%));
+  color: white;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  margin: 30px 0;
+  position: relative;
+  z-index: 1;
+}
+
+.invoice-total-amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.invoice-footer {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 2px solid rgba(59, 130, 246, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.invoice-qr {
+  width: 100px;
+  height: 100px;
   background: white;
+  margin: 20px auto;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: hsl(215, 25%, 12%);
 }
 
 .invoice header {

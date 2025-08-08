@@ -6,41 +6,55 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Portfolio() {
   const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [cart, setCart] = useState<any[]>([]);
+
+  const addToCart = (project: any) => {
+    const existingItem = cart.find(item => item.id === project.id);
+    if (existingItem) {
+      setCart(cart.map(item => 
+        item.id === project.id 
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      ));
+    } else {
+      setCart([...cart, { ...project, quantity: 1, price: 2500 }]);
+    }
+  };
 
   const projects = [
     {
       id: 1,
-      title: "متجر الأزياء العصرية",
+      title: "متجر التقنية المتقدمة",
       category: "متجر إلكتروني",
-      description: "متجر إلكتروني متكامل للأزياء النسائية مع نظام دفع متقدم وإدارة المخزون",
-      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      tags: ["React", "Node.js", "PayPal", "Stripe"],
+      description: "متجر إلكتروني متكامل للمنتجات التقنية مع نظام دفع متقدم وإدارة المخزون الذكية",
+      image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+      tags: ["React", "Node.js", "PayPal", "AI"],
       features: [
         "تصميم متجاوب بالكامل",
         "نظام دفع متعدد الطرق",
         "إدارة المخزون التلقائية",
         "تتبع الطلبات والشحن",
-        "برنامج نقاط الولاء"
+        "برنامج نقاط الولاء الذكي"
       ],
       testimonial: {
         text: "موقع رائع وسهل الاستخدام، زادت مبيعاتي بنسبة 300% خلال شهرين",
-        author: "فاطمة أحمد",
-        role: "صاحبة متجر"
+        author: "أحمد التقني",
+        role: "صاحب متجر"
       }
     },
     {
       id: 2,
       title: "منصة التعلم الذكي",
       category: "تعليمي",
-      description: "منصة تعليمية تفاعلية مع اختبارات ذكية ونظام تتبع التقدم",
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+      description: "منصة تعليمية تفاعلية مع اختبارات ذكية ونظام تتبع التقدم باستخدام الذكاء الاصطناعي",
+      image: "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
       tags: ["Vue.js", "Python", "AI", "Machine Learning"],
       features: [
         "مسارات تعليمية مخصصة",
         "اختبارات تفاعلية ذكية",
         "تتبع التقدم والإنجازات",
         "منتدى طلابي نشط",
-        "شهادات معتمدة"
+        "شهادات معتمدة رقمية"
       ],
       testimonial: {
         text: "أفضل منصة تعليمية استخدمتها، التصميم بديهي والمحتوى عالي الجودة",
@@ -50,17 +64,17 @@ export default function Portfolio() {
     },
     {
       id: 3,
-      title: "تطبيق إدارة المشاريع",
+      title: "تطبيق إدارة المشاريع الذكي",
       category: "تطبيق جوال",
-      description: "تطبيق جوال لإدارة المشاريع وتنسيق الفرق مع ميزات متقدمة",
-      image: "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      tags: ["React Native", "Firebase", "Real-time"],
+      description: "تطبيق جوال متقدم لإدارة المشاريع وتنسيق الفرق مع ميزات الذكاء الاصطناعي",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+      tags: ["React Native", "Firebase", "Real-time", "AI"],
       features: [
-        "إدارة المهام والمشاريع",
-        "تنسيق الفرق والتعاون",
+        "إدارة المهام والمشاريع بالذكاء الاصطناعي",
+        "تنسيق الفرق والتعاون الفوري",
         "تقارير الأداء المتقدمة",
-        "إشعارات فورية",
-        "تزامن متعدد الأجهزة"
+        "إشعارات ذكية ومخصصة",
+        "تزامن متعدد الأجهزة والمنصات"
       ],
       testimonial: {
         text: "ساعدنا التطبيق في تحسين إنتاجية الفريق بشكل كبير ونظم عملنا",
@@ -70,67 +84,67 @@ export default function Portfolio() {
     },
     {
       id: 4,
-      title: "موقع الشركة التقنية",
+      title: "موقع الشركة التقنية الذكي",
       category: "مؤسسي",
-      description: "موقع احترافي لشركة تقنية مع عرض الخدمات والحلول",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      tags: ["Next.js", "TypeScript", "SEO"],
+      description: "موقع احترافي لشركة تقنية مع عرض الخدمات والحلول المبتكرة وتقنيات الذكاء الاصطناعي",
+      image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+      tags: ["Next.js", "TypeScript", "SEO", "AI"],
       features: [
         "تصميم احترافي ومعاصر",
-        "تحسين محركات البحث",
-        "صفحات خدمات تفاعلية",
-        "نماذج تواصل متقدمة",
-        "سرعة تحميل عالية"
+        "تحسين محركات البحث المتقدم",
+        "صفحات خدمات تفاعلية وذكية",
+        "نماذج تواصل مدعومة بالذكاء الاصطناعي",
+        "سرعة تحميل فائقة وأداء محسن"
       ],
       testimonial: {
         text: "موقع يعكس احترافية شركتنا ويجذب العملاء بشكل ممتاز",
-        author: "سارة المحمدي",
-        role: "مديرة التسويق"
+        author: "خالد المحمدي",
+        role: "مدير التسويق"
       }
     },
     {
       id: 5,
-      title: "منصة الطبخ والوصفات",
+      title: "منصة المحتوى الرقمي",
       category: "اجتماعي",
-      description: "منصة اجتماعية لمشاركة الوصفات وتقييمها مع مجتمع الطهاة",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      tags: ["React", "MongoDB", "Social Features"],
+      description: "منصة اجتماعية لمشاركة المحتوى الرقمي والتفاعل مع مجتمع المبدعين والتقنيين",
+      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+      tags: ["React", "MongoDB", "Social Features", "AI"],
       features: [
-        "مشاركة الوصفات بالصور",
-        "تقييم وتعليق المستخدمين",
-        "قوائم التسوق الذكية",
-        "متابعة الطهاة المفضلين",
-        "مقاطع فيديو تعليمية"
+        "مشاركة المحتوى بتنسيقات متعددة",
+        "تقييم وتعليق المستخدمين الذكي",
+        "خوارزميات توصيات ذكية",
+        "متابعة المبدعين المفضلين",
+        "أدوات إنتاج المحتوى المتقدمة"
       ],
       testimonial: {
-        text: "منصة رائعة لمحبي الطبخ، استفدت كثيراً من الوصفات والنصائح",
-        author: "نورا العلي",
-        role: "طاهية هاوية"
+        text: "منصة رائعة للمبدعين، ساعدتني في الوصول لجمهور أكبر وتحسين محتواي",
+        author: "عبدالله العلي",
+        role: "منشئ محتوى"
       }
     },
     {
       id: 6,
-      title: "تطبيق اللياقة البدنية",
-      category: "صحة ولياقة",
-      description: "تطبيق متكامل للياقة البدنية مع برامج تدريب شخصية",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      tags: ["Flutter", "Health APIs", "Wearables"],
+      title: "تطبيق الإنتاجية الذكي",
+      category: "إنتاجية",
+      description: "تطبيق متكامل لتحسين الإنتاجية الشخصية مع تتبع العادات وتحسين الأداء",
+      image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+      tags: ["Flutter", "Analytics", "AI", "Productivity"],
       features: [
-        "برامج تدريب مخصصة",
-        "تتبع التقدم والإحصائيات",
-        "تكامل مع الأجهزة القابلة للارتداء",
-        "تحديات جماعية",
-        "نصائح تغذية"
+        "تتبع المهام والأهداف الذكي",
+        "تحليل الإنتاجية والأداء",
+        "تذكيرات ذكية ومخصصة",
+        "تتبع العادات والتقدم",
+        "تقارير تفصيلية وإحصائيات متقدمة"
       ],
       testimonial: {
-        text: "التطبيق غير حياتي الصحية بشكل إيجابي وحفزني للاستمرار",
-        author: "خالد الرشيد",
-        role: "رياضي"
+        text: "التطبيق غير طريقة عملي بشكل إيجابي وساعدني في تحقيق أهدافي",
+        author: "محمد الرشيد",
+        role: "رجل أعمال"
       }
     }
   ];
 
-  const categories = ["الكل", "متجر إلكتروني", "تعليمي", "تطبيق جوال", "مؤسسي", "اجتماعي", "صحة ولياقة"];
+  const categories = ["الكل", "متجر إلكتروني", "تعليمي", "تطبيق جوال", "مؤسسي", "اجتماعي", "إنتاجية"];
   const [selectedCategory, setSelectedCategory] = useState("الكل");
 
   const filteredProjects = selectedCategory === "الكل" 
@@ -145,26 +159,53 @@ export default function Portfolio() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <section className="bg-primary-600 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">معرض أعمالنا</h1>
-          <p className="text-xl opacity-90">
-            مجموعة مختارة من أفضل مشاريعنا التي أنجزناها لعملائنا
+      <section className="gradient-bg text-white py-16 relative overflow-hidden">
+        <div className="absolute inset-0 cyber-grid opacity-10"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in-down">
+            <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              معرض أعمالنا الرقمية
+            </span>
+          </h1>
+          <p className="text-xl opacity-90 animate-fade-in-up">
+            مجموعة مختارة من أفضل مشاريعنا التقنية المبتكرة والحلول الذكية
           </p>
         </div>
       </section>
 
+      {/* Cart Summary */}
+      {cart.length > 0 && (
+        <div className="fixed top-20 left-4 z-50">
+          <Card className="bg-card/95 backdrop-blur border-primary/20 neon-glow">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-primary mb-2">
+                <i className="fas fa-shopping-cart"></i>
+                <span className="font-bold">عربة التسوق ({cart.reduce((sum, item) => sum + item.quantity, 0)})</span>
+              </div>
+              <div className="text-sm text-muted-foreground mb-3">
+                المجموع: {cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)} ر.س
+              </div>
+              <Button size="sm" className="w-full bg-primary hover:bg-primary/80">
+                إتمام الطلب
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-card/50 backdrop-blur">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             {stats.map((stat, index) => (
-              <div key={index} className="p-6">
-                <i className={`${stat.icon} text-primary-500 text-3xl mb-4`}></i>
-                <div className="text-3xl font-bold text-gray-800 mb-2">{stat.number}</div>
-                <div className="text-gray-600">{stat.label}</div>
+              <div key={index} className="p-6 group hover:scale-105 transition-all duration-300">
+                <i className={`${stat.icon} text-primary text-4xl mb-4 group-hover:animate-pulse`}></i>
+                <div className="text-4xl font-bold text-foreground mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  {stat.number}
+                </div>
+                <div className="text-muted-foreground">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -172,18 +213,23 @@ export default function Portfolio() {
       </section>
 
       {/* Portfolio Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className="py-20 bg-background relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
+        <div className="container mx-auto px-4 relative z-10">
           {/* Category Filter */}
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-8">مشاريعنا المتميزة</h2>
+            <h2 className="text-4xl font-bold text-foreground mb-8">
+              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                مشاريعنا المتميزة
+              </span>
+            </h2>
             <div className="flex flex-wrap justify-center gap-4">
               {categories.map((category) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category)}
-                  className={selectedCategory === category ? "bg-primary-500 hover:bg-primary-600" : ""}
+                  className={selectedCategory === category ? "bg-primary hover:bg-primary/80 neon-glow" : "border-border hover:bg-card"}
                 >
                   {category}
                 </Button>
@@ -196,24 +242,27 @@ export default function Portfolio() {
             {filteredProjects.map((project) => (
               <Card 
                 key={project.id} 
-                className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
+                className="overflow-hidden hover:shadow-2xl service-card bg-card/50 backdrop-blur border-border hover:border-primary/50 transition-all duration-500 cursor-pointer group"
                 onClick={() => setSelectedProject(project)}
               >
                 <div className="relative">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-primary-500">
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={project.image} 
+                      alt={project.title}
+                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  <div className="absolute top-4 right-4 z-10">
+                    <Badge className="bg-primary/90 backdrop-blur text-white neon-glow">
                       {project.category}
                     </Badge>
                   </div>
                 </div>
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-bold mb-3">{project.title}</h3>
-                  <p className="text-gray-600 mb-4 text-sm line-clamp-2">
+                  <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors">{project.title}</h3>
+                  <p className="text-muted-foreground mb-4 text-sm line-clamp-2">
                     {project.description}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
@@ -228,15 +277,28 @@ export default function Portfolio() {
                       </Badge>
                     )}
                   </div>
-                  <Button 
-                    className="w-full bg-primary-500 hover:bg-primary-600"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedProject(project);
-                    }}
-                  >
-                    عرض التفاصيل
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      className="flex-1 bg-primary hover:bg-primary/80"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedProject(project);
+                      }}
+                    >
+                      عرض التفاصيل
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      className="border-primary text-primary hover:bg-primary hover:text-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(project);
+                      }}
+                    >
+                      <i className="fas fa-cart-plus"></i>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -245,20 +307,27 @@ export default function Portfolio() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">هل أنت مستعد لبدء مشروعك؟</h2>
+      <section className="py-20 gradient-bg text-white relative overflow-hidden">
+        <div className="absolute inset-0 cyber-grid opacity-10"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-4xl font-bold mb-4 animate-pulse-slow">
+            <span className="bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">
+              هل أنت مستعد لبدء رحلتك الرقمية؟
+            </span>
+          </h2>
           <p className="text-xl mb-8 opacity-90">
-            دع فريقنا المتخصص يحول أفكارك إلى واقع رقمي متميز
+            دع فريقنا المتخصص يحول أفكارك إلى واقع رقمي متميز بأحدث التقنيات والحلول الذكية
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-white text-primary-600 px-8 py-4 text-lg font-semibold hover:bg-gray-100">
+            <Button className="bg-white text-primary px-8 py-4 text-lg font-semibold hover:bg-gray-100 neon-glow hover:scale-105 transition-all duration-300">
+              <i className="fas fa-rocket ml-2"></i>
               ابدأ مشروعك الآن
             </Button>
             <Button 
               variant="outline" 
-              className="border-white text-white px-8 py-4 text-lg font-semibold hover:bg-white hover:text-primary-600"
+              className="border-white text-white px-8 py-4 text-lg font-semibold hover:bg-white hover:text-primary glass-effect hover:scale-105 transition-all duration-300"
             >
+              <i className="fas fa-comments ml-2"></i>
               طلب استشارة مجانية
             </Button>
           </div>
@@ -267,8 +336,8 @@ export default function Portfolio() {
 
       {/* Project Detail Modal */}
       {selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto neon-glow">
             <div className="relative">
               {/* Close Button */}
               <Button

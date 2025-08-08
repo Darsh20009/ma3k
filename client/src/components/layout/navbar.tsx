@@ -14,6 +14,7 @@ export default function Navbar() {
     { href: "/services", label: "خدماتنا" },
     { href: "/tools", label: "الأدوات" },
     { href: "/portfolio", label: "أعمالنا" },
+    { href: "/invoices", label: "الفواتير" },
     { href: "#contact", label: "تواصل معنا" },
   ];
 
@@ -23,7 +24,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav className="bg-card/80 backdrop-blur border-b border-border shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -37,16 +38,17 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-gray-700 hover:text-primary-600 transition-colors ${
-                  isActive(item.href) ? "text-primary-600 font-semibold" : ""
+                className={`text-foreground hover:text-primary transition-colors ${
+                  isActive(item.href) ? "text-primary font-semibold" : ""
                 }`}
               >
                 {item.label}
               </Link>
             ))}
-            <Link href="/splash">
-              <Button className="bg-primary-500 text-white hover:bg-primary-600">
-                ابدأ رحلتك الرقمية
+            <Link href="/welcome">
+              <Button className="bg-primary text-white hover:bg-primary/80 neon-glow hover:scale-105 transition-all duration-300">
+                <i className="fas fa-rocket ml-2"></i>
+                ابدأ رحلتك
               </Button>
             </Link>
           </div>
@@ -66,17 +68,18 @@ export default function Navbar() {
                     href={item.href}
                     className={`text-lg font-medium transition-colors ${
                       isActive(item.href) 
-                        ? "text-primary-600" 
-                        : "text-gray-700 hover:text-primary-600"
+                        ? "text-primary" 
+                        : "text-foreground hover:text-primary"
                     }`}
                     onClick={() => setIsOpen(false)}
                   >
                     {item.label}
                   </Link>
                 ))}
-                <Link href="/splash" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full bg-primary-500 text-white hover:bg-primary-600">
-                    ابدأ رحلتك الرقمية
+                <Link href="/welcome" onClick={() => setIsOpen(false)}>
+                  <Button className="w-full bg-primary text-white hover:bg-primary/80">
+                    <i className="fas fa-rocket ml-2"></i>
+                    ابدأ رحلتك
                   </Button>
                 </Link>
               </div>
