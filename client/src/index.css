@@ -4,77 +4,71 @@
 @tailwind utilities;
 
 :root {
-  /* Dark Mode as Default */
-  --background: hsl(215, 28%, 7%);
-  --foreground: hsl(210, 20%, 98%);
-  --card: hsl(215, 25%, 12%);
-  --card-foreground: hsl(210, 20%, 95%);
-  --popover: hsl(215, 28%, 7%);
-  --popover-foreground: hsl(210, 20%, 98%);
-  --primary: hsl(203.8863, 88.2845%, 53.1373%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(217, 19%, 27%);
-  --secondary-foreground: hsl(210, 20%, 98%);
-  --muted: hsl(217, 13%, 18%);
-  --muted-foreground: hsl(215, 8%, 50%);
-  --accent: hsl(217, 19%, 27%);
-  --accent-foreground: hsl(210, 20%, 98%);
-  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(217, 13%, 18%);
-  --input: hsl(217, 13%, 18%);
-  --ring: hsl(202.8169, 89.1213%, 53.1373%);
-  --radius: 1.3rem;
+  /* Dark Luxury Color System - فخامة داكنة */
+  --background: hsl(0, 0%, 8%);
+  --foreground: hsl(0, 0%, 92%);
+  --card: hsl(0, 0%, 12%);
+  --card-foreground: hsl(0, 0%, 90%);
+  --popover: hsl(0, 0%, 10%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  --primary: hsl(45, 100%, 60%);
+  --primary-foreground: hsl(0, 0%, 8%);
+  --secondary: hsl(0, 0%, 16%);
+  --secondary-foreground: hsl(0, 0%, 85%);
+  --muted: hsl(0, 0%, 20%);
+  --muted-foreground: hsl(0, 0%, 65%);
+  --accent: hsl(45, 100%, 55%);
+  --accent-foreground: hsl(0, 0%, 10%);
+  --destructive: hsl(0, 70%, 50%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 25%);
+  --input: hsl(0, 0%, 20%);
+  --ring: hsl(45, 100%, 60%);
+  --radius: 1rem;
 
-  /* Enhanced Ma3k brand colors with creative gradients */
-  --brand-primary: hsl(203.8863, 88.2845%, 53.1373%);
-  --brand-success: hsl(159.7826, 100%, 36.0784%);
-  --brand-accent: hsl(42.0290, 92.8251%, 56.2745%);
-  --brand-purple: hsl(270, 70%, 50%);
-  --brand-pink: hsl(320, 85%, 60%);
-  --brand-orange: hsl(25, 95%, 55%);
+  /* Luxury Color Palette - باليت الألوان الفخمة */
+  --royal-black: hsl(0, 0%, 8%);
+  --deep-charcoal: hsl(0, 0%, 12%);
+  --midnight-gray: hsl(0, 0%, 16%);
+  --steel-gray: hsl(0, 0%, 20%);
+  --silver-gray: hsl(0, 0%, 70%);
+  --platinum-white: hsl(0, 0%, 92%);
+  --pure-gold: hsl(45, 100%, 60%);
+  --rich-gold: hsl(40, 90%, 55%);
+  --royal-purple: hsl(270, 50%, 35%);
+  --deep-sapphire: hsl(220, 60%, 30%);
+  --emerald-dark: hsl(150, 50%, 25%);
+  --ruby-deep: hsl(0, 60%, 35%);
   
-  --brand-primary-50: hsl(214, 100%, 97%);
-  --brand-primary-100: hsl(214, 95%, 93%);
-  --brand-primary-600: hsl(203, 89%, 48%);
-  --brand-primary-700: hsl(203, 89%, 43%);
-  --brand-success-50: hsl(166, 76%, 97%);
-  --brand-success-100: hsl(167, 85%, 89%);
-  --brand-success-400: hsl(160, 84%, 45%);
-  --brand-success-500: hsl(160, 84%, 39%);
-  --brand-success-600: hsl(158, 64%, 52%);
-  --brand-accent-50: hsl(49, 100%, 96%);
-  --brand-accent-100: hsl(48, 96%, 89%);
-  --brand-accent-500: hsl(43, 96%, 56%);
-  --brand-accent-600: hsl(32, 95%, 44%);
-  --brand-purple-500: hsl(270, 70%, 50%);
-  --brand-pink-500: hsl(320, 85%, 60%);
-  --brand-orange-500: hsl(25, 95%, 55%);
+  /* Luxury Gradient System - نظام التدرجات الفخمة */
+  --gradient-royal: linear-gradient(135deg, var(--royal-black) 0%, var(--deep-charcoal) 50%, var(--midnight-gray) 100%);
+  --gradient-gold: linear-gradient(135deg, var(--pure-gold) 0%, var(--rich-gold) 50%, hsl(35, 85%, 50%) 100%);
+  --gradient-luxury: linear-gradient(135deg, var(--royal-purple) 0%, var(--deep-sapphire) 50%, var(--emerald-dark) 100%);
+  --gradient-platinum: linear-gradient(135deg, var(--steel-gray) 0%, var(--midnight-gray) 50%, var(--deep-charcoal) 100%);
+  --gradient-dark: linear-gradient(145deg, var(--royal-black) 0%, var(--deep-charcoal) 25%, var(--midnight-gray) 75%, var(--steel-gray) 100%);
+  
+  /* Luxury Glow Effects - تأثيرات الإضاءة الفخمة */
+  --glow-gold: hsla(45, 100%, 60%, 0.4);
+  --glow-purple: hsla(270, 50%, 35%, 0.3);
+  --glow-sapphire: hsla(220, 60%, 30%, 0.3);
+  --glass-bg: hsla(0, 0%, 0%, 0.4);
+  --glass-border: hsla(45, 100%, 60%, 0.2);
 
-  /* Typography */
+  /* Typography - الخطوط */
   --font-tajawal: 'Tajawal', sans-serif;
+  --font-size-hero: clamp(3rem, 8vw, 8rem);
+  --font-size-h1: clamp(2rem, 5vw, 4rem);
+  --font-size-h2: clamp(1.5rem, 4vw, 3rem);
 }
 
 .dark {
-  --background: hsl(0, 0%, 0%);
-  --foreground: hsl(200, 6.6667%, 91.1765%);
-  --card: hsl(228, 9.8039%, 10%);
-  --card-foreground: hsl(0, 0%, 85.0980%);
-  --popover: hsl(0, 0%, 0%);
-  --popover-foreground: hsl(200, 6.6667%, 91.1765%);
-  --primary: hsl(203.7736, 87.6033%, 52.5490%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(195.0000, 15.3846%, 94.9020%);
-  --secondary-foreground: hsl(210, 25%, 7.8431%);
-  --muted: hsl(0, 0%, 9.4118%);
-  --muted-foreground: hsl(210, 3.3898%, 46.2745%);
-  --accent: hsl(205.7143, 70%, 7.8431%);
-  --accent-foreground: hsl(203.7736, 87.6033%, 52.5490%);
-  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(210, 5.2632%, 14.9020%);
-  --input: hsl(207.6923, 27.6596%, 18.4314%);
-  --ring: hsl(202.8169, 89.1213%, 53.1373%);
+  /* Enhanced Dark Mode */
+  --background: var(--royal-black);
+  --foreground: var(--platinum-white);
+  --card: var(--deep-charcoal);
+  --card-foreground: var(--silver-gray);
+  --popover: var(--royal-black);
+  --popover-foreground: var(--platinum-white);
 }
 
 @layer base {
@@ -82,11 +76,31 @@
     @apply border-border;
   }
 
+  html,
   body {
-    @apply font-tajawal antialiased bg-background text-foreground;
+    @apply font-tajawal antialiased;
     font-family: var(--font-tajawal);
-    background: linear-gradient(135deg, hsl(215, 28%, 7%) 0%, hsl(217, 19%, 12%) 100%);
+    background: var(--gradient-royal) !important;
+    color: var(--platinum-white) !important;
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 50%, var(--glow-gold) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, var(--glow-purple) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, var(--glow-sapphire) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.15;
   }
 
   html {
@@ -95,126 +109,134 @@
 }
 
 @layer utilities {
-  .gradient-bg {
-    background: linear-gradient(135deg, 
-      hsl(203.8863, 88.2845%, 53.1373%) 0%, 
-      hsl(159.7826, 100%, 36.0784%) 25%,
-      hsl(270, 70%, 50%) 50%,
-      hsl(42.0290, 92.8251%, 56.2745%) 75%,
-      hsl(320, 85%, 60%) 100%);
+  /* Luxury Gradient Classes - فئات التدرجات الفخمة */
+  .royal-gradient {
+    background: var(--gradient-royal);
     background-size: 400% 400%;
-    animation: gradient-flow 8s ease infinite;
+    animation: luxury-flow 15s ease infinite;
   }
   
-  .creative-gradient {
-    background: linear-gradient(45deg, 
-      hsl(203, 89%, 53%) 0%,
-      hsl(270, 70%, 50%) 20%,
-      hsl(320, 85%, 60%) 40%,
-      hsl(25, 95%, 55%) 60%,
-      hsl(159, 100%, 36%) 80%,
-      hsl(42, 96%, 56%) 100%);
-    background-size: 600% 600%;
-    animation: creative-flow 12s ease infinite;
+  .gold-gradient {
+    background: var(--gradient-gold);
+    background-size: 400% 400%;
+    animation: gold-flow 12s ease infinite;
   }
   
-  .service-gradient {
-    background: linear-gradient(135deg,
-      rgba(59, 130, 246, 0.1) 0%,
-      rgba(16, 185, 129, 0.1) 25%,
-      rgba(139, 69, 193, 0.1) 50%,
-      rgba(251, 191, 36, 0.1) 75%,
-      rgba(236, 72, 153, 0.1) 100%);
+  .luxury-gradient {
+    background: var(--gradient-luxury);
+    background-size: 400% 400%;
+    animation: luxury-flow 10s ease infinite;
   }
-
+  
+  .platinum-gradient {
+    background: var(--gradient-platinum);
+    background-size: 400% 400%;
+    animation: platinum-flow 20s ease infinite;
+  }
+  
   .dark-gradient {
-    background: linear-gradient(135deg, 
-      hsl(215, 28%, 7%) 0%, 
-      hsl(217, 19%, 12%) 25%,
-      hsl(220, 25%, 15%) 50%,
-      hsl(215, 28%, 7%) 100%);
-  }
-
-  .neon-glow {
-    box-shadow: 
-      0 0 20px hsl(203.8863, 88.2845%, 53.1373%),
-      0 0 40px hsl(203.8863, 88.2845%, 53.1373%),
-      0 0 80px hsl(203.8863, 88.2845%, 53.1373%);
+    background: var(--gradient-dark);
+    background-size: 600% 600%;
+    animation: dark-flow 25s ease infinite;
   }
   
-  .multi-glow {
-    box-shadow: 
-      0 0 10px hsl(203, 89%, 53%),
-      0 0 20px hsl(159, 100%, 36%),
-      0 0 30px hsl(270, 70%, 50%),
-      0 0 40px hsl(42, 96%, 56%);
-  }
-  
-  .floating-card {
-    transform: perspective(1000px) rotateX(0deg);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  
-  .floating-card:hover {
-    transform: perspective(1000px) rotateX(5deg) translateY(-10px);
-    box-shadow: 
-      0 20px 40px rgba(0, 0, 0, 0.3),
-      0 0 30px rgba(59, 130, 246, 0.3),
-      0 0 50px rgba(16, 185, 129, 0.2);
-  }
-
-  .cyber-grid {
-    background-image: 
-      linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+  .luxury-bg {
+    background: 
+      linear-gradient(45deg, transparent 30%, var(--glow-gold) 30%, var(--glow-gold) 70%, transparent 70%),
+      linear-gradient(-45deg, transparent 30%, var(--glow-purple) 30%, var(--glow-purple) 70%, transparent 70%);
     background-size: 40px 40px;
+    opacity: 0.1;
   }
 
-  .glass-effect {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.1);
+  /* Luxury Glass Effects - تأثيرات الزجاج الفخمة */
+  .luxury-card {
+    background: linear-gradient(145deg, 
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(20, 20, 20, 0.6) 50%,
+      rgba(0, 0, 0, 0.9) 100%);
+    backdrop-filter: blur(25px);
+    border: 2px solid var(--glass-border);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.6),
+      0 0 20px var(--glow-gold),
+      inset 0 1px 0 rgba(255, 215, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .luxury-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--glow-gold), transparent);
+    transition: left 0.5s;
+  }
+  
+  .luxury-card:hover::before {
+    left: 100%;
+  }
+  
+  .luxury-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.7),
+      0 0 30px var(--glow-gold),
+      0 0 50px var(--glow-purple);
+  }
+  
+  .royal-card {
+    background: linear-gradient(145deg, 
+      rgba(16, 16, 16, 0.9) 0%,
+      rgba(32, 32, 32, 0.8) 50%,
+      rgba(48, 48, 48, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(112, 59, 161, 0.3);
+    box-shadow: 
+      0 0 30px rgba(112, 59, 161, 0.2),
+      0 8px 32px rgba(0, 0, 0, 0.5);
   }
 
-  .service-card {
-    transition: all 0.3s ease;
+  .glass-morphism {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 215, 0, 0.1);
   }
 
-  .service-card:hover {
-    transform: translateY(-5px);
+  .royal-grid {
+    background-image: 
+      linear-gradient(rgba(255, 215, 0, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 215, 0, 0.1) 1px, transparent 1px);
+    background-size: 60px 60px;
   }
 
-  .logo-animation {
-    animation: pulse 2s infinite;
+  .luxury-glow {
+    box-shadow: 
+      0 0 20px var(--glow-gold),
+      0 0 40px var(--glow-purple),
+      0 0 60px var(--glow-sapphire);
   }
 
-  .font-tajawal {
-    font-family: var(--font-tajawal);
-  }
-
-  /* Enhanced Animation keyframes */
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(30px);
+  /* Luxury Animation System - نظام الحركات الفخمة */
+  @keyframes luxury-flow {
+    0%, 100% {
+      background-position: 0% 50%;
     }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
+    33% {
+      background-position: 100% 0%;
     }
-  }
-
-  @keyframes fadeInDown {
-    0% {
-      opacity: 0;
-      transform: translateY(-30px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
+    66% {
+      background-position: 0% 100%;
     }
   }
   
-  @keyframes gradient-flow {
+  @keyframes gold-flow {
     0%, 100% {
       background-position: 0% 50%;
     }
@@ -223,7 +245,7 @@
     }
   }
   
-  @keyframes creative-flow {
+  @keyframes platinum-flow {
     0%, 100% {
       background-position: 0% 0%;
     }
@@ -238,90 +260,312 @@
     }
   }
   
-  @keyframes float {
+  @keyframes dark-flow {
     0%, 100% {
-      transform: translateY(0px);
+      background-position: 0% 50%;
+    }
+    20% {
+      background-position: 100% 0%;
+    }
+    40% {
+      background-position: 0% 100%;
+    }
+    60% {
+      background-position: 100% 50%;
+    }
+    80% {
+      background-position: 50% 0%;
+    }
+  }
+  
+  @keyframes luxury-float {
+    0%, 100% {
+      transform: translateY(0px) rotateX(0deg);
+    }
+    25% {
+      transform: translateY(-8px) rotateX(2deg);
     }
     50% {
-      transform: translateY(-10px);
+      transform: translateY(-15px) rotateX(0deg);
+    }
+    75% {
+      transform: translateY(-8px) rotateX(-2deg);
     }
   }
   
-  @keyframes glow-pulse {
+  @keyframes gold-pulse {
     0%, 100% {
-      box-shadow: 0 0 5px var(--brand-primary), 0 0 10px var(--brand-primary), 0 0 15px var(--brand-primary);
+      box-shadow: 
+        0 0 20px var(--pure-gold),
+        0 0 40px rgba(255, 215, 0, 0.3);
+    }
+    25% {
+      box-shadow: 
+        0 0 30px var(--rich-gold),
+        0 0 60px rgba(255, 215, 0, 0.4);
     }
     50% {
-      box-shadow: 0 0 10px var(--brand-primary), 0 0 20px var(--brand-primary), 0 0 30px var(--brand-primary);
+      box-shadow: 
+        0 0 25px var(--pure-gold),
+        0 0 50px rgba(255, 215, 0, 0.5);
+    }
+    75% {
+      box-shadow: 
+        0 0 35px var(--rich-gold),
+        0 0 70px rgba(255, 215, 0, 0.3);
+    }
+  }
+  
+  @keyframes luxury-glow {
+    0%, 100% {
+      filter: drop-shadow(0 0 10px var(--glow-gold));
+    }
+    33% {
+      filter: drop-shadow(0 0 20px var(--glow-purple));
+    }
+    66% {
+      filter: drop-shadow(0 0 15px var(--glow-sapphire));
+    }
+  }
+  
+  @keyframes text-shimmer {
+    0% {
+      background-position: -200% center;
+    }
+    100% {
+      background-position: 200% center;
     }
   }
 
-  .animate-fade-in-up {
-    animation: fadeInUp 0.8s ease-out;
+  /* Animation Classes - فئات الحركة */
+  .animate-luxury-float {
+    animation: luxury-float 4s ease-in-out infinite;
   }
 
-  .animate-fade-in-down {
-    animation: fadeInDown 0.8s ease-out;
-  }
-
-  .animate-bounce-slow {
-    animation: bounce 2s infinite;
-  }
-
-  .animate-pulse-slow {
-    animation: pulse 3s infinite;
+  .animate-gold-pulse {
+    animation: gold-pulse 3s ease-in-out infinite;
   }
   
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
+  .animate-luxury-glow {
+    animation: luxury-glow 4s ease-in-out infinite;
   }
   
-  .animate-glow-pulse {
-    animation: glow-pulse 2s ease-in-out infinite;
+  .animate-text-shimmer {
+    background: linear-gradient(90deg, 
+      var(--silver-gray) 0%, 
+      var(--pure-gold) 30%, 
+      var(--platinum-white) 50%, 
+      var(--pure-gold) 70%, 
+      var(--silver-gray) 100%);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: text-shimmer 3s linear infinite;
   }
   
-  .creative-hover {
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  
-  .creative-hover:hover {
-    transform: translateY(-5px) scale(1.05);
-  }
-  
-  .glass-morphism {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  }
-  
-  .tech-border {
-    border: 2px solid transparent;
-    background: linear-gradient(white, white) padding-box,
-                linear-gradient(45deg, var(--brand-primary), var(--brand-success), var(--brand-accent)) border-box;
-  }
-  
-  .section-divider {
-    width: 100px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--brand-primary), var(--brand-success), var(--brand-accent));
-    border-radius: 2px;
+  /* Luxury Utility Classes - الفئات المساعدة الفخمة */
+  .luxury-divider {
+    width: 120px;
+    height: 6px;
+    background: var(--gradient-gold);
+    border-radius: 3px;
     margin: 0 auto;
+    position: relative;
+  }
+  
+  .luxury-divider::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: var(--gradient-gold);
+    border-radius: inherit;
+    filter: blur(8px);
+    opacity: 0.7;
+    z-index: -1;
+  }
+  
+  /* Luxury Button System - نظام الأزرار الفخمة */
+  .btn-luxury {
+    background: var(--gradient-gold);
+    border: 2px solid var(--pure-gold);
+    color: var(--royal-black);
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  
+  .btn-luxury::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-luxury:hover::before {
+    left: 100%;
+  }
+  
+  .btn-luxury:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px var(--glow-gold);
+    color: var(--royal-black);
+  }
+  
+  /* Cart Badge - شارة العربة */
+  .cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--gradient-gold);
+    color: var(--royal-black);
+    border: 2px solid var(--pure-gold);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    animation: gold-pulse 2s infinite;
+  }
+  
+  /* Luxury Service Cards - بطاقات الخدمات الفخمة */
+  .service-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .luxury-hover:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.4), 
+      0 0 20px var(--glow-gold);
+  }
+
+  .floating-card {
+    animation: luxury-float 6s ease-in-out infinite;
+  }
+
+  /* Dark Theme Overrides - تجاوزات التصميم الداكن */
+  .bg-white,
+  .bg-white\/80 {
+    background-color: var(--deep-charcoal) !important;
+    color: var(--platinum-white) !important;
+  }
+
+  .text-gray-800,
+  .text-gray-900,
+  .text-black {
+    color: var(--platinum-white) !important;
+  }
+
+  .text-gray-600,
+  .text-gray-700 {
+    color: var(--silver-gray) !important;
+  }
+
+  .text-gray-500 {
+    color: rgba(179, 179, 179, 0.8) !important;
+  }
+
+  .border-gray-300,
+  .border-gray-200 {
+    border-color: rgba(255, 215, 0, 0.2) !important;
+  }
+
+  .bg-gray-50,
+  .bg-gray-100 {
+    background-color: var(--steel-gray) !important;
+    color: var(--platinum-white) !important;
+  }
+
+  .bg-gray-800 {
+    background-color: var(--midnight-gray) !important;
+  }
+
+  /* Gold Accent Colors - ألوان اللكنة الذهبية */
+  .text-yellow-300,
+  .text-yellow-400 {
+    color: var(--pure-gold) !important;
+  }
+
+  .text-green-400 {
+    color: var(--emerald-dark) !important;
+  }
+
+  .text-pink-400 {
+    color: hsl(320, 60%, 60%) !important;
+  }
+
+  .text-blue-400,
+  .text-blue-500,
+  .text-blue-600 {
+    color: var(--deep-sapphire) !important;
+  }
+
+  .text-purple-600 {
+    color: var(--royal-purple) !important;
+  }
+
+  /* Input Styling - تنسيق المدخلات */
+  input,
+  textarea,
+  select {
+    background-color: var(--midnight-gray) !important;
+    border-color: rgba(255, 215, 0, 0.3) !important;
+    color: var(--platinum-white) !important;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: var(--pure-gold) !important;
+    box-shadow: 0 0 0 3px var(--glow-gold) !important;
+  }
+
+  /* Color Palette Extensions - امتدادات باليت الألوان */
+  .bg-primary-500 { background-color: var(--royal-purple) !important; }
+  .text-primary-500 { color: var(--royal-purple) !important; }
+  .bg-success-500 { background-color: var(--emerald-dark) !important; }
+  .text-success-500 { color: var(--emerald-dark) !important; }
+  .bg-accent-500 { background-color: var(--pure-gold) !important; }
+  .text-accent-500 { color: var(--pure-gold) !important; }
+
+  /* Luxury Border Effects - تأثيرات الحدود الفخمة */
+  .luxury-border {
+    position: relative;
+  }
+
+  .luxury-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: conic-gradient(from 0deg, var(--pure-gold), var(--royal-purple), var(--deep-sapphire), var(--pure-gold));
+    border-radius: inherit;
+    z-index: -1;
+    animation: luxury-flow 4s linear infinite;
   }
 }
 
-/* Invoice styles - Dark Theme */
+/* Invoice Styles - تنسيق الفواتير */
 .invoice {
   font-family: var(--font-tajawal);
   max-width: 800px;
   padding: 30px;
-  background: linear-gradient(135deg, hsl(215, 25%, 12%) 0%, hsl(217, 19%, 15%) 100%);
-  border: 2px solid hsl(203.8863, 88.2845%, 53.1373%);
+  background: var(--gradient-dark);
+  border: 2px solid var(--pure-gold);
   border-radius: 20px;
-  color: hsl(210, 20%, 98%);
+  color: var(--platinum-white);
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 0 40px var(--glow-gold),
+    inset 0 1px 0 rgba(255, 215, 0, 0.2);
   position: relative;
   overflow: hidden;
 }
@@ -334,9 +578,10 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, var(--glow-gold) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, var(--glow-purple) 0%, transparent 50%);
   pointer-events: none;
+  opacity: 0.1;
 }
 
 .invoice-header {
@@ -350,67 +595,28 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 20px;
-  background: linear-gradient(135deg, hsl(203.8863, 88.2845%, 53.1373%), hsl(159.7826, 100%, 36.0784%));
+  background: var(--gradient-gold);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
-  color: white;
-  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+  color: var(--royal-black);
+  box-shadow: 0 10px 30px var(--glow-gold);
 }
 
 .invoice-title {
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, hsl(203.8863, 88.2845%, 53.1373%), hsl(159.7826, 100%, 36.0784%));
+  background: var(--gradient-gold);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 10px;
 }
 
-.invoice-number {
-  font-size: 1.2rem;
-  color: hsl(215, 8%, 70%);
-  font-weight: 600;
-}
-
-.invoice-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
-  margin: 30px 0;
-  position: relative;
-  z-index: 1;
-}
-
-.invoice-section {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 20px;
-  border-radius: 15px;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-.invoice-section h3 {
-  color: hsl(203.8863, 88.2845%, 53.1373%);
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 15px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.invoice-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
 .invoice-total {
-  background: linear-gradient(135deg, hsl(203.8863, 88.2845%, 53.1373%), hsl(159.7826, 100%, 36.0784%));
-  color: white;
+  background: var(--gradient-gold);
+  color: var(--royal-black);
   padding: 20px;
   border-radius: 15px;
   text-align: center;
@@ -419,69 +625,30 @@
   z-index: 1;
 }
 
-.invoice-total-amount {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 5px;
+/* Responsive Design - التصميم المتجاوب */
+@media (max-width: 768px) {
+  .animate-luxury-float {
+    animation-duration: 6s;
+  }
+  
+  .luxury-divider {
+    width: 80px;
+    height: 3px;
+  }
 }
 
-.invoice-footer {
-  text-align: center;
-  margin-top: 40px;
-  padding-top: 30px;
-  border-top: 2px solid rgba(59, 130, 246, 0.2);
-  position: relative;
-  z-index: 1;
+/* Global Dark Theme Enforcement - فرض التصميم الداكن العالمي */
+body,
+html,
+#root {
+  background: var(--gradient-royal) !important;
+  color: var(--platinum-white) !important;
+  min-height: 100vh;
 }
 
-.invoice-qr {
-  width: 100px;
-  height: 100px;
-  background: white;
-  margin: 20px auto;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  color: hsl(215, 25%, 12%);
-}
-
-.invoice header {
-  border-bottom: 2px solid var(--brand-primary);
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-}
-
-.invoice h1 {
-  color: var(--brand-primary);
-  font-size: 1.8rem;
-  font-weight: bold;
-}
-
-.invoice-details {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin: 20px 0;
-}
-
-.invoice-item {
-  padding: 10px 0;
-  border-bottom: 1px solid hsl(240, 1.9608%, 90%);
-}
-
-/* Code tool dark mode */
-.code-tool-dark {
-  --bg-color: hsl(215, 28%, 17%);
-  --container-bg: hsl(215, 25%, 27%);
-  --text-color: hsl(210, 20%, 98%);
-  --border-color: hsl(215, 14%, 34%);
-  --header-bg: hsl(215, 18%, 35%);
-  --button-bg: var(--brand-success);
-  --button-hover-bg: var(--brand-success-600);
-  --secondary-button-bg: var(--brand-primary);
-  --secondary-button-hover-bg: var(--brand-primary-600);
-  --textarea-bg: hsl(215, 28%, 17%);
-  --textarea-text: hsl(210, 20%, 98%);
+/* Card and Component Overrides - تجاوزات البطاقات والمكونات */
+[class*="bg-white"],
+[class*="bg-gray"] {
+  background: var(--gradient-dark) !important;
+  color: var(--platinum-white) !important;
 }

@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/hooks/use-toast";
 import type { Service } from "@shared/schema";
 
 interface ServiceCardProps {
   service: Service;
-  onOrder: (service: Service) => void;
   variant?: "primary" | "success" | "accent";
 }
 
-export default function ServiceCard({ service, onOrder, variant = "primary" }: ServiceCardProps) {
+export default function ServiceCard({ service, variant = "primary" }: ServiceCardProps) {
+  const { addToCart } = useCart();
+  const { toast } = useToast();
   const getIcon = (category: string) => {
     switch (category) {
       case "مواقع وتطبيقات":
@@ -42,60 +45,67 @@ export default function ServiceCard({ service, onOrder, variant = "primary" }: S
     return getIcon(service.category);
   };
 
+  const handleAddToCart = () => {
+    addToCart(service);
+    toast({
+      title: "✅ تم إضافة الخدمة للعربة!",
+      description: `تم إضافة "${service.name}" إلى عربة التسوق`,
+    });
+  };
+
   const variantClasses = {
     primary: {
-      border: "border-t-4 border-blue-500 ring-2 ring-blue-100",
-      icon: "text-blue-500",
-      price: "text-blue-600",
-      button: "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700",
+      gradient: "gold-gradient",
+      icon: "text-yellow-400",
+      price: "text-yellow-400",
+      button: "btn-luxury",
     },
     success: {
-      border: "border-t-4 border-green-500 ring-2 ring-green-100",
-      icon: "text-green-500",
-      price: "text-green-600",
-      button: "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700",
+      gradient: "luxury-gradient",
+      icon: "text-green-400",
+      price: "text-green-400",
+      button: "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white",
     },
     accent: {
-      border: "border-t-4 border-purple-500 ring-2 ring-purple-100",
-      icon: "text-purple-500",
-      price: "text-purple-600",
-      button: "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700",
+      gradient: "royal-gradient",
+      icon: "text-purple-400",
+      price: "text-purple-400",
+      button: "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white",
     },
   };
 
   const classes = variantClasses[variant];
 
   return (
-    <Card className={`service-card bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 ${classes.border} hover:shadow-2xl creative-hover glass-effect transition-all duration-500 group relative overflow-hidden`}>
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 rounded-2xl"></div>
-      </div>
+    <Card className="luxury-card p-8 rounded-3xl group relative overflow-hidden animate-luxury-float">
+      {/* Luxury background effect */}
+      <div className={`absolute inset-0 ${classes.gradient} opacity-10 group-hover:opacity-20 transition-opacity duration-500 rounded-3xl`}></div>
       
       <CardContent className="text-center p-0 relative z-10">
-        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${classes.icon.replace('text-', 'bg-').replace('-500', '-100')} mb-6 group-hover:scale-110 transition-transform duration-300`}>
-          <i className={`${getSpecificIcon(service.name)} ${classes.icon} text-2xl group-hover:animate-bounce`}></i>
+        <div className={`w-20 h-20 rounded-full ${classes.gradient} flex items-center justify-center text-black text-3xl mx-auto mb-6 animate-gold-pulse group-hover:scale-110 transition-transform duration-300`}>
+          <i className={`${getSpecificIcon(service.name)} animate-luxury-float`}></i>
         </div>
         
-        <h4 className="text-xl font-bold mb-4 group-hover:text-gray-800 transition-colors">{service.name}</h4>
+        <h4 className="text-2xl font-bold mb-4 animate-text-shimmer group-hover:scale-105 transition-transform text-gray-200">{service.name}</h4>
         
-        <p className="text-gray-600 mb-6 text-sm leading-relaxed px-2 group-hover:text-gray-700">
+        <p className="text-gray-300 mb-6 leading-relaxed px-2 text-sm">
           {service.description}
         </p>
         
-        <div className={`text-3xl font-bold ${classes.price} mb-6 group-hover:scale-110 transition-transform duration-300`}>
-          <span className="text-lg">💰</span> {service.price} ر.س
+        <div className="luxury-divider mb-6"></div>
+        
+        <div className={`text-4xl font-bold ${classes.price} mb-8 animate-gold-pulse group-hover:scale-110 transition-transform duration-300`}>
+          <span className="text-2xl">💎</span> {service.price} ر.س
         </div>
         
         <Button 
-          onClick={() => onOrder(service)}
-          className={`w-full text-white ${classes.button} transition-all duration-300 rounded-xl font-bold text-lg py-3 hover:scale-105 hover:shadow-lg relative overflow-hidden group/btn`}
+          onClick={handleAddToCart}
+          className={`w-full ${classes.button} transition-all duration-300 rounded-2xl font-bold text-lg py-4 hover:scale-105 hover:shadow-2xl animate-luxury-glow`}
         >
-          <span className="relative z-10 flex items-center justify-center">
-            <span className="ml-2">🚀</span>
-            اطلب الآن
+          <span className="flex items-center justify-center">
+            <span className="ml-2">🛒</span>
+            إضافة للعربة
           </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
         </Button>
       </CardContent>
     </Card>

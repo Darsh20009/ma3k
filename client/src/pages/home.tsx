@@ -6,15 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ServiceCard from "@/components/services/service-card";
-import OrderModal from "@/components/services/order-modal";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { CONTACT_INFO, SERVICE_CATEGORIES } from "@/lib/constants";
 import type { Service } from "@shared/schema";
 
 export default function Home() {
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const { toast } = useToast();
 
@@ -22,10 +19,6 @@ export default function Home() {
     queryKey: ["/api/services"],
   });
 
-  const handleOrderService = (service: Service) => {
-    setSelectedService(service);
-    setIsOrderModalOpen(true);
-  };
 
   const handleConsultationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,79 +86,77 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Enhanced Hero Section */}
-      <section className="creative-gradient text-white py-24 relative overflow-hidden">
-        <div className="absolute inset-0 cyber-grid opacity-10"></div>
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-float"></div>
-        <div className="absolute bottom-10 right-10 w-24 h-24 bg-yellow-300/20 rounded-full blur-xl animate-float" style={{animationDelay: '1s'}}></div>
+      {/* Luxury Hero Section */}
+      <section className="dark-gradient text-white py-32 relative overflow-hidden">
+        <div className="absolute inset-0 luxury-bg"></div>
+        <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-400 rounded-full blur-xl animate-luxury-float opacity-20"></div>
+        <div className="absolute bottom-10 right-10 w-24 h-24 bg-purple-400 rounded-full blur-xl animate-luxury-float opacity-20" style={{animationDelay: '1s'}}></div>
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-6xl mx-auto">
-            <div className="mb-8 animate-fade-in-down">
-              <h1 className="text-6xl md:text-8xl font-bold mb-4 bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent">معك</h1>
-              <div className="w-32 h-2 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 rounded-full mx-auto mb-6"></div>
+            <div className="mb-8 animate-luxury-float">
+              <h1 className="text-8xl md:text-9xl font-bold mb-6 animate-text-shimmer">معك</h1>
+              <div className="luxury-divider mb-8"></div>
             </div>
             
-            <h2 className="text-3xl md:text-4xl mb-8 font-bold animate-fade-in-up">
-              🎨 نُصمم أحلامك الرقمية بإبداع
+            <h2 className="text-4xl md:text-5xl mb-10 font-bold animate-gold-pulse">
+              👑 نُصمم أحلامك الرقمية بإبداع فخم
             </h2>
             
-            <p className="text-xl md:text-2xl mb-10 max-w-5xl mx-auto leading-relaxed animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+            <p className="text-xl md:text-2xl mb-12 max-w-5xl mx-auto leading-relaxed animate-text-shimmer">
               🚀 نحن نساعد الأفراد والمؤسسات على تحويل أفكارهم إلى واقع رقمي احترافي<br/>
               🎯 مواقع • تطبيقات • متاجر • هويات بصرية • حلول دفع وفواتير<br/>
               ⚡ خدمة سريعة • شفافية بالأسعار • دعم ما بعد التسليم
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-10 animate-fade-in-up" style={{animationDelay: '0.4s'}}>
+            <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mb-12 animate-luxury-glow">
               <Link href="/services">
-                <Button className="bg-white text-blue-600 px-10 py-5 text-xl font-bold hover:bg-gray-100 shadow-2xl rounded-2xl transform hover:scale-105 transition-all duration-300 relative overflow-hidden group">
-                  <span className="relative z-10 flex items-center">
-                    <span className="ml-3">🚀</span>
+                <Button className="btn-luxury px-12 py-6 text-2xl font-bold rounded-3xl hover:scale-110 transition-all duration-300 animate-gold-pulse">
+                  <span className="flex items-center">
+                    <span className="ml-3">💎</span>
                     اطلب الآن
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </Button>
               </Link>
               
               <Button
                 onClick={() => setIsConsultationModalOpen(true)}
-                variant="outline"
-                className="border-2 border-white text-white px-10 py-5 text-xl font-bold hover:bg-white hover:text-blue-600 rounded-2xl glass-morphism transform hover:scale-105 transition-all duration-300"
+                className="luxury-card border-2 border-yellow-400/30 text-white px-12 py-6 text-2xl font-bold hover:bg-black/20 rounded-3xl backdrop-blur-lg hover:scale-110 transition-all duration-300 animate-luxury-float"
               >
                 <span className="flex items-center">
-                  <span className="ml-3">🎆</span>
+                  <span className="ml-3">✨</span>
                   استشارة مجانية
                 </span>
               </Button>
             </div>
             
-            {/* Stats Section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 animate-fade-in-up" style={{animationDelay: '0.6s'}}>
-              <div className="glass-morphism p-6 rounded-2xl">
-                <h3 className="text-3xl font-bold text-yellow-300 mb-2">500+</h3>
-                <p className="text-lg">مشروع ناجح</p>
+            {/* Luxury Stats Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20 animate-luxury-glow">
+              <div className="luxury-card p-8 rounded-3xl border-2 border-yellow-400/30">
+                <h3 className="text-5xl font-bold text-yellow-400 mb-3 animate-gold-pulse">500+</h3>
+                <p className="text-xl font-medium text-gray-300">مشروع ناجح</p>
               </div>
-              <div className="glass-morphism p-6 rounded-2xl">
-                <h3 className="text-3xl font-bold text-green-400 mb-2">24س</h3>
-                <p className="text-lg">زمن الاستجابة</p>
+              <div className="luxury-card p-8 rounded-3xl border-2 border-green-400/30">
+                <h3 className="text-5xl font-bold text-green-400 mb-3 animate-gold-pulse">24س</h3>
+                <p className="text-xl font-medium text-gray-300">زمن الاستجابة</p>
               </div>
-              <div className="glass-morphism p-6 rounded-2xl">
-                <h3 className="text-3xl font-bold text-pink-400 mb-2">100%</h3>
-                <p className="text-lg">رضا العملاء</p>
+              <div className="luxury-card p-8 rounded-3xl border-2 border-purple-400/30">
+                <h3 className="text-5xl font-bold text-purple-400 mb-3 animate-gold-pulse">100%</h3>
+                <p className="text-xl font-medium text-gray-300">رضا العملاء</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Enhanced Services Section */}
-      <section id="services" className="py-20 bg-gradient-to-br from-white via-blue-50 to-purple-50 relative overflow-hidden">
-        <div className="absolute inset-0 service-gradient"></div>
+      {/* Luxury Services Section */}
+      <section id="services" className="py-32 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
+        <div className="absolute inset-0 luxury-bg"></div>
         <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 animate-fade-in-up">🎯 خدماتنا المتميزة</h2>
-            <div className="section-divider mb-6"></div>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">🚀 نقدم مجموعة شاملة من الخدمات الرقمية الإبداعية بأسعار تنافسية</p>
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-7xl font-bold animate-text-shimmer mb-8">👑 خدماتنا المتميزة</h2>
+            <div className="luxury-divider mb-8"></div>
+            <p className="text-2xl text-gray-300 max-w-4xl mx-auto">💎 نقدم مجموعة شاملة من الخدمات الرقمية الفخمة بأسعار تنافسية</p>
           </div>
 
           {SERVICE_CATEGORIES.map((category) => {
@@ -173,27 +164,26 @@ export default function Home() {
             if (categoryServices.length === 0) return null;
 
             return (
-              <div key={category} className="mb-20 animate-fade-in-up">
-                <div className="text-center mb-12">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full glass-morphism mb-6 animate-glow-pulse">
-                    <i className={`fas fa-${getCategoryIcon(category)} text-3xl text-blue-500`}></i>
+              <div key={category} className="mb-24 animate-luxury-float">
+                <div className="text-center mb-16">
+                  <div className="w-32 h-32 rounded-full gold-gradient flex items-center justify-center mx-auto mb-8 animate-gold-pulse">
+                    <i className={`fas fa-${getCategoryIcon(category)} text-5xl text-black animate-luxury-glow`}></i>
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                  <h3 className="text-4xl md:text-5xl font-bold animate-text-shimmer mb-6">
                     {category}
                   </h3>
-                  <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mx-auto"></div>
+                  <div className="luxury-divider"></div>
                 </div>
                 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
                   {categoryServices.map((service: Service, index: number) => (
                     <div 
                       key={service.id}
-                      className="animate-fade-in-up floating-card"
-                      style={{ animationDelay: `${index * 100}ms` }}
+                      className="animate-luxury-float"
+                      style={{ animationDelay: `${index * 200}ms` }}
                     >
                       <ServiceCard
                         service={service}
-                        onOrder={handleOrderService}
                         variant={getServiceVariant(index)}
                       />
                     </div>
@@ -203,11 +193,11 @@ export default function Home() {
             );
           })}
 
-          <div className="text-center mt-16">
+          <div className="text-center mt-20">
             <Link href="/services">
-              <Button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-12 py-5 text-xl font-bold hover:from-blue-600 hover:to-purple-700 rounded-2xl transform hover:scale-105 transition-all duration-300 multi-glow">
+              <Button className="btn-luxury px-16 py-6 text-2xl font-bold rounded-3xl hover:scale-110 transition-all duration-300 animate-gold-pulse">
                 <span className="flex items-center">
-                  <span className="ml-3">🔍</span>
+                  <span className="ml-3">💎</span>
                   عرض جميع الخدمات
                 </span>
               </Button>
@@ -216,14 +206,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Enhanced Payment Methods Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 relative">
-        <div className="absolute inset-0 cyber-grid opacity-5"></div>
+      {/* Luxury Payment Methods Section */}
+      <section className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative">
+        <div className="absolute inset-0 royal-grid opacity-10"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 animate-fade-in-up">💳 طرق الدفع الآمنة</h2>
-            <div className="section-divider mb-6"></div>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">🔒 اختر طريقة الدفع المناسبة لك من بين خياراتنا الآمنة</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-200 mb-6 animate-text-shimmer">💳 طرق الدفع الآمنة</h2>
+            <div className="luxury-divider mb-6"></div>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">🔒 اختر طريقة الدفع المناسبة لك من بين خياراتنا الآمنة</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
@@ -233,14 +223,14 @@ export default function Home() {
               { icon: 'fas fa-mobile-alt', title: 'STC Pay', desc: '00532441566', color: 'text-purple-600', bg: 'from-purple-100 to-purple-200' },
               { icon: 'fas fa-wallet', title: 'المحافظ الرقمية', desc: 'UR PAY: 0532441566', sub: 'ALINMA PAY: 966532441566', color: 'text-orange-600', bg: 'from-orange-100 to-orange-200' }
             ].map((payment, index) => (
-              <Card key={index} className={`text-center p-6 bg-gradient-to-br ${payment.bg} creative-hover floating-card border-2 border-white/50 backdrop-blur-sm`} style={{ animationDelay: `${index * 100}ms` }}>
+              <Card key={index} className={`luxury-card text-center p-6 luxury-hover floating-card border-2 border-yellow-400/30`} style={{ animationDelay: `${index * 100}ms` }}>
                 <CardContent className="pt-6">
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/80 ${payment.color} mb-6 group-hover:scale-110 transition-transform`}>
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-400/20 ${payment.color} mb-6 group-hover:scale-110 transition-transform animate-gold-pulse`}>
                     <i className={`${payment.icon} text-3xl`}></i>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-gray-800">{payment.title}</h3>
-                  <p className="text-gray-700 font-medium">{payment.desc}</p>
-                  {payment.sub && <p className="text-sm text-gray-600 mt-2 font-mono">{payment.sub}</p>}
+                  <h3 className="text-xl font-bold mb-3 text-gray-200">{payment.title}</h3>
+                  <p className="text-gray-300 font-medium">{payment.desc}</p>
+                  {payment.sub && <p className="text-sm text-gray-400 mt-2 font-mono bg-black/40 p-2 rounded">{payment.sub}</p>}
                 </CardContent>
               </Card>
             ))}
@@ -306,18 +296,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-primary-600 text-white">
+      {/* Luxury Contact Section */}
+      <section id="contact" className="py-20 dark-gradient text-white relative">
+        <div className="absolute inset-0 luxury-bg opacity-20"></div>
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">تواصل معنا</h2>
+          <div className="text-center mb-16 relative z-10">
+            <h2 className="text-4xl font-bold mb-4 animate-text-shimmer">تواصل معنا</h2>
+            <div className="luxury-divider mb-6"></div>
             <p className="text-xl opacity-90">نحن هنا لمساعدتك في تحقيق أهدافك الرقمية</p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto relative z-10">
             <div className="grid md:grid-cols-2 gap-12">
               <div>
-                <h3 className="text-2xl font-bold mb-6">معلومات الاتصال</h3>
+                <h3 className="text-2xl font-bold mb-6 text-yellow-400">معلومات الاتصال</h3>
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <i className="fas fa-envelope text-2xl ml-4"></i>
@@ -352,7 +344,7 @@ export default function Home() {
               </div>
 
               <div>
-                <h3 className="text-2xl font-bold mb-6">أرسل رسالة</h3>
+                <h3 className="text-2xl font-bold mb-6 text-yellow-400">أرسل رسالة</h3>
                 <form onSubmit={handleContactSubmit} className="space-y-6">
                   <Input
                     name="name"
@@ -382,7 +374,7 @@ export default function Home() {
                   />
                   <Button
                     type="submit"
-                    className="w-full bg-accent-500 text-white hover:bg-accent-600"
+                    className="w-full btn-luxury"
                   >
                     إرسال الرسالة
                   </Button>
@@ -393,12 +385,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Modals */}
-      <OrderModal
-        isOpen={isOrderModalOpen}
-        onClose={() => setIsOrderModalOpen(false)}
-        service={selectedService}
-      />
 
       {/* Consultation Modal */}
       {isConsultationModalOpen && (
