@@ -24,6 +24,13 @@ export default function Cart() {
       return;
     }
     
+    // Store customer info in localStorage for payment page
+    localStorage.setItem('customerInfo', JSON.stringify(customerInfo));
+    localStorage.setItem('cartItems', JSON.stringify(items));
+    
+    // Check if website specifications already exist
+    const existingSpecs = localStorage.getItem('websiteSpecs') || localStorage.getItem('websiteSpecifications');
+    
     // Check if any item is a website service
     const hasWebsiteService = items.some(item => 
       item.service.name.includes('موقع') || 
@@ -32,13 +39,9 @@ export default function Cart() {
       item.service.id === '1' || item.service.id === '2' || item.service.id === '3'
     );
     
-    // Store customer info in localStorage for payment page
-    localStorage.setItem('customerInfo', JSON.stringify(customerInfo));
-    localStorage.setItem('cartItems', JSON.stringify(items));
-    
-    if (hasWebsiteService) {
-      // Redirect to website specifications page first
-      setLocation('/website-specs');
+    if (hasWebsiteService && !existingSpecs) {
+      // Redirect to website specifications page first if no specs exist
+      setLocation('/website-specifications');
     } else {
       // Go directly to payment
       setLocation('/payment');

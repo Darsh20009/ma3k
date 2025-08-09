@@ -187,9 +187,9 @@ export default function WebsiteSpecifications() {
         description: "تم تحميل ملف المواصفات الكامل. يمكنك الآن الانتقال للدفع.",
       });
       
-      // الانتقال لصفحة الدفع
+      // الانتقال لصفحة السلة أولاً ثم الدفع
       setTimeout(() => {
-        setLocation('/payment');
+        setLocation('/cart');
       }, 2000);
       
     } catch (error) {
