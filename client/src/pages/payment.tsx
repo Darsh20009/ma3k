@@ -48,7 +48,11 @@ export default function Payment() {
     try {
       setIsProcessing(true);
       
-      // Create order in backend
+      // Get website specifications from localStorage if available
+      const websiteSpecs = localStorage.getItem('websiteSpecs') || localStorage.getItem('websiteSpecifications');
+      const parsedSpecs = websiteSpecs ? JSON.parse(websiteSpecs) : null;
+      
+      // Create order in backend with website specifications
       const orderData = {
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
@@ -56,7 +60,8 @@ export default function Payment() {
         serviceName: cartItems.map(item => `${item.service.name} (${item.quantity}x)`).join(', '),
         price: totalPrice,
         description: `${cartItems.length} خدمات - ${customerInfo.notes || 'لا توجد ملاحظات'}`,
-        paymentMethod: selectedPaymentMethod
+        paymentMethod: selectedPaymentMethod,
+        websiteSpecs: parsedSpecs
       };
 
       const response = await apiRequest("POST", "/api/orders", orderData);
@@ -87,7 +92,7 @@ export default function Payment() {
         description: `رقم الطلب: ${order.orderNumber}`,
       });
 
-      // Clear cart data
+      // Clear cart data but keep website specs for potential reuse
       localStorage.removeItem('cartItems');
       localStorage.removeItem('customerInfo');
 

@@ -24,11 +24,25 @@ export default function Cart() {
       return;
     }
     
+    // Check if any item is a website service
+    const hasWebsiteService = items.some(item => 
+      item.service.name.includes('موقع') || 
+      item.service.name.includes('تطبيق') || 
+      item.service.name.includes('متجر') ||
+      item.service.id === '1' || item.service.id === '2' || item.service.id === '3'
+    );
+    
     // Store customer info in localStorage for payment page
     localStorage.setItem('customerInfo', JSON.stringify(customerInfo));
     localStorage.setItem('cartItems', JSON.stringify(items));
     
-    setLocation('/payment');
+    if (hasWebsiteService) {
+      // Redirect to website specifications page first
+      setLocation('/website-specs');
+    } else {
+      // Go directly to payment
+      setLocation('/payment');
+    }
   };
 
   if (items.length === 0) {

@@ -12,6 +12,7 @@ import Cart from "@/pages/cart";
 import Payment from "@/pages/payment";
 import AboutUs from "@/pages/about-us";
 import WebsiteForm from "@/pages/website-form";
+import WebsiteSpecifications from "@/pages/website-specifications";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,6 +23,7 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/services" component={Services} />
         <Route path="/website-form" component={WebsiteForm} />
+        <Route path="/website-specs" component={WebsiteSpecifications} />
         <Route path="/cart" component={Cart} />
         <Route path="/payment" component={Payment} />
         <Route path="/about" component={AboutUs} />

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertOrderSchema, insertConsultationSchema, insertMessageSchema } from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
+import { sendOrderNotificationEmail } from "./email";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // PayPal routes
@@ -52,6 +53,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Website specifications submission route
+  app.post("/api/website-specs", async (req, res) => {
+    try {
+      const specsData = req.body;
+      
+      // Create a comprehensive specification document
+      const specification = {
+        ...specsData,
+        timestamp: new Date().toISOString(),
+        specId: `SPEC-${Date.now()}`
+      };
+      
+      res.status(201).json({
+        success: true,
+        specification,
+        message: "مواصفات الموقع تم حفظها بنجاح"
+      });
+    } catch (error) {
+      res.status(400).json({ error: "Invalid specifications data" });
+    }
+  });
+
   // Website form submission route
   app.post("/api/website-form", async (req, res) => {
     try {
@@ -84,6 +107,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+
   // Download routes for HTML/CSS exports
   app.get("/api/download/html/:exportId", (req, res) => {
     const { exportId } = req.params;
@@ -99,13 +124,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send(generateSampleCss(exportId));
   });
 
-  // Orders routes
+  // Orders routes with email notification
   app.post("/api/orders", async (req, res) => {
     try {
       const orderData = insertOrderSchema.parse(req.body);
       const order = await storage.createOrder(orderData);
+      
+      // Send email notification to ma3k.2025@gmail.com
+      if (orderData.customerEmail && orderData.customerName) {
+        const websiteSpecs = req.body.websiteSpecs || null;
+        
+        await sendOrderNotificationEmail({
+          orderNumber: order.id,
+          customerName: orderData.customerName,
+          customerEmail: orderData.customerEmail,
+          customerPhone: orderData.customerPhone || 'غير متوفر',
+          serviceName: orderData.serviceName,
+          price: orderData.price,
+          paymentStatus: orderData.paymentStatus || 'pending',
+          paymentMethod: orderData.paymentMethod || 'غير محدد',
+          websiteSpecs: websiteSpecs
+        });
+      }
+      
       res.status(201).json(order);
     } catch (error) {
+      console.error('Error creating order:', error);
       res.status(400).json({ error: "Invalid order data" });
     }
   });
@@ -143,9 +187,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Order not found" });
       }
 
-      // Create invoice if payment is completed
+      // Create invoice and send email if payment is completed
       if (paymentStatus === "completed") {
         await storage.createInvoice(req.params.id);
+        
+        // Send order notification email to ma3k.2025@gmail.com
+        try {
+          const websiteSpecs = req.body.websiteSpecs;
+          await sendOrderNotificationEmail({
+            orderNumber: order.id,
+            customerName: order.customerName,
+            customerEmail: order.customerEmail,
+            customerPhone: order.customerPhone,
+            serviceName: order.serviceName,
+            price: order.totalPrice,
+            paymentStatus: "completed",
+            paymentMethod: paymentMethod,
+            websiteSpecs: websiteSpecs
+          });
+          console.log('✅ Email notification sent successfully to ma3k.2025@gmail.com');
+        } catch (emailError) {
+          console.error('❌ Failed to send order notification email:', emailError);
+        }
       }
 
       res.json(order);
