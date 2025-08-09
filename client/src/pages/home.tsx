@@ -23,19 +23,14 @@ import type { Service } from "@shared/schema";
 
 export default function Home() {
   const { toast } = useToast();
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
 
   const { data: services = [] } = useQuery<Service[]>({
     queryKey: ["/api/services"],
   });
 
   const handleOrderService = (service: Service) => {
-    addItem({
-      id: service.id,
-      name: service.name,
-      price: service.price,
-      quantity: 1
-    });
+    addToCart(service);
     
     toast({
       title: "تم إضافة الخدمة للسلة",

@@ -8,9 +8,9 @@ import { useCart } from "@/context/CartContext";
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [location] = useLocation();
-  const { items } = useCart();
+  const { totalItems } = useCart();
   
-  const cartItemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const cartItemsCount = totalItems;
 
   const navLinks = [
     { href: "/", label: "الرئيسية" },

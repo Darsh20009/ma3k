@@ -16,7 +16,7 @@ export default function Services() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [priceRange, setPriceRange] = useState<"all" | "low" | "mid" | "high">("all");
 
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
   const { toast } = useToast();
 
   const { data: services = [], isLoading } = useQuery<Service[]>({
@@ -24,12 +24,7 @@ export default function Services() {
   });
 
   const handleOrderService = (service: Service) => {
-    addItem({
-      id: service.id,
-      name: service.name,
-      price: service.price,
-      quantity: 1
-    });
+    addToCart(service);
     
     toast({
       title: "تم إضافة الخدمة للسلة",
