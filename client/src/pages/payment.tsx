@@ -25,6 +25,7 @@ export default function Payment() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [invoiceGenerated, setInvoiceGenerated] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [orderId, setOrderId] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function Payment() {
       const order = await response.json();
       
       setOrderNumber(order.orderNumber);
+      setOrderId(order.id);
       
       // Generate invoice
       const invoiceData = {
