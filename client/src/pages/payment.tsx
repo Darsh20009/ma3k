@@ -26,6 +26,7 @@ export default function Payment() {
   const [invoiceGenerated, setInvoiceGenerated] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [orderId, setOrderId] = useState("");
+  const [invoiceId, setInvoiceId] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -73,7 +74,11 @@ export default function Payment() {
         amount: totalPrice
       };
 
-      await apiRequest("POST", "/api/invoices", invoiceData);
+      const invoiceResponse = await apiRequest("POST", "/api/invoices", invoiceData);
+      const invoice = await invoiceResponse.json();
+      
+      // Store the invoice ID for download
+      setInvoiceId(invoice.id);
       
       setInvoiceGenerated(true);
       
@@ -209,8 +214,9 @@ export default function Payment() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
-                  onClick={() => window.open(`/api/invoices/${orderId}/download`, '_blank')}
+                  onClick={() => window.open(`/api/invoices/${invoiceId}/download`, '_blank')}
                   className="btn-luxury px-8 py-4 text-lg font-bold rounded-2xl"
+                  disabled={!invoiceId}
                 >
                   <Download className="w-5 h-5 ml-2" />
                   📄 تحميل الفاتورة
