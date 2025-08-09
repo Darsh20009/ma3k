@@ -1,6 +1,6 @@
 # Overview
 
-Ma3k is a comprehensive Arabic digital services platform that provides website development, e-commerce solutions, educational platforms, branding services, and digital tools. The platform offers a complete service marketplace with integrated payment processing (PayPal, bank transfers, and multiple Saudi payment methods), order management, and customer support systems. Built as a full-stack web application with React frontend and Node.js/Express backend, it features a modern UI with Arabic RTL support and professional service portfolio management.
+Ma3k is a comprehensive Arabic digital services platform that provides website development, e-commerce solutions, educational platforms, branding services, and digital tools. The platform features an innovative website creation form that generates downloadable HTML/CSS templates based on customer specifications, making it easier for developers to understand and implement client requirements. The platform offers integrated payment processing (PayPal with USD conversion, bank transfers, and Saudi payment methods), automated invoice generation with download functionality, and a complete service marketplace with luxury design and Arabic RTL support.
 
 # User Preferences
 
@@ -24,15 +24,17 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Hot module replacement with Vite for fast development cycles
 
 ## Payment Integration
-- **PayPal SDK**: Official PayPal Server SDK for secure payment processing with sandbox/production environment switching
+- **PayPal SDK**: Official PayPal Server SDK with automatic SAR to USD conversion for international payments
 - **Local Payment Methods**: Support for Saudi payment systems (STC Pay, UR Pay, Alinma Pay) with manual verification workflow
 - **Bank Transfers**: Traditional bank transfer support with receipt verification via WhatsApp integration
+- **Invoice System**: Automated HTML invoice generation with downloadable receipts for customers
 
 ## Data Models
 - **Users**: Basic authentication system with username/password
-- **Services**: Categorized service catalog with pricing and descriptions
+- **Services**: Updated service catalog with competitive pricing (400-1499 SAR range)
 - **Orders**: Complete order lifecycle management from creation to completion
-- **Invoices**: Automated invoice generation linked to orders
+- **Invoices**: Automated invoice generation with HTML download functionality
+- **Website Forms**: Customer specification collection with HTML/CSS template generation
 - **Consultations**: Customer inquiry and consultation request handling
 - **Messages**: Internal messaging system for customer communication
 

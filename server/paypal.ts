@@ -97,8 +97,8 @@ export async function createPaypalOrder(req: Request, res: Response) {
         purchaseUnits: [
           {
             amount: {
-              currencyCode: currency,
-              value: amount,
+              currencyCode: "USD", // PayPal supports USD, convert SAR to USD
+              value: (parseFloat(amount) * 0.27).toFixed(2), // SAR to USD conversion
             },
           },
         ],

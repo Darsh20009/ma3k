@@ -207,7 +207,7 @@ export default function Payment() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
-                  onClick={() => setLocation('/invoices')}
+                  onClick={() => window.open(`/api/invoices/${orderId}/download`, '_blank')}
                   className="btn-luxury px-8 py-4 text-lg font-bold rounded-2xl"
                 >
                   <Download className="w-5 h-5 ml-2" />

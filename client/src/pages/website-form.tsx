@@ -77,21 +77,50 @@ export default function WebsiteForm() {
     setIsSubmitting(true);
     
     try {
-      // Here you would normally send to your backend
-      console.log('Form submitted:', data);
-      
-      toast({
-        title: "تم إرسال طلبك بنجاح! 🎉",
-        description: "ستصلك خطة موقعك خلال ساعتين إلى 24 ساعة",
+      const response = await fetch('/api/website-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
       });
       
-      // Reset form after successful submission
-      form.reset();
+      const result = await response.json();
       
+      if (result.success) {
+        toast({
+          title: "تم إنشاء المواصفات بنجاح! 🎉",
+          description: "يمكنك الآن تحميل الملفات والمواصفات",
+        });
+        
+        // Download HTML file
+        const htmlLink = document.createElement('a');
+        htmlLink.href = result.downloadLinks.html;
+        htmlLink.download = `website-${result.specification.exportId}.html`;
+        htmlLink.click();
+        
+        // Download CSS file
+        setTimeout(() => {
+          const cssLink = document.createElement('a');
+          cssLink.href = result.downloadLinks.css;
+          cssLink.download = `styles-${result.specification.exportId}.css`;
+          cssLink.click();
+        }, 1000);
+        
+        // Show option to continue to payment
+        const continueToPayment = confirm('هل تريد المتابعة لطلب الخدمة وإجراء الدفع؟');
+        if (continueToPayment) {
+          window.location.href = '/services';
+        }
+        
+        form.reset();
+      } else {
+        throw new Error('Failed to process form');
+      }
     } catch (error) {
       toast({
-        title: "حدث خطأ",
-        description: "لم يتم إرسال الطلب، الرجاء المحاولة مرة أخرى",
+        title: "حدث خطأ في المعالجة",
+        description: "يرجى المحاولة مرة أخرى",
         variant: "destructive"
       });
     } finally {
