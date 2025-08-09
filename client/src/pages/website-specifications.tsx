@@ -187,19 +187,30 @@ export default function WebsiteSpecifications() {
         duration: 5000,
       });
 
-      // رسالة للمستخدم حول الخطوات التالية
+      // فتح واتساب مباشرة مع رسالة جاهزة
       setTimeout(() => {
+        const whatsappMessage = `مرحباً! 🌟
+تم إنشاء مواصفات موقع جديد:
+• اسم المشروع: ${data.websiteName}
+• رقم الطلب: ${orderNumber}
+• تم تحميل ملفين: المواصفات والقالب الإبداعي
+
+أرغب في مناقشة تفاصيل التطوير والسعر النهائي.`;
+        
+        const whatsappUrl = `https://wa.me/966532441566?text=${encodeURIComponent(whatsappMessage)}`;
+        window.open(whatsappUrl, '_blank');
+        
         toast({
-          title: "📱 الخطوة التالية",
-          description: "أرسل الملفات المحملة عبر واتساب: 966532441566",
+          title: "📱 تم فتح واتساب",
+          description: "أرسل الرسالة الجاهزة وأرفق الملفين المحملين",
           duration: 8000,
         });
       }, 2000);
 
-      // الانتقال لصفحة دفع مبسطة
+      // الانتقال لصفحة دفع مبسطة بعد 4 ثوان
       setTimeout(() => {
         setLocation('/payment');
-      }, 3000);
+      }, 4000);
       
     } catch (error) {
       console.error('Error generating files:', error);
@@ -924,126 +935,345 @@ function generateSpecsDocument(specs: any): string {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مواصفات موقع: ${specs.websiteName}</title>
+    <title>🚀 مواصفات ${specs.websiteName} - منصة معك</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background: #f8f9fa; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { text-align: center; margin-bottom: 40px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; }
-        .section { margin: 30px 0; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; background: #f8f9ff; }
-        .section h2 { color: #667eea; margin-top: 0; }
-        .info-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin: 10px 0; }
-        .label { font-weight: bold; color: #333; }
-        .value { color: #666; }
-        .features-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-        .feature-item { background: white; padding: 10px; border-radius: 5px; border: 1px solid #e0e6ff; }
-        .footer { text-align: center; margin-top: 40px; padding: 20px; background: #2c3e50; color: white; border-radius: 10px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Tajawal', -apple-system, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.8;
+        }
+        
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .header h1 { 
+            font-size: 2.8rem; 
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h2 { 
+            font-size: 2.2rem; 
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffd700;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p { 
+            font-size: 1.2rem; 
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .order-badge {
+            display: inline-block;
+            background: rgba(255,215,0,0.9);
+            color: #333;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            box-shadow: 0 10px 20px rgba(255,215,0,0.3);
+        }
+        
+        .content {
+            padding: 0;
+        }
+        
+        .section { 
+            margin: 0;
+            padding: 35px 40px;
+            border-bottom: 1px solid rgba(102,126,234,0.1);
+            position: relative;
+        }
+        
+        .section:last-child { border-bottom: none; }
+        
+        .section h2 { 
+            color: #667eea;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section h2::before {
+            content: '';
+            width: 50px;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        .info-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 2fr; 
+            gap: 20px 30px; 
+            margin: 20px 0;
+            align-items: center;
+        }
+        
+        .label { 
+            font-weight: 600; 
+            color: #4a5568;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .label::before {
+            content: '▶';
+            color: #667eea;
+            font-size: 0.8rem;
+        }
+        
+        .value { 
+            color: #2d3748;
+            font-weight: 500;
+            background: rgba(102,126,234,0.05);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border-right: 4px solid #667eea;
+            font-size: 1.05rem;
+        }
+        
+        .features-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; 
+            margin-top: 25px;
+        }
+        
+        .feature-item { 
+            background: linear-gradient(135deg, rgba(102,126,234,0.05) 0%, rgba(118,75,162,0.05) 100%);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(102,126,234,0.1);
+            font-weight: 500;
+            font-size: 1.05rem;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102,126,234,0.15);
+            border-color: #667eea;
+        }
+        
+        .footer { 
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .footer p { 
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+        
+        .footer strong {
+            color: #ffd700;
+            font-size: 1.3rem;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .container { margin: 10px; border-radius: 20px; }
+            .header { padding: 30px 20px; }
+            .header h1 { font-size: 2.2rem; }
+            .header h2 { font-size: 1.8rem; }
+            .section { padding: 25px 20px; }
+            .info-grid { grid-template-columns: 1fr; gap: 15px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .contact-info { flex-direction: column; align-items: center; }
+        }
+        
+        .print-section {
+            page-break-inside: avoid;
+        }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: 1px solid #ddd; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📋 مواصفات الموقع المطلوب</h1>
+            <h1>🚀 مواصفات الموقع الإبداعي</h1>
             <h2>${specs.websiteName}</h2>
             <p>تم إنشاؤها في: ${new Date(specs.timestamp).toLocaleDateString('ar-SA')}</p>
-            <p>رقم المرجع: ${specs.specId}</p>
+            <div class="order-badge">رقم المرجع: ${specs.specId}</div>
         </div>
 
-        <div class="section">
-            <h2>🎯 المعلومات الأساسية</h2>
-            <div class="info-grid">
-                <span class="label">اسم الموقع:</span>
-                <span class="value">${specs.websiteName}</span>
-                <span class="label">الغرض:</span>
-                <span class="value">${specs.purpose}</span>
-                <span class="label">الفكرة:</span>
-                <span class="value">${specs.idea}</span>
-                <span class="label">الجمهور المستهدف:</span>
-                <span class="value">${specs.targetAudience}</span>
+        <div class="content">
+            <div class="section print-section">
+                <h2>🎯 المعلومات الأساسية</h2>
+                <div class="info-grid">
+                    <span class="label">اسم الموقع</span>
+                    <span class="value">${specs.websiteName}</span>
+                    <span class="label">الغرض من الموقع</span>
+                    <span class="value">${specs.purpose}</span>
+                    <span class="label">فكرة المشروع</span>
+                    <span class="value">${specs.idea}</span>
+                    <span class="label">الجمهور المستهدف</span>
+                    <span class="value">${specs.targetAudience}</span>
+                </div>
             </div>
-        </div>
 
-        <div class="section">
-            <h2>🎨 التصميم والمظهر</h2>
-            <div class="info-grid">
-                <span class="label">نوع التصميم:</span>
-                <span class="value">${specs.designType}</span>
-                <span class="label">نظام الألوان:</span>
-                <span class="value">${specs.colorScheme}</span>
-                <span class="label">اللغات:</span>
-                <span class="value">${specs.languages}</span>
-                <span class="label">الأجهزة المدعومة:</span>
-                <span class="value">${specs.deviceSupport}</span>
+            <div class="section print-section">
+                <h2>🎨 التصميم والهوية البصرية</h2>
+                <div class="info-grid">
+                    <span class="label">نوع التصميم</span>
+                    <span class="value">${specs.designType}</span>
+                    <span class="label">نظام الألوان</span>
+                    <span class="value">${specs.colorScheme}</span>
+                    <span class="label">اللغات المدعومة</span>
+                    <span class="value">${specs.languages}</span>
+                    <span class="label">الأجهزة المدعومة</span>
+                    <span class="value">${specs.deviceSupport}</span>
+                </div>
             </div>
-        </div>
 
-        <div class="section">
-            <h2>📑 الأقسام الرئيسية</h2>
-            <div class="features-list">
-                ${[specs.mainSection1, specs.mainSection2, specs.mainSection3, specs.mainSection4, specs.mainSection5]
-                  .filter(Boolean)
-                  .map(section => `<div class="feature-item">📄 ${section}</div>`)
-                  .join('')}
+            <div class="section print-section">
+                <h2>📑 هيكل وأقسام الموقع</h2>
+                <div class="features-grid">
+                    ${[specs.mainSection1, specs.mainSection2, specs.mainSection3, specs.mainSection4, specs.mainSection5]
+                      .filter(Boolean)
+                      .map(section => `<div class="feature-item">📄 ${section}</div>`)
+                      .join('')}
+                </div>
             </div>
-        </div>
 
-        <div class="section">
-            <h2>⚙️ الوظائف الأساسية</h2>
-            <div class="features-list">
-                ${[specs.mainFunction1, specs.mainFunction2, specs.mainFunction3, specs.mainFunction4]
-                  .filter(Boolean)
-                  .map(func => `<div class="feature-item">🔧 ${func}</div>`)
-                  .join('')}
+            <div class="section print-section">
+                <h2>⚙️ الوظائف والخصائص التقنية</h2>
+                <div class="features-grid">
+                    ${[specs.mainFunction1, specs.mainFunction2, specs.mainFunction3, specs.mainFunction4]
+                      .filter(Boolean)
+                      .map(func => `<div class="feature-item">🔧 ${func}</div>`)
+                      .join('')}
+                </div>
             </div>
-        </div>
 
-        ${specs.additionalFeatures && specs.additionalFeatures.length > 0 ? `
-        <div class="section">
-            <h2>✨ المميزات الإضافية</h2>
-            <div class="features-list">
-                ${specs.additionalFeatures.map((feature: string) => `<div class="feature-item">⭐ ${feature}</div>`).join('')}
+            ${specs.additionalFeatures && specs.additionalFeatures.length > 0 ? `
+            <div class="section print-section">
+                <h2>✨ المميزات الإضافية المتقدمة</h2>
+                <div class="features-grid">
+                    ${specs.additionalFeatures.map((feature: string) => `<div class="feature-item">⭐ ${feature}</div>`).join('')}
+                </div>
             </div>
-        </div>
-        ` : ''}
+            ` : ''}
 
-        ${specs.interactiveElements && specs.interactiveElements.length > 0 ? `
-        <div class="section">
-            <h2>🎮 العناصر التفاعلية</h2>
-            <div class="features-list">
-                ${specs.interactiveElements.map((element: string) => `<div class="feature-item">🎯 ${element}</div>`).join('')}
+            ${specs.interactiveElements && specs.interactiveElements.length > 0 ? `
+            <div class="section print-section">
+                <h2>🎮 العناصر التفاعلية والتجربة</h2>
+                <div class="features-grid">
+                    ${specs.interactiveElements.map((element: string) => `<div class="feature-item">🎯 ${element}</div>`).join('')}
+                </div>
             </div>
-        </div>
-        ` : ''}
+            ` : ''}
 
-        <div class="section">
-            <h2>🎯 الأهداف والمتطلبات</h2>
-            <div class="info-grid">
-                <span class="label">الهدف الأساسي:</span>
-                <span class="value">${specs.mainGoal1}</span>
-                ${specs.mainGoal2 ? `<span class="label">الهدف الثاني:</span><span class="value">${specs.mainGoal2}</span>` : ''}
-                ${specs.mainGoal3 ? `<span class="label">الهدف الثالث:</span><span class="value">${specs.mainGoal3}</span>` : ''}
-                <span class="label">الميزانية:</span>
-                <span class="value">${specs.budget}</span>
-                <span class="label">إدارة المحتوى:</span>
-                <span class="value">${specs.contentManagement}</span>
+            <div class="section print-section">
+                <h2>🎯 الأهداف والمتطلبات التجارية</h2>
+                <div class="info-grid">
+                    <span class="label">الهدف الأساسي</span>
+                    <span class="value">${specs.mainGoal1}</span>
+                    ${specs.mainGoal2 ? `<span class="label">الهدف الثاني</span><span class="value">${specs.mainGoal2}</span>` : ''}
+                    ${specs.mainGoal3 ? `<span class="label">الهدف الثالث</span><span class="value">${specs.mainGoal3}</span>` : ''}
+                    <span class="label">الميزانية المحددة</span>
+                    <span class="value">${specs.budget} ريال سعودي</span>
+                    <span class="label">نوع إدارة المحتوى</span>
+                    <span class="value">${specs.contentManagement}</span>
+                </div>
             </div>
-        </div>
 
-        ${specs.specialRequirements || specs.competitorWebsites || specs.inspirationSites || specs.additionalNotes ? `
-        <div class="section">
-            <h2>📝 معلومات إضافية</h2>
-            <div class="info-grid">
-                ${specs.specialRequirements ? `<span class="label">متطلبات خاصة:</span><span class="value">${specs.specialRequirements}</span>` : ''}
-                ${specs.competitorWebsites ? `<span class="label">مواقع منافسة:</span><span class="value">${specs.competitorWebsites}</span>` : ''}
-                ${specs.inspirationSites ? `<span class="label">مواقع إلهام:</span><span class="value">${specs.inspirationSites}</span>` : ''}
-                ${specs.additionalNotes ? `<span class="label">ملاحظات إضافية:</span><span class="value">${specs.additionalNotes}</span>` : ''}
+            ${specs.specialRequirements || specs.competitorWebsites || specs.inspirationSites || specs.additionalNotes ? `
+            <div class="section print-section">
+                <h2>📝 تفاصيل ومتطلبات إضافية</h2>
+                <div class="info-grid">
+                    ${specs.specialRequirements ? `<span class="label">متطلبات خاصة</span><span class="value">${specs.specialRequirements}</span>` : ''}
+                    ${specs.competitorWebsites ? `<span class="label">مواقع منافسة للمراجعة</span><span class="value">${specs.competitorWebsites}</span>` : ''}
+                    ${specs.inspirationSites ? `<span class="label">مواقع إلهام ومرجعية</span><span class="value">${specs.inspirationSites}</span>` : ''}
+                    ${specs.additionalNotes ? `<span class="label">ملاحظات وتوجيهات إضافية</span><span class="value">${specs.additionalNotes}</span>` : ''}
+                </div>
             </div>
+            ` : ''}
         </div>
-        ` : ''}
 
         <div class="footer">
-            <p><strong>منصة معك للخدمات الرقمية</strong></p>
-            <p>هذا المستند يحتوي على جميع التفاصيل اللازمة لتطوير الموقع</p>
-            <p>للاستفسارات: ma3k.2025@gmail.com | 966532441566</p>
+            <p><strong>🌟 منصة معك للخدمات الرقمية المتطورة 🌟</strong></p>
+            <p>هذا المستند الشامل يحتوي على جميع التفاصيل والمتطلبات اللازمة لتطوير موقعك بأعلى معايير الجودة</p>
+            <div class="contact-info">
+                <div class="contact-item">📧 ma3k.2025@gmail.com</div>
+                <div class="contact-item">📱 966532441566</div>
+                <div class="contact-item">🌐 منصة معك الرقمية</div>
+            </div>
         </div>
     </div>
 </body>
