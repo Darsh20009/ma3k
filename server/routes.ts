@@ -177,6 +177,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Invoice routes
+  app.post("/api/invoices", async (req, res) => {
+    try {
+      const { orderId, customerName, customerEmail, serviceName, amount } = req.body;
+      const invoice = await storage.createInvoice(orderId);
+      res.status(201).json(invoice);
+    } catch (error) {
+      console.error("Invoice creation error:", error);
+      res.status(500).json({ error: "Failed to create invoice" });
+    }
+  });
+
   app.get("/api/invoices/:id", async (req, res) => {
     try {
       const invoice = await storage.getInvoice(req.params.id);

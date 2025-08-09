@@ -1,4 +1,4 @@
-import { 
+import {
   users, services, orders, invoices, consultations, messages,
   type User, type InsertUser, type Service, type InsertService,
   type Order, type InsertOrder, type Consultation, type InsertConsultation,
@@ -61,7 +61,7 @@ export class MemStorage implements IStorage {
         isActive: true,
       },
       {
-        id: "2", 
+        id: "2",
         name: "تطبيق شخصي محترف",
         description: "تطبيق شخصي محترف مع خصائص متقدمة وتصميم عصري",
         price: 600,
@@ -70,7 +70,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: "3",
-        name: "موقع تعليمي غير ربحي", 
+        name: "موقع تعليمي غير ربحي",
         description: "موقع تعليمي غير ربحي مع نظام إدارة المحتوى التعليمي",
         price: 1100,
         category: "التعليم",
@@ -79,7 +79,7 @@ export class MemStorage implements IStorage {
       {
         id: "4",
         name: "موقع تعليمي ربحي",
-        description: "موقع تعليمي ربحي مع نظام الدفع والاشتراكات", 
+        description: "موقع تعليمي ربحي مع نظام الدفع والاشتراكات",
         price: 1499,
         category: "التعليم",
         isActive: true,
@@ -93,7 +93,7 @@ export class MemStorage implements IStorage {
         isActive: true,
       },
       {
-        id: "6", 
+        id: "6",
         name: "صنع شعار",
         description: "تصميم شعار احترافي مع ملفات متعددة الصيغ",
         price: 15,
@@ -109,7 +109,7 @@ export class MemStorage implements IStorage {
         isActive: true,
       },
       {
-        id: "8", 
+        id: "8",
         name: "متابعة احترافي",
         description: "خدمة متابعة احترافية مع تقارير مفصلة",
         price: 115,
@@ -125,7 +125,7 @@ export class MemStorage implements IStorage {
         isActive: true,
       },
       {
-        id: "10", 
+        id: "10",
         name: "تصميم اختبارات تفاعلية / عادية",
         description: "تصميم اختبارات تفاعلية أو عادية للمواقع التعليمية",
         price: 50,
@@ -368,12 +368,7 @@ export class MemStorage implements IStorage {
 
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
     const id = randomUUID();
-    const message: Message = {
-      ...insertMessage,
-      id,
-      status: "pending",
-      createdAt: new Date(),
-    };
+    const message: Message = { ...insertMessage, id, createdAt: new Date() };
     this.messages.set(id, message);
     return message;
   }
