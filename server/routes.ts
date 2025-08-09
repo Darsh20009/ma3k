@@ -65,6 +65,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         specId: `SPEC-${Date.now()}`
       };
       
+      // Send email notification to ma3k.2025@gmail.com
+      const emailSubject = `طلب مواصفات موقع جديد - ${specification.websiteName}`;
+      const emailContent = generateSpecsEmailContent(specification);
+      
+      try {
+        await sendOrderNotificationEmail(
+          'ma3k.2025@gmail.com',
+          emailSubject,
+          emailContent
+        );
+        console.log(`Website specs email sent for order: ${specification.specId}`);
+      } catch (emailError) {
+        console.error('Failed to send specs email:', emailError);
+        // Don't fail the whole request if email fails
+      }
+      
       res.status(201).json({
         success: true,
         specification,
@@ -288,6 +304,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+function generateSpecsEmailContent(specs: any): string {
+  return `
+    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; direction: rtl;">
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px; margin-bottom: 30px;">
+        <h1 style="margin: 0; font-size: 24px;">📋 طلب مواصفات موقع جديد</h1>
+        <h2 style="margin: 10px 0; font-size: 20px;">${specs.websiteName}</h2>
+        <p style="margin: 5px 0;">رقم الطلب: ${specs.specId}</p>
+        <p style="margin: 5px 0;">التاريخ: ${new Date(specs.timestamp).toLocaleDateString('ar-SA')}</p>
+      </div>
+
+      <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin: 20px 0;">
+        <h3 style="color: #667eea; margin-top: 0;">🎯 المعلومات الأساسية</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 8px; font-weight: bold; width: 30%;">اسم الموقع:</td><td style="padding: 8px;">${specs.websiteName}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">الغرض:</td><td style="padding: 8px;">${specs.purpose}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">الفكرة:</td><td style="padding: 8px;">${specs.idea}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">الجمهور المستهدف:</td><td style="padding: 8px;">${specs.targetAudience}</td></tr>
+        </table>
+      </div>
+
+      <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin: 20px 0;">
+        <h3 style="color: #667eea; margin-top: 0;">🎨 التصميم والمظهر</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 8px; font-weight: bold; width: 30%;">نوع التصميم:</td><td style="padding: 8px;">${specs.designType || 'غير محدد'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">نظام الألوان:</td><td style="padding: 8px;">${specs.colorScheme || 'غير محدد'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">اللغات:</td><td style="padding: 8px;">${specs.languages || 'غير محدد'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">الأجهزة المدعومة:</td><td style="padding: 8px;">${specs.deviceSupport || 'غير محدد'}</td></tr>
+        </table>
+      </div>
+
+      ${specs.mainSection1 ? `
+      <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin: 20px 0;">
+        <h3 style="color: #667eea; margin-top: 0;">📑 الأقسام الرئيسية</h3>
+        <ul style="list-style: none; padding: 0;">
+          ${specs.mainSection1 ? `<li style="padding: 5px 0;">📄 ${specs.mainSection1}</li>` : ''}
+          ${specs.mainSection2 ? `<li style="padding: 5px 0;">📄 ${specs.mainSection2}</li>` : ''}
+          ${specs.mainSection3 ? `<li style="padding: 5px 0;">📄 ${specs.mainSection3}</li>` : ''}
+          ${specs.mainSection4 ? `<li style="padding: 5px 0;">📄 ${specs.mainSection4}</li>` : ''}
+          ${specs.mainSection5 ? `<li style="padding: 5px 0;">📄 ${specs.mainSection5}</li>` : ''}
+        </ul>
+      </div>
+      ` : ''}
+
+      ${specs.mainFunction1 ? `
+      <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin: 20px 0;">
+        <h3 style="color: #667eea; margin-top: 0;">⚙️ الوظائف الأساسية</h3>
+        <ul style="list-style: none; padding: 0;">
+          ${specs.mainFunction1 ? `<li style="padding: 5px 0;">🔧 ${specs.mainFunction1}</li>` : ''}
+          ${specs.mainFunction2 ? `<li style="padding: 5px 0;">🔧 ${specs.mainFunction2}</li>` : ''}
+          ${specs.mainFunction3 ? `<li style="padding: 5px 0;">🔧 ${specs.mainFunction3}</li>` : ''}
+          ${specs.mainFunction4 ? `<li style="padding: 5px 0;">🔧 ${specs.mainFunction4}</li>` : ''}
+        </ul>
+      </div>
+      ` : ''}
+
+      <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin: 20px 0;">
+        <h3 style="color: #667eea; margin-top: 0;">🎯 الأهداف والمتطلبات</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 8px; font-weight: bold; width: 30%;">الهدف الأساسي:</td><td style="padding: 8px;">${specs.mainGoal1 || 'غير محدد'}</td></tr>
+          ${specs.mainGoal2 ? `<tr><td style="padding: 8px; font-weight: bold;">الهدف الثاني:</td><td style="padding: 8px;">${specs.mainGoal2}</td></tr>` : ''}
+          ${specs.mainGoal3 ? `<tr><td style="padding: 8px; font-weight: bold;">الهدف الثالث:</td><td style="padding: 8px;">${specs.mainGoal3}</td></tr>` : ''}
+          <tr><td style="padding: 8px; font-weight: bold;">الميزانية:</td><td style="padding: 8px;">${specs.budget || 'غير محدد'}</td></tr>
+          <tr><td style="padding: 8px; font-weight: bold;">إدارة المحتوى:</td><td style="padding: 8px;">${specs.contentManagement || 'غير محدد'}</td></tr>
+        </table>
+      </div>
+
+      ${(specs.specialRequirements || specs.competitorWebsites || specs.inspirationSites || specs.additionalNotes) ? `
+      <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin: 20px 0;">
+        <h3 style="color: #667eea; margin-top: 0;">📝 معلومات إضافية</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          ${specs.specialRequirements ? `<tr><td style="padding: 8px; font-weight: bold; width: 30%;">متطلبات خاصة:</td><td style="padding: 8px;">${specs.specialRequirements}</td></tr>` : ''}
+          ${specs.competitorWebsites ? `<tr><td style="padding: 8px; font-weight: bold;">مواقع منافسة:</td><td style="padding: 8px;">${specs.competitorWebsites}</td></tr>` : ''}
+          ${specs.inspirationSites ? `<tr><td style="padding: 8px; font-weight: bold;">مواقع إلهام:</td><td style="padding: 8px;">${specs.inspirationSites}</td></tr>` : ''}
+          ${specs.additionalNotes ? `<tr><td style="padding: 8px; font-weight: bold;">ملاحظات إضافية:</td><td style="padding: 8px;">${specs.additionalNotes}</td></tr>` : ''}
+        </table>
+      </div>
+      ` : ''}
+
+      <div style="background: #2c3e50; color: white; padding: 20px; text-align: center; border-radius: 10px; margin-top: 30px;">
+        <p style="margin: 5px 0;"><strong>منصة معك للخدمات الرقمية</strong></p>
+        <p style="margin: 5px 0;">للتواصل: ma3k.2025@gmail.com | 966532441566</p>
+        <p style="margin: 5px 0;">يرجى متابعة الطلب والتواصل مع العميل لبدء العمل</p>
+      </div>
+    </div>
+  `;
 }
 
 // Helper functions for HTML/CSS generation

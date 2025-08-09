@@ -156,44 +156,38 @@ export default function WebsiteSpecifications() {
         return;
       }
 
-      // حفظ مواصفات الموقع في localStorage
-      const websiteSpecs = {
-        ...data,
-        timestamp: new Date().toISOString(),
-        specId: `SPEC-${Date.now()}`
-      };
+      // إرسال المواصفات للخادم
+      const response = await fetch('/api/website-specs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit specifications');
+      }
+
+      const result = await response.json();
       
-      localStorage.setItem('websiteSpecs', JSON.stringify(websiteSpecs));
+      // حفظ رقم الطلب في localStorage للاستخدام في الدفع
+      const orderNumber = result.specification.specId;
+      localStorage.setItem('websiteOrderNumber', orderNumber);
       localStorage.setItem('websiteSpecifications', JSON.stringify(data));
       
-      // إنشاء ملف مواصفات قابل للتحميل
-      const specsDocument = generateSpecsDocument(websiteSpecs);
-      const blob = new Blob([specsDocument], { type: 'text/html; charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      
-      // تحميل الملف
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `مواصفات-موقع-${data.websiteName.replace(/\s+/g, '-')}-${Date.now()}.html`;
-      link.click();
-      
-      // تنظيف الرابط
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 100);
-      
       toast({
-        title: "✅ تم حفظ المواصفات بنجاح!",
-        description: "تم تحميل ملف المواصفات الكامل. يمكنك الآن الانتقال للدفع.",
+        title: "✅ تم إرسال المواصفات بنجاح!",
+        description: `رقم الطلب: ${orderNumber} - سيتم التواصل معك قريباً`,
       });
       
-      // الانتقال لصفحة السلة أولاً ثم الدفع
+      // الانتقال مباشرة للدفع
       setTimeout(() => {
-        setLocation('/cart');
-      }, 2000);
+        setLocation('/payment');
+      }, 1500);
       
     } catch (error) {
-      console.error('Error saving specifications:', error);
+      console.error('Error submitting specifications:', error);
       toast({
         title: "حدث خطأ",
         description: "يرجى المحاولة مرة أخرى",
@@ -214,9 +208,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <Globe className="w-16 h-16 mx-auto text-blue-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">المعلومات الأساسية</h2>
-              <p className="text-gray-600">ابدأ بوصف فكرة موقعك الأساسية</p>
+              <Globe className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">المعلومات الأساسية</h2>
+              <p className="text-muted-foreground">ابدأ بوصف فكرة موقعك الأساسية</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -295,9 +289,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <Sparkles className="w-16 h-16 mx-auto text-purple-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">التصميم والمظهر</h2>
-              <p className="text-gray-600">حدد نوع التصميم والألوان المفضلة</p>
+              <Sparkles className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">التصميم والمظهر</h2>
+              <p className="text-muted-foreground">حدد نوع التصميم والألوان المفضلة</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -416,9 +410,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <FileText className="w-16 h-16 mx-auto text-green-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">أقسام ووظائف الموقع</h2>
-              <p className="text-gray-600">حدد الأقسام والوظائف الأساسية للموقع</p>
+              <FileText className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">أقسام ووظائف الموقع</h2>
+              <p className="text-muted-foreground">حدد الأقسام والوظائف الأساسية للموقع</p>
             </div>
 
             <div className="space-y-4">
@@ -497,9 +491,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <CheckCircle className="w-16 h-16 mx-auto text-orange-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">المميزات المتقدمة</h2>
-              <p className="text-gray-600">اختر المميزات الإضافية التي تريدها</p>
+              <CheckCircle className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">المميزات المتقدمة</h2>
+              <p className="text-muted-foreground">اختر المميزات الإضافية التي تريدها</p>
             </div>
 
             <div className="space-y-6">
@@ -582,9 +576,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <Download className="w-16 h-16 mx-auto text-red-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">التفاصيل النهائية</h2>
-              <p className="text-gray-600">أكمل المعلومات المتبقية</p>
+              <CheckCircle className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">التفاصيل النهائية</h2>
+              <p className="text-muted-foreground">أكمل المعلومات المتبقية</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -751,38 +745,38 @@ export default function WebsiteSpecifications() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8">
+    <div className="min-h-screen royal-gradient py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        <Card className="shadow-2xl border-0">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-            <CardTitle className="text-center text-2xl">
+        <Card className="glass-card shadow-2xl border-0">
+          <CardHeader className="gold-gradient text-black dark:text-black">
+            <CardTitle className="text-center text-2xl font-bold">
               🌐 مواصفات الموقع المطلوب
             </CardTitle>
-            <p className="text-center text-blue-100">
+            <p className="text-center text-black/80 dark:text-black/80">
               اكمل التفاصيل بدقة ليتمكن المطور من إنشاء موقعك المثالي
             </p>
             
             {/* Progress Bar */}
             <div className="mt-6">
-              <div className="flex justify-between text-sm text-blue-100 mb-2">
+              <div className="flex justify-between text-sm text-black/70 dark:text-black/70 mb-2">
                 <span>الخطوة {currentStep} من 5</span>
                 <span>{Math.round((currentStep / 5) * 100)}%</span>
               </div>
-              <div className="w-full bg-blue-800 rounded-full h-2">
+              <div className="w-full bg-black/20 rounded-full h-2">
                 <div 
-                  className="bg-white h-2 rounded-full transition-all duration-500"
+                  className="bg-black h-2 rounded-full transition-all duration-500"
                   style={{ width: `${(currentStep / 5) * 100}%` }}
                 ></div>
               </div>
             </div>
           </CardHeader>
           
-          <CardContent className="p-8">
+          <CardContent className="p-8 bg-card/50 dark:bg-card/50 backdrop-blur-sm">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 {renderStep()}
                 
-                <Separator />
+                <Separator className="bg-border/20" />
                 
                 <div className="flex justify-between pt-6">
                   <Button
@@ -790,7 +784,7 @@ export default function WebsiteSpecifications() {
                     variant="outline"
                     onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
                     disabled={currentStep === 1}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-secondary/80 hover:bg-secondary border-border/30"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     السابق
@@ -800,7 +794,7 @@ export default function WebsiteSpecifications() {
                     <Button
                       type="button"
                       onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
-                      className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600"
+                      className="flex items-center gap-2 gold-gradient text-black font-semibold hover:opacity-90"
                     >
                       التالي
                       <ArrowRight className="w-4 h-4" />
@@ -809,17 +803,17 @@ export default function WebsiteSpecifications() {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-blue-600"
+                      className="flex items-center gap-2 gold-gradient text-black font-semibold hover:opacity-90"
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          جاري الحفظ...
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
+                          جاري الإرسال...
                         </>
                       ) : (
                         <>
-                          <Download className="w-4 h-4" />
-                          حفظ المواصفات والانتقال للدفع
+                          <CheckCircle className="w-4 h-4" />
+                          إرسال المواصفات والانتقال للدفع
                         </>
                       )}
                     </Button>
