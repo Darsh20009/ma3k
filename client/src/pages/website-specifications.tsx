@@ -145,55 +145,64 @@ export default function WebsiteSpecifications() {
     setIsSubmitting(true);
     
     try {
-      console.log('Form submission started with data:', data);
+      // إنشاء رقم طلب فريد
+      const orderNumber = `WEB-${Date.now()}`;
+      const timestamp = new Date().toISOString();
       
-      // Log form errors if any
-      const errors = form.formState.errors;
-      console.log('Form errors:', errors);
-      
-      if (Object.keys(errors).length > 0) {
-        toast({
-          title: "يرجى إصلاح الأخطاء في النموذج",
-          description: "تحقق من جميع الحقول المطلوبة",
-          variant: "destructive"
-        });
-        setIsSubmitting(false);
-        return;
-      }
+      const specsData = {
+        ...data,
+        specId: orderNumber,
+        timestamp
+      };
 
-      // إرسال المواصفات للخادم
-      const response = await fetch('/api/website-specs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit specifications');
-      }
-
-      const result = await response.json();
-      console.log('Server response:', result);
+      // إنشاء مستند HTML للمواصفات
+      const htmlDocument = generateSpecsDocument(specsData);
       
-      // حفظ رقم الطلب في localStorage للاستخدام في الدفع
-      const orderNumber = result.specification.specId;
-      localStorage.setItem('websiteOrderNumber', orderNumber);
-      localStorage.setItem('websiteSpecifications', JSON.stringify(data));
-      
+      // تحميل المستند كملف HTML
+      const blob = new Blob([htmlDocument], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `مواصفات-الموقع-${data.websiteName}-${orderNumber}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      // إنشاء قالب HTML/CSS إبداعي للموقع
+      const websiteTemplate = generateWebsiteTemplate(specsData);
+      const templateBlob = new Blob([websiteTemplate], { type: 'text/html;charset=utf-8' });
+      const templateUrl = URL.createObjectURL(templateBlob);
+      const templateLink = document.createElement('a');
+      templateLink.href = templateUrl;
+      templateLink.download = `قالب-موقع-${data.websiteName}-${orderNumber}.html`;
+      document.body.appendChild(templateLink);
+      templateLink.click();
+      document.body.removeChild(templateLink);
+      URL.revokeObjectURL(templateUrl);
+
       toast({
-        title: "✅ تم إرسال المواصفات بنجاح!",
-        description: `رقم الطلب: ${orderNumber} - سيتم التواصل معك قريباً`,
+        title: "✅ تم إنشاء المواصفات والقالب بنجاح!",
+        description: `رقم الطلب: ${orderNumber} - تم تحميل الملفات`,
+        duration: 5000,
       });
-      
-      // الانتقال مباشرة للدفع
+
+      // رسالة للمستخدم حول الخطوات التالية
+      setTimeout(() => {
+        toast({
+          title: "📱 الخطوة التالية",
+          description: "أرسل الملفات المحملة عبر واتساب: 966532441566",
+          duration: 8000,
+        });
+      }, 2000);
+
+      // الانتقال لصفحة دفع مبسطة
       setTimeout(() => {
         setLocation('/payment');
-      }, 1500);
+      }, 3000);
       
     } catch (error) {
-      console.error('Error submitting specifications:', error);
+      console.error('Error generating files:', error);
       toast({
         title: "حدث خطأ",
         description: "يرجى المحاولة مرة أخرى",
@@ -893,7 +902,7 @@ export default function WebsiteSpecifications() {
                       ) : (
                         <>
                           <CheckCircle className="w-4 h-4" />
-                          إرسال المواصفات والانتقال للدفع
+                          تحميل المواصفات والقالب
                         </>
                       )}
                     </Button>
@@ -1037,6 +1046,446 @@ function generateSpecsDocument(specs: any): string {
             <p>للاستفسارات: ma3k.2025@gmail.com | 966532441566</p>
         </div>
     </div>
+</body>
+</html>
+  `;
+}
+
+function generateWebsiteTemplate(specs: any): string {
+  const colors = {
+    'blue-white': { primary: '#0066cc', secondary: '#ffffff', accent: '#1a73e8' },
+    'green-gold': { primary: '#2d5016', secondary: '#ffd700', accent: '#4caf50' },
+    'red-black': { primary: '#dc143c', secondary: '#000000', accent: '#ff4444' },
+    'purple-silver': { primary: '#6a0dad', secondary: '#c0c0c0', accent: '#9c27b0' },
+    'custom': { primary: '#667eea', secondary: '#764ba2', accent: '#f093fb' }
+  };
+  
+  const selectedColors = colors[specs.colorScheme as keyof typeof colors] || colors.custom;
+  
+  return `
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${specs.websiteName}</title>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: 'Tajawal', 'Segoe UI', Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333;
+            background: linear-gradient(135deg, ${selectedColors.primary}15 0%, ${selectedColors.accent}15 100%);
+            min-height: 100vh;
+        }
+        
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 20px; 
+        }
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, ${selectedColors.primary} 0%, ${selectedColors.accent} 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, ${selectedColors.primary}20 0%, ${selectedColors.accent}20 100%);
+            padding: 4rem 0;
+            text-align: center;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, ${selectedColors.primary}, ${selectedColors.accent});
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease;
+        }
+        
+        .hero-content p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: #666;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, ${selectedColors.primary}, ${selectedColors.accent});
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        /* Sections */
+        .section {
+            padding: 4rem 0;
+            margin: 2rem 0;
+        }
+        
+        .section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: ${selectedColors.primary};
+            position: relative;
+        }
+        
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(135deg, ${selectedColors.primary}, ${selectedColors.accent});
+            border-radius: 2px;
+        }
+        
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: ${selectedColors.accent};
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, ${selectedColors.primary}, ${selectedColors.accent});
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+        
+        /* Contact Section */
+        .contact {
+            background: linear-gradient(135deg, ${selectedColors.primary}10 0%, ${selectedColors.accent}10 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 2rem 0;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, ${selectedColors.primary} 0%, ${selectedColors.accent} 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 4rem;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .section { padding: 2rem 0; }
+            .features-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* Interactive Elements */
+        .interactive-element {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .interactive-element:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        
+        .interactive-button {
+            background: linear-gradient(135deg, ${selectedColors.primary}, ${selectedColors.accent});
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+        
+        .interactive-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">${specs.websiteName}</div>
+            <ul class="nav-links">
+                ${[specs.mainSection1, specs.mainSection2, specs.mainSection3].filter(Boolean).map((section: string) => 
+                    `<li><a href="#${section.replace(/\s+/g, '-')}">${section}</a></li>`
+                ).join('')}
+                <li><a href="#contact">تواصل معنا</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>${specs.websiteName}</h1>
+                <p>${specs.idea}</p>
+                <a href="#services" class="cta-button">اكتشف خدماتنا</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section">
+        <div class="container">
+            <h2>من نحن</h2>
+            <p style="text-align: center; font-size: 1.2rem; color: #666; max-width: 800px; margin: 0 auto;">
+                ${specs.purpose}
+            </p>
+        </div>
+    </section>
+
+    <section id="services" class="section">
+        <div class="container">
+            <h2>خدماتنا</h2>
+            <div class="features-grid">
+                ${[specs.mainFunction1, specs.mainFunction2, specs.mainFunction3, specs.mainFunction4]
+                  .filter(Boolean)
+                  .map((func: string, index: number) => `
+                    <div class="feature-card">
+                        <div class="feature-icon">${['🚀', '💎', '⭐', '🎯'][index] || '✨'}</div>
+                        <h3>${func}</h3>
+                        <p>نقدم أفضل الحلول في ${func} بجودة عالية واحترافية تامة</p>
+                    </div>
+                  `).join('')}
+            </div>
+        </div>
+    </section>
+
+    ${specs.additionalFeatures && specs.additionalFeatures.length > 0 ? `
+    <section class="section">
+        <div class="container">
+            <h2>المميزات الإضافية</h2>
+            <div class="features-grid">
+                ${specs.additionalFeatures.map((feature: string) => `
+                    <div class="interactive-element">
+                        <h4>⭐ ${feature}</h4>
+                        <p>تمتع بميزة ${feature} المتطورة والمفيدة</p>
+                        <button class="interactive-button">تعرف أكثر</button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    ${specs.interactiveElements && specs.interactiveElements.length > 0 ? `
+    <section class="section">
+        <div class="container">
+            <h2>العناصر التفاعلية</h2>
+            <div class="features-grid">
+                ${specs.interactiveElements.map((element: string) => `
+                    <div class="interactive-element">
+                        <h4>🎮 ${element}</h4>
+                        <p>استمتع بتجربة ${element} التفاعلية والممتعة</p>
+                        <button class="interactive-button" onclick="alert('مرحباً! هذا مثال على ${element}')">جرب الآن</button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="contact">
+                <h2>تواصل معنا</h2>
+                <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">
+                    نحن هنا لخدمتك ومساعدتك في تحقيق أهدافك
+                </p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <h4>📧 البريد الإلكتروني</h4>
+                        <p>ma3k.2025@gmail.com</p>
+                    </div>
+                    <div class="contact-item">
+                        <h4>📱 واتساب</h4>
+                        <p>966532441566</p>
+                    </div>
+                    <div class="contact-item">
+                        <h4>🌍 الموقع الإلكتروني</h4>
+                        <p>www.${specs.websiteName.toLowerCase().replace(/\s+/g, '')}.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ${specs.websiteName} - جميع الحقوق محفوظة</p>
+            <p>تم إنشاؤه بواسطة منصة معك للخدمات الرقمية</p>
+            <p>رقم المرجع: ${specs.specId}</p>
+        </div>
+    </footer>
+
+    <script>
+        // إضافة بعض التفاعل الأساسي
+        document.addEventListener('DOMContentLoaded', function() {
+            // تأثير التمرير السلس
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // تأثير ظهور العناصر عند التمرير
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // مراقبة جميع العناصر القابلة للتحريك
+            document.querySelectorAll('.feature-card, .interactive-element').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
 </body>
 </html>
   `;
