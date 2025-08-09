@@ -145,11 +145,16 @@ export default function WebsiteSpecifications() {
     setIsSubmitting(true);
     
     try {
-      // التحقق من صحة البيانات المطلوبة
-      if (!data.websiteName || !data.idea || !data.purpose || !data.targetAudience) {
+      console.log('Form submission started with data:', data);
+      
+      // Log form errors if any
+      const errors = form.formState.errors;
+      console.log('Form errors:', errors);
+      
+      if (Object.keys(errors).length > 0) {
         toast({
-          title: "يرجى إكمال جميع الحقول المطلوبة",
-          description: "تأكد من ملء جميع البيانات الأساسية",
+          title: "يرجى إصلاح الأخطاء في النموذج",
+          description: "تحقق من جميع الحقول المطلوبة",
           variant: "destructive"
         });
         setIsSubmitting(false);
@@ -170,6 +175,7 @@ export default function WebsiteSpecifications() {
       }
 
       const result = await response.json();
+      console.log('Server response:', result);
       
       // حفظ رقم الطلب في localStorage للاستخدام في الدفع
       const orderNumber = result.specification.specId;
@@ -301,7 +307,7 @@ export default function WebsiteSpecifications() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>نوع التصميم المطلوب</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر نوع التصميم" />
@@ -327,7 +333,7 @@ export default function WebsiteSpecifications() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>نظام الألوان المفضل</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر نظام الألوان" />
@@ -357,7 +363,7 @@ export default function WebsiteSpecifications() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>اللغات المطلوبة</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر اللغات" />
@@ -381,7 +387,7 @@ export default function WebsiteSpecifications() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>الأجهزة المدعومة</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر الأجهزة" />
@@ -588,7 +594,7 @@ export default function WebsiteSpecifications() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>الميزانية المتوقعة</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر الميزانية" />
@@ -612,7 +618,7 @@ export default function WebsiteSpecifications() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>نوع إدارة المحتوى</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="اختر نوع الإدارة" />
