@@ -500,7 +500,7 @@ function generateInvoiceHtml(invoice: any, order: any): string {
             <div class="logo">معك</div>
             <h1 class="invoice-title">فاتورة ضريبية</h1>
             <p>رقم الفاتورة: ${invoice.invoiceNumber}</p>
-            <p>تاريخ الإصدار: ${new Date(invoice.issuedAt).toLocaleDateString('ar-SA')}</p>
+            <p>تاريخ الإصدار: ${new Date(invoice.createdAt).toLocaleDateString('ar-SA')}</p>
         </div>
         
         <div class="info-section">
@@ -508,6 +508,7 @@ function generateInvoiceHtml(invoice: any, order: any): string {
                 <h3>معلومات العميل</h3>
                 <p><strong>الاسم:</strong> ${order.customerName}</p>
                 <p><strong>البريد الإلكتروني:</strong> ${order.customerEmail}</p>
+                <p><strong>الهاتف:</strong> ${order.customerPhone || 'غير محدد'}</p>
             </div>
             <div class="info-box">
                 <h3>معلومات الشركة</h3>
@@ -521,22 +522,18 @@ function generateInvoiceHtml(invoice: any, order: any): string {
             <thead>
                 <tr>
                     <th>الخدمة</th>
-                    <th>الكمية</th>
+                    <th>الوصف</th>
                     <th>السعر</th>
-                    <th>الإجمالي</th>
                 </tr>
             </thead>
             <tbody>
-                ${order.items.map((item: any) => `
                 <tr>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.price} ر.س</td>
-                    <td>${item.price * item.quantity} ر.س</td>
+                    <td>${order.serviceName}</td>
+                    <td>${order.description || 'خدمات رقمية متخصصة'}</td>
+                    <td>${order.price} ر.س</td>
                 </tr>
-                `).join('')}
                 <tr class="total-row">
-                    <td colspan="3"><strong>المجموع الكلي</strong></td>
+                    <td colspan="2"><strong>المجموع الكلي</strong></td>
                     <td><strong>${invoice.amount} ر.س</strong></td>
                 </tr>
             </tbody>
@@ -545,6 +542,7 @@ function generateInvoiceHtml(invoice: any, order: any): string {
         <div class="footer">
             <p>شكراً لاختياركم خدماتنا</p>
             <p>معك - نُصمم أحلامك الرقمية</p>
+            <p>رقم الطلب: ${order.orderNumber}</p>
         </div>
     </div>
 </body>
