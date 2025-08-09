@@ -7,7 +7,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -305,23 +305,40 @@ export default function WebsiteSpecifications() {
                 control={form.control}
                 name="designType"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-3">
                     <FormLabel>نوع التصميم المطلوب</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر نوع التصميم" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="modern">عصري ومتقدم</SelectItem>
-                        <SelectItem value="classic">كلاسيكي وأنيق</SelectItem>
-                        <SelectItem value="minimalist">بسيط ونظيف</SelectItem>
-                        <SelectItem value="creative">إبداعي ومليء بالألوان</SelectItem>
-                        <SelectItem value="professional">مهني وأكاديمي</SelectItem>
-                        <SelectItem value="luxury">فاخر ومميز</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="modern" id="modern" />
+                          <FormLabel htmlFor="modern">عصري ومتقدم</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="classic" id="classic" />
+                          <FormLabel htmlFor="classic">كلاسيكي وأنيق</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="minimalist" id="minimalist" />
+                          <FormLabel htmlFor="minimalist">بسيط ونظيف</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="creative" id="creative" />
+                          <FormLabel htmlFor="creative">إبداعي ومليء بالألوان</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="professional" id="professional" />
+                          <FormLabel htmlFor="professional">مهني وأكاديمي</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="luxury" id="luxury" />
+                          <FormLabel htmlFor="luxury">فاخر ومميز</FormLabel>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -331,25 +348,36 @@ export default function WebsiteSpecifications() {
                 control={form.control}
                 name="colorScheme"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-3">
                     <FormLabel>نظام الألوان المفضل</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر نظام الألوان" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="blue-white">أزرق وأبيض</SelectItem>
-                        <SelectItem value="green-gold">أخضر وذهبي</SelectItem>
-                        <SelectItem value="red-black">أحمر وأسود</SelectItem>
-                        <SelectItem value="purple-silver">بنفسجي وفضي</SelectItem>
-                        <SelectItem value="orange-brown">برتقالي وبني</SelectItem>
-                        <SelectItem value="monochrome">أحادي اللون</SelectItem>
-                        <SelectItem value="rainbow">متعدد الألوان</SelectItem>
-                        <SelectItem value="custom">ألوان مخصصة</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="blue-white" id="blue-white" />
+                          <FormLabel htmlFor="blue-white">أزرق وأبيض</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="green-gold" id="green-gold" />
+                          <FormLabel htmlFor="green-gold">أخضر وذهبي</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="red-black" id="red-black" />
+                          <FormLabel htmlFor="red-black">أحمر وأسود</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="purple-silver" id="purple-silver" />
+                          <FormLabel htmlFor="purple-silver">بنفسجي وفضي</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="custom" id="custom" />
+                          <FormLabel htmlFor="custom">ألوان مخصصة</FormLabel>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -361,21 +389,32 @@ export default function WebsiteSpecifications() {
                 control={form.control}
                 name="languages"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-3">
                     <FormLabel>اللغات المطلوبة</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر اللغات" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="arabic">العربية فقط</SelectItem>
-                        <SelectItem value="english">الإنجليزية فقط</SelectItem>
-                        <SelectItem value="arabic-english">العربية والإنجليزية</SelectItem>
-                        <SelectItem value="multilingual">متعدد اللغات</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="arabic" id="arabic" />
+                          <FormLabel htmlFor="arabic">العربية فقط</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="english" id="english" />
+                          <FormLabel htmlFor="english">الإنجليزية فقط</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="arabic-english" id="arabic-english" />
+                          <FormLabel htmlFor="arabic-english">العربية والإنجليزية</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="multilingual" id="multilingual" />
+                          <FormLabel htmlFor="multilingual">متعدد اللغات</FormLabel>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -385,21 +424,32 @@ export default function WebsiteSpecifications() {
                 control={form.control}
                 name="deviceSupport"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-3">
                     <FormLabel>الأجهزة المدعومة</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر الأجهزة" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="responsive">جميع الأجهزة (متجاوب)</SelectItem>
-                        <SelectItem value="desktop-only">أجهزة سطح المكتب فقط</SelectItem>
-                        <SelectItem value="mobile-first">الجوال أولاً</SelectItem>
-                        <SelectItem value="tablet-optimized">محسن للتابلت</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="responsive" id="responsive" />
+                          <FormLabel htmlFor="responsive">جميع الأجهزة (متجاوب)</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="desktop-only" id="desktop-only" />
+                          <FormLabel htmlFor="desktop-only">أجهزة سطح المكتب فقط</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="mobile-first" id="mobile-first" />
+                          <FormLabel htmlFor="mobile-first">الجوال أولاً</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="tablet-optimized" id="tablet-optimized" />
+                          <FormLabel htmlFor="tablet-optimized">محسن للتابلت</FormLabel>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -594,21 +644,32 @@ export default function WebsiteSpecifications() {
                 control={form.control}
                 name="budget"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-3">
                     <FormLabel>الميزانية المتوقعة</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر الميزانية" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="400-800">400 - 800 ريال</SelectItem>
-                        <SelectItem value="800-1200">800 - 1200 ريال</SelectItem>
-                        <SelectItem value="1200-2000">1200 - 2000 ريال</SelectItem>
-                        <SelectItem value="2000+">أكثر من 2000 ريال</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="400-800" id="budget-400" />
+                          <FormLabel htmlFor="budget-400">400 - 800 ريال</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="800-1200" id="budget-800" />
+                          <FormLabel htmlFor="budget-800">800 - 1200 ريال</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="1200-2000" id="budget-1200" />
+                          <FormLabel htmlFor="budget-1200">1200 - 2000 ريال</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="2000+" id="budget-2000" />
+                          <FormLabel htmlFor="budget-2000">أكثر من 2000 ريال</FormLabel>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -618,21 +679,32 @@ export default function WebsiteSpecifications() {
                 control={form.control}
                 name="contentManagement"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-3">
                     <FormLabel>نوع إدارة المحتوى</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر نوع الإدارة" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="simple">بسيط (تحديث نصوص)</SelectItem>
-                        <SelectItem value="medium">متوسط (إضافة منتجات)</SelectItem>
-                        <SelectItem value="advanced">متقدم (إدارة كاملة)</SelectItem>
-                        <SelectItem value="custom">مخصص حسب الطلب</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="simple" id="content-simple" />
+                          <FormLabel htmlFor="content-simple">بسيط (تحديث نصوص)</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="medium" id="content-medium" />
+                          <FormLabel htmlFor="content-medium">متوسط (إضافة منتجات)</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="advanced" id="content-advanced" />
+                          <FormLabel htmlFor="content-advanced">متقدم (إدارة كاملة)</FormLabel>
+                        </div>
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <RadioGroupItem value="custom" id="content-custom" />
+                          <FormLabel htmlFor="content-custom">مخصص حسب الطلب</FormLabel>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
