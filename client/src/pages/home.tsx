@@ -77,31 +77,38 @@ export default function Home() {
             <h2 className="luxury-h1 text-white mb-6">
               نُصمم أحلامك الرقمية
             </h2>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              شريكك المثالي في رحلة التحول الرقمي - من الفكرة إلى التنفيذ بأعلى معايير الجودة والإبداع
+            <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed mb-4">
+              صمّم تطبيقك أو موقعك الخاص بسهولة واحترافية مع أوبن لايف نسخة الذكاء الاصطناعي التي نملكها اكتب ناقش فكرتك معه وأرسلها لننفذ أحسن تطبيق!
+            </p>
+            <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-4">
+              سواء كنت تحتاج تطبيقًا شخصيًا، موقعًا إلكترونيًا، متجرًا إلكترونيًا، أو خدمات إضافية، نحن هنا لنساعدك!
+            </p>
+            <p className="text-base text-amber-300 max-w-2xl mx-auto mb-8 font-semibold">
+              نقدم استراتيجيات مصممة خصيصاً لمساعدتك في بناء موقعك الإلكتروني بنجاح.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
               <Link href="/services">
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="glass-card rounded-2xl p-6 text-center group cursor-pointer"
                 >
-                  <Button className="luxury-btn bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold py-4 px-8 rounded-full text-lg shadow-2xl">
-                    استكشف خدماتنا
-                    <ArrowLeft className="mr-2 h-5 w-5" />
-                  </Button>
+                  <div className="text-4xl mb-4">✏️</div>
+                  <h3 className="text-xl font-bold text-white mb-2">أذهب واكتشف خدماتنا</h3>
+                  <p className="text-gray-300 text-sm">اطلع على المزيد</p>
                 </motion.div>
               </Link>
               
-              <Link href="/about">
+              <Link href="/website-form">
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="glass-card rounded-2xl p-6 text-center group cursor-pointer"
                 >
-                  <Button variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black font-bold py-4 px-8 rounded-full text-lg shadow-xl">
-                    تعرف علينا أكثر
-                  </Button>
+                  <div className="text-4xl mb-4">💻</div>
+                  <h3 className="text-xl font-bold text-white mb-2">أذهب واكتشف أوبن لايف</h3>
+                  <p className="text-gray-300 text-sm">اطلع على ذكائنا الاصطناعي</p>
                 </motion.div>
               </Link>
             </div>
@@ -325,6 +332,63 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <h2 className="luxury-h1 text-amber-400 mb-6">الأسئلة الشائعة</h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              أجوبة سريعة على أكثر الأسئلة شيوعاً حول خدماتنا
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
+            {[
+              {
+                question: "كيف يمكنني طلب موقع إلكتروني جديد؟",
+                answer: "يمكنك استخدام نموذج إنشاء الموقع في قسم 'إنشاء موقع' أو التواصل معنا مباشرة لمناقشة احتياجاتك."
+              },
+              {
+                question: "ما هي طرق الدفع المتاحة؟",
+                answer: "نقبل الدفع عبر PayPal، التحويل البنكي، وطرق الدفع السعودية مثل STC Pay و UR Pay."
+              },
+              {
+                question: "كم يستغرق تطوير الموقع؟",
+                answer: "يختلف الوقت حسب حجم المشروع، ولكن عادة ما يتم التسليم خلال 7-14 يوم عمل."
+              },
+              {
+                question: "هل تقدمون دعماً تقنياً بعد التسليم؟",
+                answer: "نعم، نقدم دعماً تقنياً شاملاً ومتابعة مستمرة لضمان عمل موقعك بأفضل أداء."
+              },
+              {
+                question: "هل يمكنني تعديل الموقع بعد التسليم؟",
+                answer: "بالطبع! نقدم خدمات التعديل والتحديث المستمر حسب احتياجاتك."
+              },
+              {
+                question: "ما الذي يميز خدماتكم؟",
+                answer: "نتميز بالجودة العالية، السرعة في التنفيذ، الدعم المستمر، والأسعار التنافسية."
+              }
+            ].map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="glass-card rounded-2xl p-6"
+              >
+                <h3 className="text-lg font-bold text-amber-400 mb-3">{faq.question}</h3>
+                <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20">
         <div className="container mx-auto px-6">
@@ -340,7 +404,7 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link href="/services">
+              <Link href="/website-form">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -351,16 +415,16 @@ export default function Home() {
                 </motion.div>
               </Link>
               
-              <a href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '966500000000'}`} target="_blank" rel="noopener noreferrer">
+              <Link href="/services">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Button variant="outline" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black font-bold py-4 px-8 rounded-full text-lg shadow-xl">
-                    تواصل عبر واتساب
+                    استكشف الخدمات
                   </Button>
                 </motion.div>
-              </a>
+              </Link>
             </div>
           </motion.div>
         </div>
