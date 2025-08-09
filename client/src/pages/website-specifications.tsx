@@ -74,6 +74,33 @@ export default function WebsiteSpecifications() {
   const form = useForm<WebsiteSpecsData>({
     resolver: zodResolver(websiteSpecsSchema),
     defaultValues: {
+      websiteName: "",
+      idea: "",
+      purpose: "",
+      targetAudience: "",
+      designType: "",
+      colorScheme: "",
+      mainSection1: "",
+      mainSection2: "",
+      mainSection3: "",
+      mainSection4: "",
+      mainSection5: "",
+      mainFunction1: "",
+      mainFunction2: "",
+      mainFunction3: "",
+      mainFunction4: "",
+      languages: "",
+      deviceSupport: "",
+      contentManagement: "",
+      mainGoal1: "",
+      mainGoal2: "",
+      mainGoal3: "",
+      budget: "",
+      specialRequirements: "",
+      preferredDeadline: "",
+      competitorWebsites: "",
+      inspirationSites: "",
+      additionalNotes: "",
       additionalFeatures: [],
       interactiveElements: [],
     }
@@ -118,6 +145,17 @@ export default function WebsiteSpecifications() {
     setIsSubmitting(true);
     
     try {
+      // التحقق من صحة البيانات المطلوبة
+      if (!data.websiteName || !data.idea || !data.purpose || !data.targetAudience) {
+        toast({
+          title: "يرجى إكمال جميع الحقول المطلوبة",
+          description: "تأكد من ملء جميع البيانات الأساسية",
+          variant: "destructive"
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       // حفظ مواصفات الموقع في localStorage
       const websiteSpecs = {
         ...data,
@@ -126,6 +164,7 @@ export default function WebsiteSpecifications() {
       };
       
       localStorage.setItem('websiteSpecs', JSON.stringify(websiteSpecs));
+      localStorage.setItem('websiteSpecifications', JSON.stringify(data));
       
       // إنشاء ملف مواصفات قابل للتحميل
       const specsDocument = generateSpecsDocument(websiteSpecs);
@@ -138,13 +177,15 @@ export default function WebsiteSpecifications() {
       link.download = `مواصفات-موقع-${data.websiteName.replace(/\s+/g, '-')}-${Date.now()}.html`;
       link.click();
       
+      // تنظيف الرابط
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 100);
+      
       toast({
         title: "✅ تم حفظ المواصفات بنجاح!",
         description: "تم تحميل ملف المواصفات الكامل. يمكنك الآن الانتقال للدفع.",
       });
-      
-      // حفظ المواصفات في localStorage للتكامل مع نظام الدفع
-      localStorage.setItem('websiteSpecifications', JSON.stringify(data));
       
       // الانتقال لصفحة الدفع
       setTimeout(() => {
@@ -152,6 +193,7 @@ export default function WebsiteSpecifications() {
       }, 2000);
       
     } catch (error) {
+      console.error('Error saving specifications:', error);
       toast({
         title: "حدث خطأ",
         description: "يرجى المحاولة مرة أخرى",
