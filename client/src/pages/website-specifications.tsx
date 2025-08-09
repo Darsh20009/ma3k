@@ -234,9 +234,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <Globe className="w-16 h-16 mx-auto text-indigo-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">المعلومات الأساسية</h2>
-              <p className="text-gray-600">ابدأ بوصف فكرة موقعك الأساسية</p>
+              <Globe className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">المعلومات الأساسية</h2>
+              <p className="text-muted-foreground">ابدأ بوصف فكرة موقعك الأساسية</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -315,9 +315,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <Sparkles className="w-16 h-16 mx-auto text-indigo-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">التصميم والمظهر</h2>
-              <p className="text-gray-600">حدد نوع التصميم والألوان المفضلة</p>
+              <Sparkles className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">التصميم والمظهر</h2>
+              <p className="text-muted-foreground">حدد نوع التصميم والألوان المفضلة</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -486,9 +486,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <FileText className="w-16 h-16 mx-auto text-indigo-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">أقسام ووظائف الموقع</h2>
-              <p className="text-gray-600">حدد الأقسام والوظائف الأساسية للموقع</p>
+              <FileText className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">أقسام ووظائف الموقع</h2>
+              <p className="text-muted-foreground">حدد الأقسام والوظائف الأساسية للموقع</p>
             </div>
 
             <div className="space-y-4">
@@ -567,9 +567,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <CheckCircle className="w-16 h-16 mx-auto text-indigo-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">المميزات المتقدمة</h2>
-              <p className="text-gray-600">اختر المميزات الإضافية التي تريدها</p>
+              <CheckCircle className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">المميزات المتقدمة</h2>
+              <p className="text-muted-foreground">اختر المميزات الإضافية التي تريدها</p>
             </div>
 
             <div className="space-y-6">
@@ -654,9 +654,9 @@ export default function WebsiteSpecifications() {
             className="space-y-6"
           >
             <div className="text-center mb-8">
-              <CheckCircle className="w-16 h-16 mx-auto text-indigo-600 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-900">التفاصيل النهائية</h2>
-              <p className="text-gray-600">أكمل المعلومات المتبقية</p>
+              <CheckCircle className="w-16 h-16 mx-auto text-primary mb-4" />
+              <h2 className="text-2xl font-bold text-foreground">التفاصيل النهائية</h2>
+              <p className="text-muted-foreground">أكمل المعلومات المتبقية</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -845,38 +845,38 @@ export default function WebsiteSpecifications() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 py-8">
+    <div className="min-h-screen royal-gradient py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        <Card className="shadow-xl border border-indigo-100 bg-white/95 backdrop-blur-sm">
-          <CardHeader className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-t-lg">
+        <Card className="glass-card shadow-2xl border-0">
+          <CardHeader className="gold-gradient text-black dark:text-black">
             <CardTitle className="text-center text-2xl font-bold">
               🌐 مواصفات الموقع المطلوب
             </CardTitle>
-            <p className="text-center text-white/90">
+            <p className="text-center text-black/80 dark:text-black/80">
               اكمل التفاصيل بدقة ليتمكن المطور من إنشاء موقعك المثالي
             </p>
             
             {/* Progress Bar */}
             <div className="mt-6">
-              <div className="flex justify-between text-sm text-white/80 mb-2">
+              <div className="flex justify-between text-sm text-black/70 dark:text-black/70 mb-2">
                 <span>الخطوة {currentStep} من 5</span>
                 <span>{Math.round((currentStep / 5) * 100)}%</span>
               </div>
-              <div className="w-full bg-white/20 rounded-full h-2">
+              <div className="w-full bg-black/20 rounded-full h-2">
                 <div 
-                  className="bg-white h-2 rounded-full transition-all duration-500"
+                  className="bg-black h-2 rounded-full transition-all duration-500"
                   style={{ width: `${(currentStep / 5) * 100}%` }}
                 ></div>
               </div>
             </div>
           </CardHeader>
           
-          <CardContent className="p-8 bg-white">
+          <CardContent className="p-8 bg-card/50 dark:bg-card/50 backdrop-blur-sm">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 {renderStep()}
                 
-                <Separator className="bg-gray-200" />
+                <Separator className="bg-border/20" />
                 
                 <div className="flex justify-between pt-6">
                   <Button
@@ -884,7 +884,7 @@ export default function WebsiteSpecifications() {
                     variant="outline"
                     onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
                     disabled={currentStep === 1}
-                    className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                    className="flex items-center gap-2 bg-secondary/80 hover:bg-secondary border-border/30"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     السابق
@@ -894,7 +894,7 @@ export default function WebsiteSpecifications() {
                     <Button
                       type="button"
                       onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
-                      className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold hover:from-indigo-700 hover:to-blue-700"
+                      className="flex items-center gap-2 gold-gradient text-black font-semibold hover:opacity-90"
                     >
                       التالي
                       <ArrowRight className="w-4 h-4" />
@@ -903,11 +903,11 @@ export default function WebsiteSpecifications() {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold hover:from-green-700 hover:to-emerald-700"
+                      className="flex items-center gap-2 gold-gradient text-black font-semibold hover:opacity-90"
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
                           جاري الإرسال...
                         </>
                       ) : (
