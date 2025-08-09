@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,35 +55,41 @@ export default function SimplePayment() {
   const orderNumber = localStorage.getItem('websiteOrderNumber') || 'WEB-' + Date.now();
 
   return (
-    <div className="min-h-screen royal-gradient py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-        
-        {/* Header */}
-        <Card className="glass-card shadow-2xl border-0 mb-8">
-          <CardHeader className="gold-gradient text-black text-center">
-            <CardTitle className="text-3xl font-bold">💳 طرق الدفع المتاحة</CardTitle>
-            <p className="text-lg mt-2">اختر الطريقة الأنسب لك لإتمام عملية الدفع</p>
-            <Badge variant="secondary" className="mx-auto mt-4 text-lg px-4 py-2">
-              رقم الطلب: {orderNumber}
-            </Badge>
-          </CardHeader>
-        </Card>
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative">
+      <div className="absolute inset-0 luxury-bg"></div>
+      
+      {/* Hero Section */}
+      <section className="dark-gradient text-white py-20 relative overflow-hidden">
+        <div className="absolute inset-0 luxury-bg opacity-20"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-text-shimmer">
+            💳 طرق الدفع المتاحة
+          </h1>
+          <div className="luxury-divider mb-6"></div>
+          <p className="text-xl opacity-90 mb-8">
+            اختر الطريقة الأنسب لك لإتمام عملية الدفع
+          </p>
+          <Badge variant="secondary" className="text-lg px-6 py-3 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black font-bold">
+            رقم الطلب: {orderNumber}
+          </Badge>
+        </div>
+      </section>
 
-        {/* Packages */}
-        <Card className="glass-card shadow-2xl border-0 mb-8">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center text-foreground">📦 باقات الخدمات والأسعار</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <div className="container mx-auto px-4 py-12 relative z-10">
+        <div className="max-w-7xl mx-auto">
+          
+          {/* Packages Section */}
+          <div className="luxury-card p-8 rounded-3xl mb-12">
+            <h2 className="text-3xl font-bold mb-8 text-center text-gray-200">📦 باقات الخدمات والأسعار</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {packages.map((pkg, index) => (
-                <div key={index} className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-xl border border-primary/20 hover:border-primary/40 transition-all">
-                  <h3 className="font-bold text-lg mb-2 text-primary">{pkg.name}</h3>
-                  <div className="text-2xl font-bold text-accent mb-4">{pkg.price} ريال</div>
-                  <ul className="space-y-2">
+                <div key={index} className="luxury-card p-6 rounded-2xl hover:scale-105 transition-all duration-300 border border-yellow-400/20">
+                  <h3 className="font-bold text-xl mb-3 text-yellow-400">{pkg.name}</h3>
+                  <div className="text-3xl font-bold text-white mb-4">{pkg.price} ريال</div>
+                  <ul className="space-y-3">
                     {pkg.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      <li key={i} className="flex items-center gap-3 text-sm text-gray-300">
+                        <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
                         {feature}
                       </li>
                     ))}
@@ -90,117 +97,110 @@ export default function SimplePayment() {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
           {/* Payment Methods */}
-          {paymentMethods.map((method) => (
-            <Card key={method.id} className="glass-card shadow-2xl border-0">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-xl">
-                  <div className={`${method.color} p-3 rounded-full text-white`}>
-                    <method.icon className="w-6 h-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            {paymentMethods.map((method) => (
+              <div key={method.id} className="luxury-card p-8 rounded-3xl">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className={`${method.color} p-4 rounded-full text-white`}>
+                    <method.icon className="w-8 h-8" />
                   </div>
-                  {method.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+                  <h3 className="text-2xl font-bold text-gray-200">{method.title}</h3>
+                </div>
                 
-                {method.accounts && method.accounts.map((account, index) => (
-                  <div key={index} className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
-                    <div className="font-semibold text-blue-800 dark:text-blue-200 mb-2">{account.bank}</div>
-                    <div className="space-y-2">
+                <div className="space-y-6">
+                  {method.accounts && method.accounts.map((account, index) => (
+                    <div key={index} className="luxury-card p-6 rounded-2xl border border-blue-400/30">
+                      <div className="font-semibold text-blue-400 mb-4 text-lg">{account.bank}</div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400">رقم الآيبان:</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(account.iban, `آيبان ${account.bank}`)}
+                            className="flex items-center gap-2 text-gray-200 hover:text-white"
+                          >
+                            {copied === `آيبان ${account.bank}` ? (
+                              <CheckCircle2 className="w-4 h-4 text-green-400" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                            {account.iban}
+                          </Button>
+                        </div>
+                        <div className="text-sm font-medium text-gray-300">{account.name}</div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {method.wallets && method.wallets.map((wallet, index) => (
+                    <div key={index} className="luxury-card p-6 rounded-2xl border border-green-400/30">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">رقم الآيبان:</span>
+                        <div className="flex items-center gap-4">
+                          <span className="text-3xl">{wallet.logo}</span>
+                          <span className="font-semibold text-green-400 text-lg">{wallet.name}</span>
+                        </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => copyToClipboard(account.iban, `آيبان ${account.bank}`)}
-                          className="flex items-center gap-2"
+                          onClick={() => copyToClipboard(wallet.number, wallet.name)}
+                          className="flex items-center gap-2 text-gray-200 hover:text-white"
                         >
-                          {copied === `آيبان ${account.bank}` ? (
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                          {copied === wallet.name ? (
+                            <CheckCircle2 className="w-4 h-4 text-green-400" />
                           ) : (
                             <Copy className="w-4 h-4" />
                           )}
-                          {account.iban}
+                          {wallet.number}
                         </Button>
                       </div>
-                      <div className="text-sm font-medium">{account.name}</div>
                     </div>
-                  </div>
-                ))}
-
-                {method.wallets && method.wallets.map((wallet, index) => (
-                  <div key={index} className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-lg border border-green-200 dark:border-green-700">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{wallet.logo}</span>
-                        <span className="font-semibold text-green-800 dark:text-green-200">{wallet.name}</span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(wallet.number, wallet.name)}
-                        className="flex items-center gap-2"
-                      >
-                        {copied === wallet.name ? (
-                          <CheckCircle2 className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                        {wallet.number}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-                
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Instructions */}
-        <Card className="glass-card shadow-2xl border-0 mt-8">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center text-foreground">📋 تعليمات الدفع</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div className="space-y-3">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                  <span className="text-2xl">1️⃣</span>
+                  ))}
                 </div>
-                <h3 className="font-bold text-lg">اختر طريقة الدفع</h3>
-                <p className="text-sm text-muted-foreground">
+              </div>
+            ))}
+          </div>
+
+          {/* Instructions */}
+          <div className="luxury-card p-8 rounded-3xl">
+            <h2 className="text-3xl font-bold text-center text-gray-200 mb-8">📋 تعليمات الدفع</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-8">
+              <div className="space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-3xl">1️⃣</span>
+                </div>
+                <h3 className="font-bold text-xl text-yellow-400">اختر طريقة الدفع</h3>
+                <p className="text-gray-300">
                   اختر الطريقة الأنسب لك من التحويل البنكي أو المحافظ الرقمية
                 </p>
               </div>
               
-              <div className="space-y-3">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                  <span className="text-2xl">2️⃣</span>
+              <div className="space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-3xl">2️⃣</span>
                 </div>
-                <h3 className="font-bold text-lg">أرسل إيصال الدفع</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-bold text-xl text-blue-400">أرسل إيصال الدفع</h3>
+                <p className="text-gray-300">
                   أرسل صورة إيصال التحويل مع رقم الطلب عبر واتساب
                 </p>
               </div>
               
-              <div className="space-y-3">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                  <span className="text-2xl">3️⃣</span>
+              <div className="space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-3xl">3️⃣</span>
                 </div>
-                <h3 className="font-bold text-lg">ابدأ العمل</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-bold text-xl text-green-400">ابدأ العمل</h3>
+                <p className="text-gray-300">
                   سنبدأ العمل على مشروعك فور تأكيد استلام الدفع
                 </p>
               </div>
             </div>
             
-            <Separator className="my-6" />
+            <Separator className="my-8 bg-gray-600" />
             
             <div className="text-center">
               <Button
@@ -210,16 +210,16 @@ export default function SimplePayment() {
 مرفق إيصال التحويل`;
                   window.open(`https://wa.me/966532441566?text=${encodeURIComponent(message)}`, '_blank');
                 }}
-                className="gold-gradient text-black font-bold text-lg px-8 py-4 hover:opacity-90"
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold text-lg px-10 py-4 rounded-2xl hover:scale-105 transition-all duration-300 mb-6"
               >
                 📱 إرسال إيصال الدفع عبر واتساب
               </Button>
-              <p className="text-sm text-muted-foreground mt-4">
+              <p className="text-gray-400">
                 📞 للاستفسارات: 966532441566 | 📧 ma3k.2025@gmail.com
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
