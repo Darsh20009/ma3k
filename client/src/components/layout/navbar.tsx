@@ -1,133 +1,151 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ShoppingCart, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/context/CartContext";
-import { Menu, ShoppingCart } from "lucide-react";
 
 export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [location] = useLocation();
-  const [isOpen, setIsOpen] = useState(false);
-  const { totalItems } = useCart();
+  const { items } = useCart();
+  
+  const cartItemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const navItems = [
+  const navLinks = [
     { href: "/", label: "الرئيسية" },
-    { href: "/services", label: "خدماتنا" },
-    { href: "/tools", label: "الأدوات" },
-    { href: "/portfolio", label: "أعمالنا" },
-    { href: "/invoices", label: "الفواتير" },
-    { href: "#contact", label: "تواصل معنا" },
+    { href: "/services", label: "الخدمات" },
+    { href: "/about", label: "من نحن" }
   ];
 
-  const isActive = (href: string) => {
-    if (href === "/") return location === "/";
-    return location.startsWith(href);
-  };
+  const isActive = (path: string) => location === path;
 
   return (
-    <nav className="luxury-card border-b border-yellow-400/20 shadow-2xl sticky top-0 z-50 backdrop-blur-lg">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-18">
-          {/* Enhanced Logo */}
-          <Link href="/" className="transform hover:scale-105 transition-all duration-300">
-            <div className="flex items-center space-x-reverse space-x-2">
-              <div className="w-12 h-12 rounded-full gold-gradient flex items-center justify-center text-black font-bold text-xl animate-gold-pulse">
-                م
-              </div>
-              <span className="text-2xl font-bold animate-text-shimmer">معك</span>
-            </div>
-          </Link>
-
-          {/* Enhanced Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-reverse space-x-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative px-4 py-2 rounded-lg transition-all duration-300 font-medium hover:scale-105 ${
-                  isActive(item.href) 
-                    ? "bg-gradient-to-r from-yellow-500 to-yellow-600 text-black shadow-lg" 
-                    : "text-gray-200 hover:bg-gradient-to-r hover:from-yellow-100/20 hover:to-yellow-200/20 hover:text-yellow-400"
-                }`}
+    <>
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="fixed top-0 w-full z-50 glass-morphism backdrop-blur-xl border-b border-amber-400/20"
+      >
+        <div className="container mx-auto px-6">
+          <div className="flex items-center justify-between h-20">
+            {/* Logo */}
+            <Link href="/">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center space-x-3 space-x-reverse"
               >
-                {item.label}
-              </Link>
-            ))}
-            <div className="flex items-center gap-4">
-              <Link href="/cart" className="relative">
-                <Button variant="outline" className="relative p-3 rounded-full hover:scale-110 transition-all duration-300 border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/10">
-                  <ShoppingCart className="w-5 h-5" />
-                  {totalItems > 0 && (
-                    <span className="cart-badge">
-                      {totalItems}
-                    </span>
+                <div className="relative">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center font-bold text-xl text-black shadow-xl">
+                    معك
+                  </div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-amber-400 to-amber-600 rounded-xl blur opacity-30 -z-10"></div>
+                </div>
+                <div className="hidden md:block">
+                  <h1 className="text-2xl font-bold text-white">معك</h1>
+                  <p className="text-sm text-gray-400">نُصمم أحلامك الرقمية</p>
+                </div>
+              </motion.div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8 space-x-reverse">
+              {navLinks.map((link) => (
+                <Link key={link.href} href={link.href}>
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    className={`relative py-2 px-4 transition-all duration-300 ${
+                      isActive(link.href)
+                        ? "text-amber-400 font-semibold"
+                        : "text-gray-300 hover:text-white"
+                    }`}
+                  >
+                    {link.label}
+                    {isActive(link.href) && (
+                      <motion.div
+                        layoutId="activeTab"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 to-amber-600"
+                        initial={false}
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      />
+                    )}
+                  </motion.div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Cart & Menu Toggle */}
+            <div className="flex items-center space-x-4 space-x-reverse">
+              {/* Cart Icon */}
+              <Link href="/cart">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative p-2 rounded-lg glass-morphism hover:bg-amber-400/10 transition-colors"
+                >
+                  <ShoppingCart className="w-6 h-6 text-gray-300" />
+                  {cartItemsCount > 0 && (
+                    <Badge className="absolute -top-2 -right-2 bg-amber-400 text-black text-xs min-w-[20px] h-5 flex items-center justify-center p-0">
+                      {cartItemsCount}
+                    </Badge>
                   )}
-                </Button>
+                </motion.div>
               </Link>
-              
-              <Link href="/welcome">
-                <Button className="btn-luxury hover:scale-110 transition-all duration-300 rounded-xl px-6 py-3 font-bold">
-                  👑 ابدأ رحلتك
-                </Button>
-              </Link>
+
+              {/* Mobile Menu Toggle */}
+              <div className="md:hidden">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="p-2 rounded-lg glass-morphism hover:bg-amber-400/10 transition-colors"
+                >
+                  {isMenuOpen ? (
+                    <X className="w-6 h-6 text-gray-300" />
+                  ) : (
+                    <Menu className="w-6 h-6 text-gray-300" />
+                  )}
+                </motion.button>
+              </div>
             </div>
           </div>
+        </div>
+      </motion.nav>
 
-          {/* Mobile Menu */}
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-[320px] luxury-card border-r border-yellow-400/20">
-              <div className="flex flex-col space-y-6 mt-8">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 rounded-full gold-gradient flex items-center justify-center text-black font-bold text-2xl mx-auto mb-3 animate-gold-pulse">
-                    م
-                  </div>
-                  <h3 className="text-xl font-bold animate-text-shimmer">معك</h3>
-                </div>
-                
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`text-lg font-medium transition-all duration-300 px-4 py-3 rounded-xl ${
-                      isActive(item.href) 
-                        ? "bg-gradient-to-r from-yellow-500 to-yellow-600 text-black shadow-lg" 
-                        : "text-gray-200 hover:bg-gradient-to-r hover:from-yellow-100/20 hover:to-yellow-200/20 hover:text-yellow-400"
-                    }`}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.label}
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-20 left-0 right-0 z-40 md:hidden"
+          >
+            <div className="mx-6 mt-2 glass-card rounded-2xl overflow-hidden">
+              <div className="py-4">
+                {navLinks.map((link, index) => (
+                  <Link key={link.href} href={link.href}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`block px-6 py-4 text-lg transition-colors ${
+                        isActive(link.href)
+                          ? "text-amber-400 font-semibold bg-amber-400/10"
+                          : "text-gray-300 hover:text-white hover:bg-white/5"
+                      }`}
+                    >
+                      {link.label}
+                    </motion.div>
                   </Link>
                 ))}
-                
-                <div className="space-y-4">
-                  <Link href="/cart" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" className="w-full py-4 font-bold text-lg rounded-xl relative border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/10">
-                      <ShoppingCart className="w-5 h-5 ml-2" />
-                      🛒 عربة التسوق
-                      {totalItems > 0 && (
-                        <span className="cart-badge">
-                          {totalItems}
-                        </span>
-                      )}
-                    </Button>
-                  </Link>
-                  
-                  <Link href="/welcome" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full btn-luxury rounded-xl py-4 font-bold text-lg">
-                      👑 ابدأ رحلتك
-                    </Button>
-                  </Link>
-                </div>
               </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </div>
-    </nav>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

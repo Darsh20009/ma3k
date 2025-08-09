@@ -1,307 +1,283 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { ShoppingCart, Filter, Search, Grid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ServiceCard from "@/components/services/service-card";
-import PayPalButton from "@/components/PayPalButton";
-import { BANK_DETAILS, WALLET_DETAILS, WHATSAPP_URL, WHATSAPP_MESSAGE_TEMPLATE } from "@/lib/constants";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/hooks/use-toast";
 import type { Service } from "@shared/schema";
 
 export default function Services() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [priceRange, setPriceRange] = useState<"all" | "low" | "mid" | "high">("all");
 
-  const { data: services = [] } = useQuery<Service[]>({
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
+  const { data: services = [], isLoading } = useQuery<Service[]>({
     queryKey: ["/api/services"],
   });
 
+  const handleOrderService = (service: Service) => {
+    addItem({
+      id: service.id,
+      name: service.name,
+      price: service.price,
+      quantity: 1
+    });
+    
+    toast({
+      title: "تم إضافة الخدمة للسلة",
+      description: `تم إضافة ${service.name} إلى سلة التسوق`,
+    });
+  };
 
-  const groupedServices = (services as Service[]).reduce((acc: Record<string, Service[]>, service: Service) => {
-    if (!acc[service.category]) {
-      acc[service.category] = [];
+  // Get unique categories
+  const categories = ["all", ...Array.from(new Set(services.map(s => s.category)))];
+
+  // Filter services
+  const filteredServices = services.filter(service => {
+    const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         service.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || service.category === selectedCategory;
+    
+    let matchesPrice = true;
+    if (priceRange === "low") matchesPrice = service.price <= 1000;
+    else if (priceRange === "mid") matchesPrice = service.price > 1000 && service.price <= 5000;
+    else if (priceRange === "high") matchesPrice = service.price > 5000;
+
+    return matchesSearch && matchesCategory && matchesPrice;
+  });
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.1,
+        staggerChildren: 0.05
+      }
     }
-    acc[service.category].push(service);
-    return acc;
-  }, {});
+  };
 
-  const categories = Object.keys(groupedServices);
+  const itemVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <div className="text-center">
+          <div className="animate-spin w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-300">جاري تحميل الخدمات...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black relative">
-      <div className="absolute inset-0 luxury-bg"></div>
-      
-      {/* Luxury Creative Header */}
-      <section className="dark-gradient text-white py-32 relative overflow-hidden">
-        <div className="absolute inset-0 luxury-bg"></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <div className="animate-luxury-float">
-            <h1 className="text-7xl md:text-9xl font-bold mb-8 animate-text-shimmer">خدماتنا المتميزة</h1>
-            <div className="luxury-divider mb-8"></div>
-            <p className="text-2xl md:text-3xl opacity-90 max-w-5xl mx-auto leading-relaxed animate-gold-pulse">
-              👑 نقدم مجموعة شاملة من الخدمات الرقمية الفخمة بأسعار تنافسية وجودة عالمية
+    <div className="min-h-screen pt-20">
+      {/* Header */}
+      <section className="py-16">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <h1 className="luxury-h1 text-amber-400 mb-6">خدماتنا الرقمية</h1>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              اكتشف مجموعة واسعة من الخدمات الرقمية المتقدمة التي نقدمها لتحقيق أهدافك وتطوير عملك
             </p>
-          </div>
-          <div className="mt-12 animate-luxury-glow">
-            <div className="luxury-card px-10 py-5 rounded-3xl border-2 border-yellow-400/30">
-              <span className="text-2xl font-bold text-yellow-400">💎 أكثر من 500 مشروع ناجح 💎</span>
-            </div>
-          </div>
-        </div>
-      </section>
+          </motion.div>
 
-      {/* Luxury Services Section */}
-      <section className="py-32 relative z-10">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-bold animate-text-shimmer mb-8">👑 اختر خدمتك المثالية</h2>
-            <div className="luxury-divider mb-8"></div>
-            <p className="text-2xl text-gray-300 max-w-4xl mx-auto animate-gold-pulse">استكشف مجموعتنا الشاملة من الخدمات الرقمية المصممة خصيصاً لتحقيق أهدافك</p>
-          </div>
-          
-          <Tabs defaultValue={categories[0]} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-16 luxury-card p-3 rounded-3xl border-2 border-yellow-400/20">
-              {categories.map((category) => (
-                <TabsTrigger 
-                  key={category} 
-                  value={category} 
-                  className="text-lg font-bold rounded-2xl transition-all duration-300 hover:scale-110 data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-yellow-600 data-[state=active]:text-black animate-luxury-glow data-[state=active]:animate-gold-pulse"
+          {/* Filters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="glass-card rounded-2xl p-6 mb-8"
+          >
+            <div className="grid md:grid-cols-4 gap-4 mb-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="ابحث عن خدمة..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-10 bg-gray-800/50 border-gray-600 text-white"
+                />
+              </div>
+
+              {/* Category Filter */}
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white focus:border-amber-400"
+              >
+                <option value="all">جميع الفئات</option>
+                {categories.slice(1).map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+
+              {/* Price Range */}
+              <select
+                value={priceRange}
+                onChange={(e) => setPriceRange(e.target.value as any)}
+                className="px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-md text-white focus:border-amber-400"
+              >
+                <option value="all">جميع الأسعار</option>
+                <option value="low">أقل من 1,000 ريال</option>
+                <option value="mid">1,000 - 5,000 ريال</option>
+                <option value="high">أكثر من 5,000 ريال</option>
+              </select>
+
+              {/* View Mode */}
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="flex-1"
                 >
-                  {category.split(' ')[0]}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {categories.map((category) => (
-              <TabsContent key={category} value={category} className="animate-luxury-float">
-                <div className="mb-16 text-center">
-                  <div className="w-32 h-32 rounded-full gold-gradient flex items-center justify-center mx-auto mb-8 animate-gold-pulse">
-                    <i className={`fas fa-${getCategoryIcon(category)} text-5xl text-black animate-luxury-glow`}></i>
-                  </div>
-                  <h2 className="text-4xl md:text-6xl font-bold animate-text-shimmer mb-6">
-                    {category}
-                  </h2>
-                  <div className="luxury-divider"></div>
-                </div>
-
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
-                  {groupedServices[category]?.map((service: Service, index: number) => (
-                    <div 
-                      key={service.id} 
-                      className="animate-luxury-float"
-                      style={{ animationDelay: `${index * 200}ms` }}
-                    >
-                      <ServiceCard
-                        service={service}
-                        variant={getServiceVariant(index)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-        </div>
-      </section>
-
-      {/* Luxury Payment Methods */}
-      <section className="py-32 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden z-10">
-        <div className="absolute inset-0 luxury-bg opacity-20"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-20 relative z-10">
-            <h2 className="text-5xl md:text-7xl font-bold animate-text-shimmer mb-8">💳 طرق الدفع الآمنة</h2>
-            <div className="luxury-divider mb-8"></div>
-            <p className="text-2xl text-gray-300 max-w-4xl mx-auto animate-gold-pulse">🔒 اختر طريقة الدفع المناسبة لك من بين خياراتنا الآمنة والمتنوعة</p>
-          </div>
-
-          <div className="max-w-6xl mx-auto relative z-10">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
-              <Card className="holographic-card text-center p-8 hover:scale-105 transition-all duration-300 animate-glow-pulse border-2 border-blue-400/30">
-                <CardContent className="pt-6">
-                  <i className="fab fa-paypal text-blue-400 text-6xl mb-6 animate-neon-pulse"></i>
-                  <h3 className="text-2xl font-bold mb-4 text-blue-600">PayPal</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6">ادفع عبر حساب PayPal الآمن</p>
-                  <div className="mt-6">
-                    <PayPalButton 
-                      amount="100" 
-                      currency="SAR" 
-                      intent="capture" 
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="holographic-card text-center p-8 hover:scale-105 transition-all duration-300 animate-glow-pulse border-2 border-green-400/30">
-                <CardContent className="pt-6">
-                  <i className="fas fa-university text-green-400 text-6xl mb-6 animate-neon-pulse"></i>
-                  <h3 className="text-2xl font-bold mb-4 text-green-600">تحويل بنكي</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-3 text-lg">{BANK_DETAILS.BANK_NAME}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-800 p-3 rounded-xl">
-                    {BANK_DETAILS.IBAN}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="holographic-card text-center p-8 hover:scale-105 transition-all duration-300 animate-glow-pulse border-2 border-purple-400/30">
-                <CardContent className="pt-6">
-                  <i className="fas fa-mobile-alt text-purple-400 text-6xl mb-6 animate-neon-pulse"></i>
-                  <h3 className="text-2xl font-bold mb-4 text-purple-600">STC Pay</h3>
-                  <p className="text-gray-600 dark:text-gray-300 font-mono text-lg bg-gray-100 dark:bg-gray-800 p-3 rounded-xl">{WALLET_DETAILS.STC_PAY}</p>
-                </CardContent>
-              </Card>
-
-              <Card className="holographic-card text-center p-8 hover:scale-105 transition-all duration-300 animate-glow-pulse border-2 border-orange-400/30">
-                <CardContent className="pt-6">
-                  <i className="fas fa-wallet text-orange-400 text-6xl mb-6 animate-neon-pulse"></i>
-                  <h3 className="text-2xl font-bold mb-4 text-orange-600">المحافظ الرقمية</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-2 bg-gray-100 dark:bg-gray-800 p-2 rounded-lg">UR PAY: {WALLET_DETAILS.UR_PAY}</p>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded-lg">ALINMA PAY: {WALLET_DETAILS.ALINMA_PAY}</p>
-                </CardContent>
-              </Card>
+                  <Grid className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="flex-1"
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
-            <Card className="luxury-card border-4 border-yellow-400/30 animate-luxury-glow backdrop-blur-lg">
-              <CardContent className="p-12">
-                <div className="text-center mb-8">
-                  <div className="w-24 h-24 rounded-full gold-gradient text-black mb-6 flex items-center justify-center animate-gold-pulse">
-                    <i className="fas fa-check-circle text-4xl"></i>
-                  </div>
-                  <h3 className="text-3xl md:text-4xl font-bold animate-text-shimmer mb-6">✅ خطوات ما بعد الدفع</h3>
-                  <div className="luxury-divider mb-6"></div>
-                </div>
-                <p className="text-gray-700 mb-6 text-lg text-center">
-                  📤 الرجاء إرسال صورة/سند التحويل (Receipt) عبر واتساب:
-                </p>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="bg-amber-400/10 text-amber-400">
+                {filteredServices.length} خدمة متوفرة
+              </Badge>
+              {searchTerm && (
+                <Badge variant="outline" className="border-gray-600">
+                  البحث: {searchTerm}
+                </Badge>
+              )}
+              {selectedCategory !== "all" && (
+                <Badge variant="outline" className="border-gray-600">
+                  الفئة: {selectedCategory}
+                </Badge>
+              )}
+            </div>
+          </motion.div>
 
-                <Card className="bg-white border mb-6">
-                  <CardContent className="p-6">
-                    <h4 className="font-bold mb-3">نموذج رسالة جاهز:</h4>
-                    <div className="bg-gray-100 p-4 rounded-lg font-mono text-sm">
-                      مرحبًا، أنا [الاسم الكامل]<br />
-                      - رقم الطلب (إن وُجد): [ORDER_ID]<br />
-                      - المبلغ: [AMOUNT] ر.س<br />
-                      - طريقة الدفع: [METHOD]<br />
-                      - إرفق صورة سند التحويل هنا.<br />
-                      الرجاء إصدار الفاتورة وإرسالها لي.
+          {/* Services Grid/List */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className={viewMode === "grid" 
+              ? "grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              : "space-y-4"
+            }
+          >
+            {filteredServices.map((service) => (
+              <motion.div
+                key={service.id}
+                variants={itemVariants}
+                whileHover={viewMode === "grid" ? { y: -8 } : { x: 8 }}
+                className={`glass-card rounded-2xl p-6 group hover:shadow-2xl transition-all duration-500 ${
+                  viewMode === "list" ? "flex items-center justify-between" : ""
+                }`}
+              >
+                <div className={viewMode === "list" ? "flex-1" : ""}>
+                  <div className="flex items-start justify-between mb-4">
+                    <Badge className="bg-amber-400/10 text-amber-400 text-xs">
+                      {service.category}
+                    </Badge>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-amber-400">
+                        {service.price.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-gray-400">ريال</div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
 
-                <div className="text-center">
-                  <Button
-                    onClick={() => {
-                      const message = WHATSAPP_MESSAGE_TEMPLATE(
-                        "رقم الطلب",
-                        "اسمك",
-                        0,
-                        "طريقة الدفع المختارة"
-                      );
-                      window.open(WHATSAPP_URL(message), "_blank");
-                    }}
-                    className="btn-luxury px-12 py-6 text-2xl font-bold rounded-3xl hover:scale-110 transition-all duration-300 animate-gold-pulse"
-                  >
-                    <i className="fab fa-whatsapp ml-3 text-3xl animate-luxury-float"></i>
-                    💎 أرسل سند التحويل الآن
-                  </Button>
-                </div>
-
-                <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl border border-green-200">
-                  <p className="text-center text-gray-700 text-lg font-medium">
-                    ⚡ سنؤكد الدفع خلال 1-24 ساعة ونرسل الفاتورة الرقمية فور التحقق
+                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-amber-400 transition-colors">
+                    {service.name}
+                  </h3>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-6">
+                    {service.description}
                   </p>
-                  <div className="flex justify-center mt-3">
-                    <span className="inline-block px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
-                      🎯 ضمان الرد السريع
-                    </span>
-                  </div>
+
+                  {viewMode === "grid" && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleOrderService(service)}
+                      className="luxury-btn w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold py-3 px-6 rounded-full shadow-xl"
+                    >
+                      <ShoppingCart className="w-4 h-4 ml-2" />
+                      أضف للسلة
+                    </motion.button>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
-      {/* Workflow Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">آلية العمل</h2>
-            <p className="text-xl text-gray-600">خطوات بسيطة للحصول على مشروعك</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                step: "1",
-                title: "اختيار الخدمة",
-                description: "يختار العميل الحزمة ويضغط 'اطلب الآن'",
-                icon: "fas fa-mouse-pointer",
-              },
-              {
-                step: "2",
-                title: "دخول بيانات الطلب",
-                description: "اسم، بريد، رقم واتساب، وصف مختصر",
-                icon: "fas fa-edit",
-              },
-              {
-                step: "3",
-                title: "خيارات الدفع",
-                description: "يختار طريقة دفع ويظهر له تفاصيل التحويل",
-                icon: "fas fa-credit-card",
-              },
-              {
-                step: "4",
-                title: "إرسال سند التحويل",
-                description: "يضغط العميل زر واتساب ويرسل سند التحويل",
-                icon: "fab fa-whatsapp",
-              },
-              {
-                step: "5",
-                title: "تأكيد واستلام فاتورة",
-                description: "بعد التحقق من السند، نصدر فاتورة ونبدأ التنفيذ",
-                icon: "fas fa-file-invoice",
-              },
-              {
-                step: "6",
-                title: "التسليم",
-                description: "تسليم أولي > مراجعتين مجانية > التسليم النهائي",
-                icon: "fas fa-check-circle",
-              },
-            ].map((step, index) => (
-              <Card key={index} className="text-center p-6 hover:shadow-lg transition-shadow">
-                <CardContent className="pt-6">
-                  <div className="w-16 h-16 bg-primary-500 text-white rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold">{step.step}</span>
+                {viewMode === "list" && (
+                  <div className="flex items-center gap-4 mr-6">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleOrderService(service)}
+                      className="luxury-btn bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold py-2 px-4 rounded-full shadow-xl"
+                    >
+                      <ShoppingCart className="w-4 h-4 ml-1" />
+                      أضف للسلة
+                    </motion.button>
                   </div>
-                  <i className={`${step.icon} text-primary-500 text-3xl mb-4`}></i>
-                  <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                  <p className="text-gray-600">{step.description}</p>
-                </CardContent>
-              </Card>
+                )}
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
+
+          {filteredServices.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-16"
+            >
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-2xl font-bold text-gray-300 mb-4">لم يتم العثور على خدمات</h3>
+              <p className="text-gray-400 mb-6">جرب تعديل معايير البحث أو الفلترة</p>
+              <Button
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("all");
+                  setPriceRange("all");
+                }}
+                className="luxury-btn bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold"
+              >
+                إعادة تعيين الفلاتر
+              </Button>
+            </motion.div>
+          )}
         </div>
       </section>
-
     </div>
   );
-}
-
-function getCategoryIcon(category: string): string {
-  switch (category) {
-    case "مواقع وتطبيقات":
-      return "globe";
-    case "هويات وتصميم":
-      return "paint-brush";
-    case "متابعة ودعم":
-      return "headset";
-    case "تجارب تفاعلية وحلول مبتكرة":
-      return "flask";
-    case "مدفوعات ورصيد":
-      return "credit-card";
-    default:
-      return "cog";
-  }
-}
-
-function getServiceVariant(index: number): "primary" | "success" | "accent" {
-  const variants = ["primary", "success", "accent"] as const;
-  return variants[index % 3];
 }

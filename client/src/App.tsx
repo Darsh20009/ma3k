@@ -7,32 +7,22 @@ import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import Home from "@/pages/home";
-import Welcome from "@/pages/welcome";
-import Splash from "@/pages/splash";
 import Services from "@/pages/services";
-import Tools from "@/pages/tools";
-import Portfolio from "@/pages/portfolio";
-import Invoices from "@/pages/invoices";
-import Privacy from "@/pages/privacy";
 import Cart from "@/pages/cart";
 import Payment from "@/pages/payment";
+import AboutUs from "@/pages/about-us";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen royal-gradient">
       <Navbar />
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/welcome" component={Welcome} />
-        <Route path="/splash" component={Splash} />
         <Route path="/services" component={Services} />
-        <Route path="/tools" component={Tools} />
-        <Route path="/portfolio" component={Portfolio} />
-        <Route path="/invoices" component={Invoices} />
-        <Route path="/privacy" component={Privacy} />
         <Route path="/cart" component={Cart} />
         <Route path="/payment" component={Payment} />
+        <Route path="/about" component={AboutUs} />
         <Route component={NotFound} />
       </Switch>
       <Footer />

@@ -125,530 +125,119 @@
   .luxury-gradient {
     background: var(--gradient-luxury);
     background-size: 400% 400%;
-    animation: luxury-flow 10s ease infinite;
+    animation: luxury-flow 18s ease infinite;
   }
   
   .platinum-gradient {
     background: var(--gradient-platinum);
     background-size: 400% 400%;
-    animation: platinum-flow 20s ease infinite;
+    animation: platinum-flow 10s ease infinite;
   }
   
-  .dark-gradient {
-    background: var(--gradient-dark);
-    background-size: 600% 600%;
-    animation: dark-flow 25s ease infinite;
-  }
-  
-  .luxury-bg {
-    background: 
-      linear-gradient(45deg, transparent 30%, var(--glow-gold) 30%, var(--glow-gold) 70%, transparent 70%),
-      linear-gradient(-45deg, transparent 30%, var(--glow-purple) 30%, var(--glow-purple) 70%, transparent 70%);
-    background-size: 40px 40px;
-    opacity: 0.1;
-  }
-
-  /* Luxury Glass Effects - تأثيرات الزجاج الفخمة */
-  .luxury-card {
-    background: linear-gradient(145deg, 
-      rgba(0, 0, 0, 0.8) 0%,
-      rgba(20, 20, 20, 0.6) 50%,
-      rgba(0, 0, 0, 0.9) 100%);
-    backdrop-filter: blur(25px);
-    border: 2px solid var(--glass-border);
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.6),
-      0 0 20px var(--glow-gold),
-      inset 0 1px 0 rgba(255, 215, 0, 0.1);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  }
-  
-  .luxury-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, var(--glow-gold), transparent);
-    transition: left 0.5s;
-  }
-  
-  .luxury-card:hover::before {
-    left: 100%;
-  }
-  
-  .luxury-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 
-      0 20px 40px rgba(0, 0, 0, 0.7),
-      0 0 30px var(--glow-gold),
-      0 0 50px var(--glow-purple);
-  }
-  
-  .royal-card {
-    background: linear-gradient(145deg, 
-      rgba(16, 16, 16, 0.9) 0%,
-      rgba(32, 32, 32, 0.8) 50%,
-      rgba(48, 48, 48, 0.9) 100%);
-    backdrop-filter: blur(20px);
-    border: 2px solid rgba(112, 59, 161, 0.3);
-    box-shadow: 
-      0 0 30px rgba(112, 59, 161, 0.2),
-      0 8px 32px rgba(0, 0, 0, 0.5);
-  }
-
   .glass-morphism {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+  }
+  
+  .glass-card {
+    background: linear-gradient(145deg, 
+      hsla(0, 0%, 0%, 0.6) 0%, 
+      hsla(0, 0%, 5%, 0.4) 50%, 
+      hsla(0, 0%, 0%, 0.8) 100%);
+    backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid hsla(45, 100%, 60%, 0.15);
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 215, 0, 0.1);
-  }
-
-  .royal-grid {
-    background-image: 
-      linear-gradient(rgba(255, 215, 0, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 215, 0, 0.1) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
-
-  .luxury-glow {
-    box-shadow: 
-      0 0 20px var(--glow-gold),
-      0 0 40px var(--glow-purple),
-      0 0 60px var(--glow-sapphire);
-  }
-
-  /* Luxury Animation System - نظام الحركات الفخمة */
-  @keyframes luxury-flow {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    33% {
-      background-position: 100% 0%;
-    }
-    66% {
-      background-position: 0% 100%;
-    }
+      0 25px 50px -12px hsla(0, 0%, 0%, 0.25),
+      0 0 0 1px hsla(45, 100%, 60%, 0.05),
+      inset 0 1px 0 hsla(0, 0%, 100%, 0.1);
   }
   
-  @keyframes gold-flow {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-  
-  @keyframes platinum-flow {
-    0%, 100% {
-      background-position: 0% 0%;
-    }
-    25% {
-      background-position: 100% 0%;
-    }
-    50% {
-      background-position: 100% 100%;
-    }
-    75% {
-      background-position: 0% 100%;
-    }
-  }
-  
-  @keyframes dark-flow {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    20% {
-      background-position: 100% 0%;
-    }
-    40% {
-      background-position: 0% 100%;
-    }
-    60% {
-      background-position: 100% 50%;
-    }
-    80% {
-      background-position: 50% 0%;
-    }
-  }
-  
-  @keyframes luxury-float {
-    0%, 100% {
-      transform: translateY(0px) rotateX(0deg);
-    }
-    25% {
-      transform: translateY(-8px) rotateX(2deg);
-    }
-    50% {
-      transform: translateY(-15px) rotateX(0deg);
-    }
-    75% {
-      transform: translateY(-8px) rotateX(-2deg);
-    }
-  }
-  
-  @keyframes gold-pulse {
-    0%, 100% {
-      box-shadow: 
-        0 0 20px var(--pure-gold),
-        0 0 40px rgba(255, 215, 0, 0.3);
-    }
-    25% {
-      box-shadow: 
-        0 0 30px var(--rich-gold),
-        0 0 60px rgba(255, 215, 0, 0.4);
-    }
-    50% {
-      box-shadow: 
-        0 0 25px var(--pure-gold),
-        0 0 50px rgba(255, 215, 0, 0.5);
-    }
-    75% {
-      box-shadow: 
-        0 0 35px var(--rich-gold),
-        0 0 70px rgba(255, 215, 0, 0.3);
-    }
-  }
-  
-  @keyframes luxury-glow {
-    0%, 100% {
-      filter: drop-shadow(0 0 10px var(--glow-gold));
-    }
-    33% {
-      filter: drop-shadow(0 0 20px var(--glow-purple));
-    }
-    66% {
-      filter: drop-shadow(0 0 15px var(--glow-sapphire));
-    }
-  }
-  
-  @keyframes text-shimmer {
-    0% {
-      background-position: -200% center;
-    }
-    100% {
-      background-position: 200% center;
-    }
-  }
-
-  /* Animation Classes - فئات الحركة */
-  .animate-luxury-float {
-    animation: luxury-float 4s ease-in-out infinite;
-  }
-
-  .animate-gold-pulse {
-    animation: gold-pulse 3s ease-in-out infinite;
-  }
-  
-  .animate-luxury-glow {
-    animation: luxury-glow 4s ease-in-out infinite;
-  }
-  
-  .animate-text-shimmer {
-    background: linear-gradient(90deg, 
-      var(--silver-gray) 0%, 
-      var(--pure-gold) 30%, 
-      var(--platinum-white) 50%, 
-      var(--pure-gold) 70%, 
-      var(--silver-gray) 100%);
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: text-shimmer 3s linear infinite;
-  }
-  
-  /* Luxury Utility Classes - الفئات المساعدة الفخمة */
-  .luxury-divider {
-    width: 120px;
-    height: 6px;
-    background: var(--gradient-gold);
-    border-radius: 3px;
-    margin: 0 auto;
-    position: relative;
-  }
-  
-  .luxury-divider::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: var(--gradient-gold);
-    border-radius: inherit;
-    filter: blur(8px);
-    opacity: 0.7;
-    z-index: -1;
-  }
-  
-  /* Luxury Button System - نظام الأزرار الفخمة */
-  .btn-luxury {
-    background: var(--gradient-gold);
-    border: 2px solid var(--pure-gold);
-    color: var(--royal-black);
-    font-weight: bold;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s;
-  }
-  
-  .btn-luxury::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.5s;
-  }
-  
-  .btn-luxury:hover::before {
-    left: 100%;
-  }
-  
-  .btn-luxury:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px var(--glow-gold);
-    color: var(--royal-black);
-  }
-  
-  /* Cart Badge - شارة العربة */
-  .cart-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: var(--gradient-gold);
-    color: var(--royal-black);
-    border: 2px solid var(--pure-gold);
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    animation: gold-pulse 2s infinite;
-  }
-  
-  /* Luxury Service Cards - بطاقات الخدمات الفخمة */
-  .service-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .luxury-hover:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 
-      0 20px 40px rgba(0, 0, 0, 0.4), 
+  .luxury-text-shadow {
+    text-shadow: 
+      0 2px 8px hsla(0, 0%, 0%, 0.8),
       0 0 20px var(--glow-gold);
   }
-
-  .floating-card {
-    animation: luxury-float 6s ease-in-out infinite;
-  }
-
-  /* Dark Theme Overrides - تجاوزات التصميم الداكن */
-  .bg-white,
-  .bg-white\/80 {
-    background-color: var(--deep-charcoal) !important;
-    color: var(--platinum-white) !important;
-  }
-
-  .text-gray-800,
-  .text-gray-900,
-  .text-black {
-    color: var(--platinum-white) !important;
-  }
-
-  .text-gray-600,
-  .text-gray-700 {
-    color: var(--silver-gray) !important;
-  }
-
-  .text-gray-500 {
-    color: rgba(179, 179, 179, 0.8) !important;
-  }
-
-  .border-gray-300,
-  .border-gray-200 {
-    border-color: rgba(255, 215, 0, 0.2) !important;
-  }
-
-  .bg-gray-50,
-  .bg-gray-100 {
-    background-color: var(--steel-gray) !important;
-    color: var(--platinum-white) !important;
-  }
-
-  .bg-gray-800 {
-    background-color: var(--midnight-gray) !important;
-  }
-
-  /* Gold Accent Colors - ألوان اللكنة الذهبية */
-  .text-yellow-300,
-  .text-yellow-400 {
-    color: var(--pure-gold) !important;
-  }
-
-  .text-green-400 {
-    color: var(--emerald-dark) !important;
-  }
-
-  .text-pink-400 {
-    color: hsl(320, 60%, 60%) !important;
-  }
-
-  .text-blue-400,
-  .text-blue-500,
-  .text-blue-600 {
-    color: var(--deep-sapphire) !important;
-  }
-
-  .text-purple-600 {
-    color: var(--royal-purple) !important;
-  }
-
-  /* Input Styling - تنسيق المدخلات */
-  input,
-  textarea,
-  select {
-    background-color: var(--midnight-gray) !important;
-    border-color: rgba(255, 215, 0, 0.3) !important;
-    color: var(--platinum-white) !important;
-  }
-
-  input:focus,
-  textarea:focus,
-  select:focus {
-    border-color: var(--pure-gold) !important;
-    box-shadow: 0 0 0 3px var(--glow-gold) !important;
-  }
-
-  /* Color Palette Extensions - امتدادات باليت الألوان */
-  .bg-primary-500 { background-color: var(--royal-purple) !important; }
-  .text-primary-500 { color: var(--royal-purple) !important; }
-  .bg-success-500 { background-color: var(--emerald-dark) !important; }
-  .text-success-500 { color: var(--emerald-dark) !important; }
-  .bg-accent-500 { background-color: var(--pure-gold) !important; }
-  .text-accent-500 { color: var(--pure-gold) !important; }
-
-  /* Luxury Border Effects - تأثيرات الحدود الفخمة */
-  .luxury-border {
-    position: relative;
-  }
-
-  .luxury-border::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: conic-gradient(from 0deg, var(--pure-gold), var(--royal-purple), var(--deep-sapphire), var(--pure-gold));
-    border-radius: inherit;
-    z-index: -1;
-    animation: luxury-flow 4s linear infinite;
+  
+  .gold-glow {
+    box-shadow: 
+      0 0 20px var(--glow-gold),
+      0 0 40px var(--glow-gold),
+      0 0 80px var(--glow-gold);
   }
 }
 
-/* Invoice Styles - تنسيق الفواتير */
-.invoice {
+@keyframes luxury-flow {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+}
+
+@keyframes gold-flow {
+  0%, 100% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+}
+
+@keyframes platinum-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Font Classes */
+.font-tajawal {
   font-family: var(--font-tajawal);
-  max-width: 800px;
-  padding: 30px;
-  background: var(--gradient-dark);
-  border: 2px solid var(--pure-gold);
-  border-radius: 20px;
-  color: var(--platinum-white);
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.7),
-    0 0 40px var(--glow-gold),
-    inset 0 1px 0 rgba(255, 215, 0, 0.2);
+}
+
+/* Responsive Luxury Typography */
+.hero-text {
+  font-size: var(--font-size-hero);
+  font-weight: 900;
+  line-height: 0.9;
+}
+
+.luxury-h1 {
+  font-size: var(--font-size-h1);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.luxury-h2 {
+  font-size: var(--font-size-h2);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Service Card Animations */
+.service-card {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+/* Button Animations */
+.luxury-btn {
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.invoice::before {
+.luxury-btn::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 80%, var(--glow-gold) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, var(--glow-purple) 0%, transparent 50%);
-  pointer-events: none;
-  opacity: 0.1;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, var(--glow-gold) 0%, transparent 70%);
+  transition: all 0.6s ease;
+  transform: translate(-50%, -50%);
 }
 
-.invoice-header {
-  text-align: center;
-  margin-bottom: 40px;
-  position: relative;
-  z-index: 1;
-}
-
-.invoice-logo {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
-  background: var(--gradient-gold);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: var(--royal-black);
-  box-shadow: 0 10px 30px var(--glow-gold);
-}
-
-.invoice-title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: var(--gradient-gold);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 10px;
-}
-
-.invoice-total {
-  background: var(--gradient-gold);
-  color: var(--royal-black);
-  padding: 20px;
-  border-radius: 15px;
-  text-align: center;
-  margin: 30px 0;
-  position: relative;
-  z-index: 1;
-}
-
-/* Responsive Design - التصميم المتجاوب */
-@media (max-width: 768px) {
-  .animate-luxury-float {
-    animation-duration: 6s;
-  }
-  
-  .luxury-divider {
-    width: 80px;
-    height: 3px;
-  }
-}
-
-/* Global Dark Theme Enforcement - فرض التصميم الداكن العالمي */
-body,
-html,
-#root {
-  background: var(--gradient-royal) !important;
-  color: var(--platinum-white) !important;
-  min-height: 100vh;
-}
-
-/* Card and Component Overrides - تجاوزات البطاقات والمكونات */
-[class*="bg-white"],
-[class*="bg-gray"] {
-  background: var(--gradient-dark) !important;
-  color: var(--platinum-white) !important;
+.luxury-btn:hover::before {
+  width: 300%;
+  height: 300%;
 }

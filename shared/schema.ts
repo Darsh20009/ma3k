@@ -108,19 +108,14 @@ export const insertMessageSchema = createInsertSchema(messages).pick({
 });
 
 // Types
-export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-
-export type InsertService = z.infer<typeof insertServiceSchema>;
+export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Service = typeof services.$inferSelect;
-
-export type InsertOrder = z.infer<typeof insertOrderSchema>;
+export type InsertService = z.infer<typeof insertServiceSchema>;
 export type Order = typeof orders.$inferSelect;
-
-export type InsertConsultation = z.infer<typeof insertConsultationSchema>;
-export type Consultation = typeof consultations.$inferSelect;
-
-export type InsertMessage = z.infer<typeof insertMessageSchema>;
-export type Message = typeof messages.$inferSelect;
-
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
 export type Invoice = typeof invoices.$inferSelect;
+export type Consultation = typeof consultations.$inferSelect;
+export type InsertConsultation = z.infer<typeof insertConsultationSchema>;
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
