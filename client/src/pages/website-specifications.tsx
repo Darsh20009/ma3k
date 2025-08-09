@@ -521,9 +521,10 @@ export default function WebsiteSpecifications() {
                                 <Checkbox
                                   checked={field.value?.includes(feature)}
                                   onCheckedChange={(checked) => {
+                                    const currentValue = field.value || [];
                                     return checked
-                                      ? field.onChange([...field.value, feature])
-                                      : field.onChange(field.value?.filter((value) => value !== feature))
+                                      ? field.onChange([...currentValue, feature])
+                                      : field.onChange(currentValue.filter((value) => value !== feature))
                                   }}
                                 />
                               </FormControl>
@@ -555,9 +556,10 @@ export default function WebsiteSpecifications() {
                                 <Checkbox
                                   checked={field.value?.includes(element)}
                                   onCheckedChange={(checked) => {
+                                    const currentValue = field.value || [];
                                     return checked
-                                      ? field.onChange([...field.value, element])
-                                      : field.onChange(field.value?.filter((value) => value !== element))
+                                      ? field.onChange([...currentValue, element])
+                                      : field.onChange(currentValue.filter((value) => value !== element))
                                   }}
                                 />
                               </FormControl>
