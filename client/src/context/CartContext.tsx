@@ -9,10 +9,12 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
+  cart: Service[];
   addToCart: (service: Service, customization?: string) => void;
   removeFromCart: (serviceId: string) => void;
   updateQuantity: (serviceId: string, quantity: number) => void;
   clearCart: () => void;
+  getTotalPrice: () => number;
   totalPrice: number;
   totalItems: number;
 }
@@ -63,14 +65,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const totalPrice = items.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const cart = items.map(item => item.service);
+  const getTotalPrice = () => totalPrice;
 
   return (
     <CartContext.Provider value={{
       items,
+      cart,
       addToCart,
       removeFromCart,
       updateQuantity,
       clearCart,
+      getTotalPrice,
       totalPrice,
       totalItems
     }}>

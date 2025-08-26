@@ -34,7 +34,7 @@ export default function CreativePayment() {
     projectIdea: ""
   });
 
-  const totalPrice = getTotalPrice();
+  const totalPrice = getTotalPrice?.() || 0;
 
   const paymentMethods = [
     {
@@ -115,7 +115,7 @@ export default function CreativePayment() {
     try {
       // Create order for each service
       const orders = await Promise.all(
-        cart.map(async (service) => {
+        (cart || []).map(async (service) => {
           const orderData = {
             customerName: customerInfo.name,
             customerEmail: customerInfo.email,
@@ -163,7 +163,7 @@ export default function CreativePayment() {
     }
   };
 
-  if (cart.length === 0) {
+  if (!cart || cart.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-20">
         <div className="container mx-auto px-6 text-center py-20">
@@ -217,7 +217,7 @@ export default function CreativePayment() {
               </h2>
 
               <div className="space-y-4 mb-6">
-                {cart.map((service) => (
+                {cart?.map((service) => (
                   <div key={service.id} className="flex justify-between items-start p-4 bg-white/5 rounded-2xl">
                     <div className="flex-1">
                       <h3 className="text-white font-bold mb-1">{service.name}</h3>

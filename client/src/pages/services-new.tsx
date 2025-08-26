@@ -63,7 +63,7 @@ export default function ServicesNew() {
   };
 
   const isInCart = (serviceId: string) => {
-    return cart.some(item => item.id === serviceId);
+    return cart?.some(item => item.id === serviceId) || false;
   };
 
   const getServiceIcon = (category: string) => {
@@ -360,7 +360,7 @@ export default function ServicesNew() {
                 <a href="/cart" data-testid="button-view-cart">
                   <Button className="luxury-btn bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold py-4 px-8 rounded-full text-lg shadow-xl">
                     <ShoppingCart className="w-6 h-6 ml-2" />
-                    عرض السلة ({cart.length})
+                    عرض السلة ({cart?.length || 0})
                   </Button>
                 </a>
                 <a href="https://wa.me/966532441566" target="_blank" rel="noopener noreferrer" data-testid="button-custom-service">
