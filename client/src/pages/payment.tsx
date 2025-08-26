@@ -301,8 +301,14 @@ export default function Payment() {
                     <div className="text-center">
                       <University className="w-12 h-12 text-green-600 mx-auto mb-4" />
                       <h3 className="text-xl font-bold mb-2 text-gray-200">تحويل بنكي</h3>
-                      <p className="text-gray-300 text-sm mb-2">{BANK_DETAILS.BANK_NAME}</p>
-                      <p className="text-xs text-gray-400 font-mono">{BANK_DETAILS.IBAN}</p>
+                      <div className="text-sm space-y-2">
+                        {BANK_DETAILS.map((bank, idx) => (
+                          <div key={idx} className="border-b border-gray-600 pb-2 last:border-b-0">
+                            <p className="text-gray-300 font-medium">{bank.BANK_NAME}</p>
+                            <p className="text-xs text-gray-400 font-mono">{bank.IBAN}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 

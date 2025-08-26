@@ -18,8 +18,8 @@ export default function SimplePayment() {
       icon: Building2,
       color: 'bg-blue-500',
       accounts: [
-        { bank: 'البنك الأهلي السعودي', iban: 'SA80 1000 0000 0000 0000 0001', name: 'منصة معك للخدمات الرقمية' },
-        { bank: 'بنك الراجحي', iban: 'SA12 8000 0000 0000 0000 0002', name: 'منصة معك للخدمات الرقمية' }
+        { bank: 'بنك الراجحي', iban: 'SA78 8000 0539 6080 1942 4738', name: 'منصة معك للخدمات الرقمية' },
+        { bank: 'البنك العربي الوطني (ANB)', iban: 'SA23 3010 0991 1010 9719 7438', name: 'منصة معك للخدمات الرقمية' }
       ]
     },
     {
@@ -28,9 +28,9 @@ export default function SimplePayment() {
       icon: Smartphone,
       color: 'bg-green-500',
       wallets: [
-        { name: 'STC Pay', number: '966532441566', logo: '📱' },
-        { name: 'UR Pay', number: '966532441566', logo: '💳' },
-        { name: 'Alinma Pay', number: '966532441566', logo: '🏦' }
+        { name: 'STC Pay', number: '+966532441566', logo: '📱' },
+        { name: 'UR Pay', number: '+966532441566', logo: '💳' },
+        { name: 'Alinma Pay', number: '+966532441566', logo: '🏦' }
       ]
     }
   ];

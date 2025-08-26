@@ -6,16 +6,23 @@ export const PAYMENT_METHODS = {
   ALINMA_PAY: "alinma_pay",
 } as const;
 
-export const BANK_DETAILS = {
-  BANK_NAME: "بنك الراجحي",
-  IBAN: "SA78 8000 0539 6080 1942 4738",
-  ACCOUNT_NAME: "منصة معك للخدمات الرقمية",
-};
+export const BANK_DETAILS = [
+  {
+    BANK_NAME: "بنك الراجحي",
+    IBAN: "SA78 8000 0539 6080 1942 4738",
+    ACCOUNT_NAME: "منصة معك للخدمات الرقمية",
+  },
+  {
+    BANK_NAME: "البنك العربي الوطني (ANB)",
+    IBAN: "SA23 3010 0991 1010 9719 7438",
+    ACCOUNT_NAME: "منصة معك للخدمات الرقمية",
+  }
+];
 
 export const WALLET_DETAILS = {
-  STC_PAY: "966532441566",
-  UR_PAY: "966532441566", 
-  ALINMA_PAY: "966532441566",
+  STC_PAY: "+966532441566",
+  UR_PAY: "+966532441566", 
+  ALINMA_PAY: "+966532441566",
 };
 
 export const CONTACT_INFO = {
