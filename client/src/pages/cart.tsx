@@ -28,24 +28,9 @@ export default function Cart() {
     localStorage.setItem('customerInfo', JSON.stringify(customerInfo));
     localStorage.setItem('cartItems', JSON.stringify(items));
     
-    // Check if website specifications already exist
-    const existingSpecs = localStorage.getItem('websiteSpecs') || localStorage.getItem('websiteSpecifications');
     
-    // Check if any item is a website service
-    const hasWebsiteService = items.some(item => 
-      item.service.name.includes('موقع') || 
-      item.service.name.includes('تطبيق') || 
-      item.service.name.includes('متجر') ||
-      item.service.id === '1' || item.service.id === '2' || item.service.id === '3'
-    );
-    
-    if (hasWebsiteService && !existingSpecs) {
-      // Redirect to website specifications page first if no specs exist
-      setLocation('/website-specifications');
-    } else {
-      // Go directly to payment
-      setLocation('/payment');
-    }
+    // Go directly to payment
+    setLocation('/payment');
   };
 
   if (items.length === 0) {

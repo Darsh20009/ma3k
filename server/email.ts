@@ -109,21 +109,6 @@ function generateOrderEmailHTML(data: EmailData): string {
             border-radius: 10px; 
             margin: 20px 0;
         }
-        .website-specs {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-        .website-specs h3 { margin: 0 0 20px; font-size: 20px; }
-        .spec-item { 
-            background: rgba(255,255,255,0.1); 
-            padding: 10px 15px; 
-            margin: 8px 0; 
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-        }
         .status { 
             padding: 8px 20px; 
             border-radius: 20px; 
@@ -201,30 +186,6 @@ function generateOrderEmailHTML(data: EmailData): string {
                 💰 المبلغ الإجمالي: ${data.price} ريال سعودي
             </div>
             
-            ${isWebsiteService && data.websiteSpecs ? `
-            <div class="website-specs">
-                <h3>🌐 مواصفات الموقع المطلوب</h3>
-                <div class="spec-item"><strong>اسم الموقع:</strong> ${data.websiteSpecs.websiteName || 'غير محدد'}</div>
-                <div class="spec-item"><strong>الفكرة:</strong> ${data.websiteSpecs.idea || 'غير محددة'}</div>
-                <div class="spec-item"><strong>الغرض:</strong> ${data.websiteSpecs.purpose || 'غير محدد'}</div>
-                <div class="spec-item"><strong>الجمهور المستهدف:</strong> ${data.websiteSpecs.targetAudience || 'غير محدد'}</div>
-                <div class="spec-item"><strong>نوع التصميم:</strong> ${data.websiteSpecs.designType || 'غير محدد'}</div>
-                <div class="spec-item"><strong>الأقسام الرئيسية:</strong> ${[
-                  data.websiteSpecs.mainSection1,
-                  data.websiteSpecs.mainSection2,
-                  data.websiteSpecs.mainSection3,
-                  data.websiteSpecs.mainSection4,
-                  data.websiteSpecs.mainSection5
-                ].filter(Boolean).join(' - ') || 'غير محددة'}</div>
-                <div class="spec-item"><strong>الوظائف الأساسية:</strong> ${[
-                  data.websiteSpecs.mainFunction1,
-                  data.websiteSpecs.mainFunction2,
-                  data.websiteSpecs.mainFunction3
-                ].filter(Boolean).join(' - ') || 'غير محددة'}</div>
-                <div class="spec-item"><strong>اللغات:</strong> ${data.websiteSpecs.languages || 'غير محددة'}</div>
-                <div class="spec-item"><strong>الأجهزة المدعومة:</strong> ${data.websiteSpecs.deviceSupport || 'غير محددة'}</div>
-            </div>
-            ` : ''}
             
             <div style="text-align: center; margin: 30px 0;">
                 <a href="https://wa.me/966532441566?text=بخصوص الطلب رقم ${data.orderNumber}" class="action-btn">

@@ -54,49 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Website specifications submission route
-  app.post("/api/website-specs", async (req, res) => {
-    try {
-      const specsData = req.body;
-      
-      // Create a comprehensive specification document
-      const specification = {
-        ...specsData,
-        timestamp: new Date().toISOString(),
-        specId: `SPEC-${Date.now()}`
-      };
-      
-      // Send email notification to ma3k.2025@gmail.com
-      const emailSubject = `طلب مواصفات موقع جديد - ${specification.websiteName}`;
-      const emailContent = generateSpecsEmailContent(specification);
-      
-      try {
-        await sendOrderNotificationEmail({
-          orderNumber: specification.specId,
-          customerName: 'طلب مواصفات موقع',
-          customerEmail: 'ma3k.2025@gmail.com',
-          customerPhone: 'غير متوفر',
-          serviceName: specification.websiteName,
-          price: 0,
-          paymentStatus: 'specs-request',
-          paymentMethod: 'لا يوجد',
-          websiteSpecs: specification
-        });
-        console.log(`Website specs email sent for order: ${specification.specId}`);
-      } catch (emailError) {
-        console.error('Failed to send specs email:', emailError);
-        // Don't fail the whole request if email fails
-      }
-      
-      res.status(201).json({
-        success: true,
-        specification,
-        message: "مواصفات الموقع تم حفظها بنجاح"
-      });
-    } catch (error) {
-      res.status(400).json({ error: "Invalid specifications data" });
-    }
-  });
+  // Website specifications submission route removed
 
   // Website form submission route
   app.post("/api/website-form", async (req, res) => {
