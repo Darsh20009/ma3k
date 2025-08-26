@@ -19,8 +19,8 @@ export const WALLET_DETAILS = {
 
 export const CONTACT_INFO = {
   EMAIL: "ma3k.2025@gmail.com",
-  WHATSAPP: "+20 115 520 1921",
-  WHATSAPP_API: "201155201921",
+  WHATSAPP: "+966 532 441 566",
+  WHATSAPP_API: "966532441566",
 };
 
 export const WHATSAPP_MESSAGE_TEMPLATE = (orderId: string, name: string, amount: number, method: string) => 
