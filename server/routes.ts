@@ -254,7 +254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Order not found" });
       }
 
-      const service = order.serviceId ? await storage.getService(order.serviceId) : null;
+      const service = order.serviceId ? await storage.getService(order.serviceId) : undefined;
       const invoiceHTML = generateInvoiceHTML(order, service);
       
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
