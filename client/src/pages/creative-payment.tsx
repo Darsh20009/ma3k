@@ -38,28 +38,31 @@ export default function CreativePayment() {
 
   const paymentMethods = [
     {
-      id: "paypal",
-      name: "PayPal",
-      icon: CreditCard,
-      description: "دفع دولي آمن",
-      color: "from-blue-500 to-blue-600",
-      available: true
+      id: "whatsapp_order",
+      name: "طلب عبر واتساب",
+      icon: MessageCircle,
+      description: "تواصل مباشر لترتيب الدفع",
+      color: "from-green-400 to-green-500",
+      available: true,
+      details: "966532441566"
     },
     {
       id: "stc_pay",
       name: "STC Pay",
       icon: Smartphone,
-      description: "دفع محلي سعودي",
+      description: "دفع محلي سعودي سريع",
       color: "from-purple-500 to-purple-600",
-      available: true
+      available: true,
+      details: "966532441566"
     },
     {
       id: "bank_transfer",
       name: "تحويل بنكي",
       icon: Building,
-      description: "تحويل مباشر للحساب",
-      color: "from-green-500 to-green-600",
-      available: true
+      description: "تحويل مباشر للحساب البنكي",
+      color: "from-blue-500 to-blue-600",
+      available: true,
+      details: "البنك الأهلي - 10000012345678"
     }
   ];
 
@@ -69,7 +72,14 @@ export default function CreativePayment() {
 
   const generateInvoice = async (orderId: string) => {
     try {
-      const response = await apiRequest("POST", "/api/generate-invoice", { orderId });
+      const response = await fetch(`/api/generate-invoice`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId })
+      });
+      
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -101,10 +111,10 @@ export default function CreativePayment() {
       return;
     }
 
-    if (!customerInfo.name || !customerInfo.email || !customerInfo.phone) {
+    if (!customerInfo.name || !customerInfo.phone) {
       toast({
         title: "بيانات ناقصة",
-        description: "يرجى ملء جميع البيانات المطلوبة",
+        description: "يرجى ملء الاسم ورقم الهاتف على الأقل",
         variant: "destructive"
       });
       return;
@@ -113,43 +123,62 @@ export default function CreativePayment() {
     setIsProcessing(true);
 
     try {
-      // Create order for each service
-      const orders = await Promise.all(
-        (cart || []).map(async (service) => {
-          const orderData = {
-            customerName: customerInfo.name,
-            customerEmail: customerInfo.email,
-            customerPhone: customerInfo.phone,
-            serviceId: service.id,
-            serviceName: service.name,
-            price: service.price,
-            description: customerInfo.projectIdea || `طلب خدمة: ${service.name}`,
-            paymentMethod: selectedPayment
-          };
-          
-          const response = await apiRequest("POST", "/api/orders", orderData);
-          return await response.json();
-        })
-      );
+      // Create a single comprehensive order
+      const orderData = {
+        customerName: customerInfo.name,
+        customerEmail: customerInfo.email || 'غير محدد',
+        customerPhone: customerInfo.phone,
+        serviceName: cart?.map(item => `${item.service?.name || item.name} (x${item.quantity || 1})`).join(', ') || 'خدمات متنوعة',
+        price: totalPrice,
+        description: `${cart?.length || 0} خدمات - ${customerInfo.projectIdea || 'لا توجد تفاصيل إضافية'}`,
+        paymentMethod: selectedPayment,
+        items: cart
+      };
 
-      // Generate invoices for all orders
-      await Promise.all(orders.map(order => generateInvoice(order.id)));
-
-      clearCart();
-      
-      toast({
-        title: "تم إنشاء الطلب بنجاح! 🎉",
-        description: "سيتم التواصل معك قريباً لتأكيد التفاصيل",
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
       });
 
-      // Redirect to WhatsApp with order details
-      const orderSummary = orders.map(order => 
-        `${order.serviceName} - ${order.price} ريال`
-      ).join('\n');
-      
-      const whatsappMessage = `مرحباً، قمت بطلب الخدمات التالية:\n\n${orderSummary}\n\nالمجموع: ${totalPrice} ريال\nطريقة الدفع: ${selectedPayment}\n\nفكرة المشروع: ${customerInfo.projectIdea || 'غير محدد'}`;
-      
-      window.open(`https://wa.me/966532441566?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+      if (response.ok) {
+        const order = await response.json();
+        
+        // Generate invoice
+        await generateInvoice(order.id);
+        
+        // Clear cart
+        clearCart?.();
+        
+        toast({
+          title: "تم إنشاء الطلب بنجاح! 🎉",
+          description: `رقم الطلب: ${order.orderNumber}`,
+        });
+
+        // Create WhatsApp message based on payment method
+        let whatsappMessage = `مرحباً! أريد طلب الخدمات التالية:\n\n`;
+        whatsappMessage += `الاسم: ${customerInfo.name}\n`;
+        whatsappMessage += `الهاتف: ${customerInfo.phone}\n`;
+        whatsappMessage += `الإيميل: ${customerInfo.email || 'غير محدد'}\n\n`;
+        whatsappMessage += `الخدمات المطلوبة:\n`;
+        cart?.forEach(item => {
+          whatsappMessage += `• ${item.service?.name || item.name} (x${item.quantity || 1}) - ${(item.service?.price || item.price) * (item.quantity || 1)} ر.س\n`;
+        });
+        whatsappMessage += `\nالمجموع: ${totalPrice} ر.س\n\n`;
+        whatsappMessage += `طريقة الدفع المفضلة: ${paymentMethods.find(p => p.id === selectedPayment)?.name}\n\n`;
+        if (customerInfo.projectIdea) {
+          whatsappMessage += `تفاصيل المشروع: ${customerInfo.projectIdea}\n\n`;
+        }
+        whatsappMessage += `رقم الطلب: ${order.orderNumber}`;
+        
+        const whatsappUrl = `https://wa.me/966532441566?text=${encodeURIComponent(whatsappMessage)}`;
+        window.open(whatsappUrl, '_blank');
+        
+      } else {
+        throw new Error('فشل في إنشاء الطلب');
+      }
       
     } catch (error) {
       console.error("Payment error:", error);
@@ -217,23 +246,28 @@ export default function CreativePayment() {
               </h2>
 
               <div className="space-y-4 mb-6">
-                {cart?.map((service) => (
-                  <div key={service.id} className="flex justify-between items-start p-4 bg-white/5 rounded-2xl">
+                {cart?.map((item) => (
+                  <div key={item.id} className="flex justify-between items-start p-4 bg-white/5 rounded-2xl">
                     <div className="flex-1">
-                      <h3 className="text-white font-bold mb-1">{service.name}</h3>
-                      {service.originalPrice && (
+                      <h3 className="text-white font-bold mb-1">
+                        {item.service?.name || item.name} 
+                        {(item.quantity && item.quantity > 1) && (
+                          <span className="text-amber-400 mr-2">(x{item.quantity})</span>
+                        )}
+                      </h3>
+                      {(item.service?.originalPrice || item.originalPrice) && (
                         <div className="flex items-center gap-2 mb-2">
                           <Badge variant="destructive" className="text-xs">
-                            خصم {Math.round(((service.originalPrice - service.price) / service.originalPrice) * 100)}%
+                            خصم {Math.round((((item.service?.originalPrice || item.originalPrice) - (item.service?.price || item.price)) / (item.service?.originalPrice || item.originalPrice)) * 100)}%
                           </Badge>
                           <span className="text-gray-500 line-through text-sm">
-                            {service.originalPrice} ريال
+                            {item.service?.originalPrice || item.originalPrice} ريال
                           </span>
                         </div>
                       )}
-                      {service.features && (
+                      {(item.service?.features || item.features) && (
                         <div className="text-gray-400 text-sm">
-                          {service.features.slice(0, 2).map((feature, idx) => (
+                          {(item.service?.features || item.features).slice(0, 2).map((feature: string, idx: number) => (
                             <div key={idx} className="flex items-center">
                               <CheckCircle className="w-3 h-3 text-green-400 ml-1" />
                               {feature}
@@ -243,7 +277,7 @@ export default function CreativePayment() {
                       )}
                     </div>
                     <div className="text-amber-400 font-bold text-xl">
-                      {service.price} ريال
+                      {((item.service?.price || item.price) * (item.quantity || 1)).toLocaleString()} ريال
                     </div>
                   </div>
                 ))}
@@ -280,7 +314,7 @@ export default function CreativePayment() {
                 </div>
 
                 <div>
-                  <Label htmlFor="email" className="text-white mb-2 block">البريد الإلكتروني *</Label>
+                  <Label htmlFor="email" className="text-white mb-2 block">البريد الإلكتروني (اختياري)</Label>
                   <Input
                     id="email"
                     type="email"
