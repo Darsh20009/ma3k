@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertOrderSchema, insertConsultationSchema, insertMessageSchema } from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { sendOrderNotificationEmail } from "./email";
+import { generateInvoiceHTML } from "./invoice-generator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // PayPal routes
@@ -276,6 +277,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(invoice);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch invoice" });
+    }
+  });
+
+  // Generate and download invoice route
+  app.post("/api/generate-invoice", async (req, res) => {
+    try {
+      const { orderId } = req.body;
+      const order = await storage.getOrder(orderId);
+      
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+
+      const service = await storage.getService(order.serviceId);
+      const invoiceHTML = generateInvoiceHTML(order, service);
+      
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename=invoice-${order.orderNumber}.html`);
+      res.send(invoiceHTML);
+    } catch (error) {
+      console.error("Invoice generation error:", error);
+      res.status(500).json({ error: "Failed to generate invoice" });
     }
   });
 

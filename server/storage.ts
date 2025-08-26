@@ -1,10 +1,11 @@
 import {
-  users, services, orders, invoices, consultations, messages,
   type User, type InsertUser, type Service, type InsertService,
   type Order, type InsertOrder, type Consultation, type InsertConsultation,
   type Message, type InsertMessage, type Invoice
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { join } from "path";
 
 export interface IStorage {
   // Users
@@ -38,7 +39,8 @@ export interface IStorage {
   getMessages(): Promise<Message[]>;
 }
 
-export class MemStorage implements IStorage {
+export class JsonStorage implements IStorage {
+  private dataDir = join(process.cwd(), 'data');
   private users: Map<string, User> = new Map();
   private services: Map<string, Service> = new Map();
   private orders: Map<string, Order> = new Map();
@@ -47,195 +49,293 @@ export class MemStorage implements IStorage {
   private messages: Map<string, Message> = new Map();
 
   constructor() {
+    this.ensureDataDir();
+    this.loadData();
     this.initializeServices();
+  }
+
+  private ensureDataDir() {
+    if (!existsSync(this.dataDir)) {
+      mkdirSync(this.dataDir, { recursive: true });
+    }
+  }
+
+  private loadData() {
+    this.loadUsers();
+    this.loadServices();
+    this.loadOrders();
+    this.loadInvoices();
+    this.loadConsultations();
+    this.loadMessages();
+  }
+
+  private loadUsers() {
+    const filePath = join(this.dataDir, 'users.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((user: User) => this.users.set(user.id, user));
+    }
+  }
+
+  private loadServices() {
+    const filePath = join(this.dataDir, 'services.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((service: Service) => this.services.set(service.id, service));
+    }
+  }
+
+  private loadOrders() {
+    const filePath = join(this.dataDir, 'orders.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((order: Order) => {
+        if (order.createdAt) order.createdAt = new Date(order.createdAt);
+        if (order.updatedAt) order.updatedAt = new Date(order.updatedAt);
+        this.orders.set(order.id, order);
+      });
+    }
+  }
+
+  private loadInvoices() {
+    const filePath = join(this.dataDir, 'invoices.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((invoice: Invoice) => {
+        if (invoice.createdAt) invoice.createdAt = new Date(invoice.createdAt);
+        this.invoices.set(invoice.id, invoice);
+      });
+    }
+  }
+
+  private loadConsultations() {
+    const filePath = join(this.dataDir, 'consultations.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((consultation: Consultation) => {
+        if (consultation.createdAt) consultation.createdAt = new Date(consultation.createdAt);
+        this.consultations.set(consultation.id, consultation);
+      });
+    }
+  }
+
+  private loadMessages() {
+    const filePath = join(this.dataDir, 'messages.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((message: Message) => {
+        if (message.createdAt) message.createdAt = new Date(message.createdAt);
+        this.messages.set(message.id, message);
+      });
+    }
+  }
+
+  private saveUsers() {
+    const data = Array.from(this.users.values());
+    writeFileSync(join(this.dataDir, 'users.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveServices() {
+    const data = Array.from(this.services.values());
+    writeFileSync(join(this.dataDir, 'services.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveOrders() {
+    const data = Array.from(this.orders.values());
+    writeFileSync(join(this.dataDir, 'orders.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveInvoices() {
+    const data = Array.from(this.invoices.values());
+    writeFileSync(join(this.dataDir, 'invoices.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveConsultations() {
+    const data = Array.from(this.consultations.values());
+    writeFileSync(join(this.dataDir, 'consultations.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveMessages() {
+    const data = Array.from(this.messages.values());
+    writeFileSync(join(this.dataDir, 'messages.json'), JSON.stringify(data, null, 2));
   }
 
   private initializeServices() {
     const defaultServices: Service[] = [
+      // خدمات الأفراد
       {
-        id: "1",
-        name: "موقع شخصي بسيط",
-        description: "موقع شخصي بسيط مع تصميم نظيف وسهل الاستخدام",
-        price: 400,
-        category: "المواقع الشخصية",
+        id: "ind-1",
+        name: "موقع شخصي أساسي",
+        description: "موقع شخصي بسيط مع تصميم نظيف وسهل الاستخدام - مثالي لعرض السيرة الذاتية والأعمال الشخصية",
+        price: 299,
+        originalPrice: 500,
+        category: "individuals",
+        subcategory: "personal-websites",
+        features: ["تصميم متجاوب", "5 صفحات أساسية", "دعم لمدة شهر", "سهولة التحديث"],
         isActive: true,
+        isFeatured: true,
       },
       {
-        id: "2",
+        id: "ind-2",
         name: "تطبيق شخصي محترف",
-        description: "تطبيق شخصي محترف مع خصائص متقدمة وتصميم عصري",
-        price: 600,
-        category: "التطبيقات",
+        description: "تطبيق شخصي محترف مع خصائص متقدمة وتصميم عصري للمحترفين والفنانين",
+        price: 599,
+        originalPrice: 900,
+        category: "individuals",
+        subcategory: "personal-apps",
+        features: ["تطبيق ويب كامل", "لوحة تحكم شخصية", "معرض أعمال", "دعم لـ 3 أشهر"],
         isActive: true,
+        isFeatured: false,
       },
       {
-        id: "3",
-        name: "موقع تعليمي غير ربحي",
-        description: "موقع تعليمي غير ربحي مع نظام إدارة المحتوى التعليمي",
-        price: 1100,
-        category: "التعليم",
+        id: "ind-3",
+        name: "متجر شخصي بسيط",
+        description: "متجر إلكتروني بسيط لبيع المنتجات الشخصية أو الحرفية بأسعار منافسة",
+        price: 449,
+        originalPrice: 700,
+        category: "individuals",
+        subcategory: "personal-store",
+        features: ["نظام دفع مدمج", "إدارة المنتجات", "تتبع الطلبات", "دعم لمدة شهرين"],
         isActive: true,
-      },
-      {
-        id: "4",
-        name: "موقع تعليمي ربحي",
-        description: "موقع تعليمي ربحي مع نظام الدفع والاشتراكات",
-        price: 1499,
-        category: "التعليم",
-        isActive: true,
-      },
-      {
-        id: "5",
-        name: "موقع إلكتروني ومتجر",
-        description: "موقع إلكتروني مع متجر إلكتروني متكامل ونظام دفع",
-        price: 550,
-        category: "التجارة الإلكترونية",
-        isActive: true,
-      },
-      {
-        id: "6",
-        name: "صنع شعار",
-        description: "تصميم شعار احترافي مع ملفات متعددة الصيغ",
-        price: 15,
-        category: "التصميم",
-        isActive: true,
-      },
-      {
-        id: "7",
-        name: "متابعة مبتدئ",
-        description: "خدمة متابعة مبتدئة لإدارة الحسابات الشخصية",
-        price: 50,
-        category: "المتابعة",
-        isActive: true,
-      },
-      {
-        id: "8",
-        name: "متابعة احترافي",
-        description: "خدمة متابعة احترافية مع تقارير مفصلة",
-        price: 115,
-        category: "المتابعة",
-        isActive: true,
-      },
-      {
-        id: "9",
-        name: "متابعة خبير",
-        description: "خدمة متابعة على مستوى خبير مع استراتيجيات متقدمة",
-        price: 150,
-        category: "المتابعة",
-        isActive: true,
-      },
-      {
-        id: "10",
-        name: "تصميم اختبارات تفاعلية / عادية",
-        description: "تصميم اختبارات تفاعلية أو عادية للمواقع التعليمية",
-        price: 50,
-        category: "التفاعلية",
-        isActive: true,
-      },
-      {
-        id: "11",
-        name: "النظام اللامحدود",
-        description: "نظام شامل بخصائص لامحدودة حسب المتطلبات",
-        price: 200,
-        category: "الأنظمة",
-        isActive: true,
-      },
-      {
-        id: "12",
-        name: "موقع شركة احترافي",
-        description: "موقع شركة احترافي بتصميم عصري ومتجاوب",
-        price: 800,
-        category: "المواقع التجارية",
-        isActive: true,
-      },
-      {
-        id: "13",
-        name: "تطبيق أعمال متقدم",
-        description: "تطبيق أعمال متقدم مع خصائص إدارية شاملة",
-        price: 1200,
-        category: "التطبيقات",
-        isActive: true,
-      },
-      {
-        id: "14",
-        name: "حملة تسويقية إبداعية",
-        description: "حملة تسويقية إبداعية مع محتوى مميز",
-        price: 300,
-        category: "التسويق",
-        isActive: true,
-      },
-      {
-        id: "15",
-        name: "استشارة تقنية متخصصة",
-        description: "استشارة تقنية متخصصة لحل المشاكل التقنية",
-        price: 100,
-        category: "الاستشارات",
-        isActive: true,
-      },
-      {
-        id: "16",
-        name: "نظام إدارة محتوى",
-        description: "نظام إدارة محتوى مخصص وسهل الاستخدام",
-        price: 750,
-        category: "الأنظمة",
-        isActive: true,
+        isFeatured: true,
       },
 
+      // خدمات المطاعم
       {
-        id: "17",
-        name: "بوابة أعضاء",
-        description: "نظام عضوية متكامل مع صلاحيات وإدارة المحتوى",
-        price: 900,
-        category: "مواقع وتطبيقات",
-        isActive: true,
-      },
-      {
-        id: "18",
-        name: "موقع معرض أعمال (Portfolio)",
-        description: "موقع لعرض الأعمال والمشاريع بشكل احترافي",
-        price: 500,
-        category: "مواقع وتطبيقات",
-        isActive: true,
-      },
-      {
-        id: "19",
-        name: "تحويل المحتوى بالذكاء الاصطناعي",
-        description: "مولد نصوص وصفحات تلقائي باستخدام AI",
+        id: "rest-1",
+        name: "منيو احترافي مع الدفع",
+        description: "منيو إلكتروني احترافي للمطاعم يشمل نظام الطلبات والدفع الإلكتروني",
         price: 300,
-        category: "تجارب تفاعلية وحلول مبتكرة",
+        originalPrice: 1230,
+        category: "restaurants",
+        subcategory: "menu-with-payment",
+        features: ["منيو تفاعلي", "نظام طلبات", "دفع إلكتروني", "تتبع الطلبات", "تقارير المبيعات"],
         isActive: true,
+        isFeatured: true,
       },
       {
-        id: "20",
-        name: "نظام فواتير تلقائي",
-        description: "يولد فاتورة HTML/CSS وPDF عند تأكيد الدفع",
-        price: 250,
-        category: "تجارب تفاعلية وحلول مبتكرة",
+        id: "rest-2", 
+        name: "منيو احترافي بدون دفع",
+        description: "منيو إلكتروني أنيق وبسيط لعرض قائمة الطعام والأسعار فقط",
+        price: 50,
+        originalPrice: 199,
+        category: "restaurants",
+        subcategory: "menu-only",
+        features: ["منيو تفاعلي", "تصميم أنيق", "متجاوب مع الجوال", "سهل التحديث"],
         isActive: true,
+        isFeatured: true,
       },
       {
-        id: "21",
-        name: "نظام تذاكر ودعم",
-        description: "نظام دعم داخل الموقع لتتبع الطلبات والشكاوى",
-        price: 400,
-        category: "متابعة ودعم",
+        id: "rest-3",
+        name: "موقع متكامل للمطعم أو كافيه",
+        description: "موقع شامل للمطاعم والكافيهات يشمل التوصيل والدفع وجميع الخدمات",
+        price: 2999,
+        originalPrice: 5000,
+        category: "restaurants",
+        subcategory: "full-restaurant",
+        features: ["منيو كامل", "نظام توصيل", "إدارة الطاولات", "نظام الولاء", "تطبيق جوال", "لوحة تحكم إدارية", "دعم لمدة 6 أشهر"],
         isActive: true,
+        isFeatured: true,
       },
       {
-        id: "22",
-        name: "تسليم الملفات المصدرية",
-        description: "خدمة تسليم ملفات PSD/AI وشفرة المصدر",
-        price: 100,
-        category: "هويات وتصميم",
+        id: "rest-4",
+        name: "نظام حجز الطاولات",
+        description: "نظام ذكي لحجز الطاولات مع إدارة المواعيد والإشعارات",
+        price: 399,
+        originalPrice: 600,
+        category: "restaurants",
+        subcategory: "reservations",
+        features: ["حجز الطاولات", "تقويم المواعيد", "إشعارات SMS", "دعم لمدة شهرين"],
         isActive: true,
+        isFeatured: false,
+      },
+
+      // خدمات الشركات  
+      {
+        id: "comp-1",
+        name: "موقع شركة احترافي",
+        description: "موقع شركة احترافي بتصميم عصري ومتجاوب مع جميع المزايا التجارية",
+        price: 799,
+        originalPrice: 1200,
+        category: "companies",
+        subcategory: "corporate-website",
+        features: ["تصميم احترافي", "10+ صفحات", "نموذج اتصال", "تحسين SEO", "دعم لـ 3 أشهر"],
+        isActive: true,
+        isFeatured: true,
       },
       {
-        id: "23",
-        name: "تركيب Google Analytics + SEO أساسي",
-        description: "إعداد تتبع الإحصائيات وتحسين محركات البحث",
-        price: 150,
-        category: "متابعة ودعم",
+        id: "comp-2",
+        name: "متجر إلكتروني شامل",
+        description: "متجر إلكتروني متكامل للشركات مع جميع المزايا التجارية المتقدمة",
+        price: 1499,
+        originalPrice: 2500,
+        category: "companies",
+        subcategory: "ecommerce",
+        features: ["متجر كامل", "إدارة المخزون", "أنظمة دفع متعددة", "تقارير مفصلة", "دعم لـ 6 أشهر"],
         isActive: true,
+        isFeatured: true,
+      },
+      {
+        id: "comp-3",
+        name: "نظام إدارة العملاء CRM",
+        description: "نظام متكامل لإدارة علاقات العملاء مع تتبع المبيعات والمتابعة",
+        price: 999,
+        originalPrice: 1800,
+        category: "companies",
+        subcategory: "crm-system",
+        features: ["إدارة العملاء", "تتبع المبيعات", "تقارير تحليلية", "نظام المهام", "دعم لـ 4 أشهر"],
+        isActive: true,
+        isFeatured: false,
+      },
+      {
+        id: "comp-4",
+        name: "تطبيق أعمال متقدم",
+        description: "تطبيق أعمال متقدم مع خصائص إدارية شاملة ولوحة تحكم متطورة",
+        price: 1999,
+        originalPrice: 3500,
+        category: "companies",
+        subcategory: "business-app",
+        features: ["تطبيق ويب متقدم", "لوحة إدارية", "نظام المستخدمين", "تقارير شاملة", "دعم لـ 6 أشهر"],
+        isActive: true,
+        isFeatured: false,
+      },
+      {
+        id: "comp-5",
+        name: "منصة تعليمية تفاعلية",
+        description: "منصة تعليمية متكاملة مع كورسات وامتحانات وشهادات",
+        price: 2299,
+        originalPrice: 4000,
+        category: "companies",
+        subcategory: "learning-platform",
+        features: ["منصة تعليمية", "إدارة الكورسات", "نظام امتحانات", "شهادات", "دعم لـ 6 أشهر"],
+        isActive: true,
+        isFeatured: true,
+      },
+
+      // خدمات تقنية إضافية
+      {
+        id: "tech-1",
+        name: "تصميم شعار احترافي",
+        description: "تصميم شعار احترافي مميز مع ملفات متعددة الصيغ",
+        price: 99,
+        originalPrice: 200,
+        category: "companies",
+        subcategory: "branding",
+        features: ["3 تصاميم مختلفة", "ملفات عالية الجودة", "جميع الصيغ", "دعم لمدة شهر"],
+        isActive: true,
+        isFeatured: false,
+      },
+      {
+        id: "tech-2",
+        name: "خدمة تحسين الأداء والسرعة",
+        description: "تحسين سرعة المواقع وتحسين الأداء لتجربة مستخدم أفضل",
+        price: 199,
+        originalPrice: 400,
+        category: "companies",
+        subcategory: "optimization",
+        features: ["تحسين السرعة", "ضغط الصور", "تحسين الكود", "تقرير شامل"],
+        isActive: true,
+        isFeatured: false,
       },
     ];
 
@@ -258,6 +358,7 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const user: User = { ...insertUser, id };
     this.users.set(id, user);
+    this.saveUsers();
     return user;
   }
 
@@ -273,6 +374,7 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const service: Service = { ...insertService, id };
     this.services.set(id, service);
+    this.saveServices();
     return service;
   }
 
@@ -301,6 +403,7 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
     };
     this.orders.set(id, order);
+    this.saveOrders();
     return order;
   }
 
@@ -309,6 +412,7 @@ export class MemStorage implements IStorage {
     if (order) {
       const updatedOrder = { ...order, status, updatedAt: new Date() };
       this.orders.set(id, updatedOrder);
+      this.saveOrders();
       return updatedOrder;
     }
     return undefined;
@@ -319,6 +423,7 @@ export class MemStorage implements IStorage {
     if (order) {
       const updatedOrder = { ...order, paymentMethod, paymentStatus, updatedAt: new Date() };
       this.orders.set(id, updatedOrder);
+      this.saveOrders();
       return updatedOrder;
     }
     return undefined;
@@ -343,6 +448,7 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
     };
     this.invoices.set(id, invoice);
+    this.saveInvoices();
     return invoice;
   }
 
@@ -359,6 +465,7 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
     };
     this.consultations.set(id, consultation);
+    this.saveConsultations();
     return consultation;
   }
 
@@ -370,6 +477,7 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const message: Message = { ...insertMessage, id, createdAt: new Date() };
     this.messages.set(id, message);
+    this.saveMessages();
     return message;
   }
 
@@ -378,4 +486,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new JsonStorage();

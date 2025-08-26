@@ -14,8 +14,12 @@ export const services = pgTable("services", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(), // Price in SAR
-  category: text("category").notNull(),
+  originalPrice: integer("original_price"), // Original price before discount
+  category: text("category").notNull(), // 'individuals', 'restaurants', 'companies'
+  subcategory: text("subcategory"), // More specific categorization
+  features: text("features").array(),
   isActive: boolean("is_active").default(true),
+  isFeatured: boolean("is_featured").default(false),
 });
 
 export const orders = pgTable("orders", {
@@ -77,8 +81,12 @@ export const insertServiceSchema = createInsertSchema(services).pick({
   name: true,
   description: true,
   price: true,
+  originalPrice: true,
   category: true,
+  subcategory: true,
+  features: true,
   isActive: true,
+  isFeatured: true,
 });
 
 export const insertOrderSchema = createInsertSchema(orders).pick({
