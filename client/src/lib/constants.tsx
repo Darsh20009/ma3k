@@ -9,11 +9,12 @@ export const PAYMENT_METHODS = {
 export const BANK_DETAILS = {
   BANK_NAME: "بنك الراجحي",
   IBAN: "SA78 8000 0539 6080 1942 4738",
+  ACCOUNT_NAME: "منصة معك للخدمات الرقمية",
 };
 
 export const WALLET_DETAILS = {
-  STC_PAY: "00532441566",
-  UR_PAY: "0532441566",
+  STC_PAY: "966532441566",
+  UR_PAY: "966532441566", 
   ALINMA_PAY: "966532441566",
 };
 

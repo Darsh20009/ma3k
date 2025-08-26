@@ -275,27 +275,19 @@ export default function Payment() {
                 
                 <div className="grid md:grid-cols-2 gap-6">
                   
-                  {/* PayPal */}
+                  {/* PayPal - مُعطّل مؤقتاً */}
                   <div 
-                    className={`luxury-card p-6 rounded-2xl cursor-pointer transition-all duration-300 hover:scale-105 ${
-                      selectedPaymentMethod === 'paypal' ? 'ring-4 ring-blue-400 bg-blue-500/10 border-blue-400/30' : 'hover:bg-white/5'
-                    }`}
-                    onClick={() => handlePaymentMethodSelect('paypal')}
+                    className="luxury-card p-6 rounded-2xl opacity-50 cursor-not-allowed"
                   >
                     <div className="text-center">
                       <CreditCard className="w-12 h-12 text-blue-600 mx-auto mb-4" />
                       <h3 className="text-xl font-bold mb-2 text-gray-200">PayPal</h3>
-                      <p className="text-gray-300 mb-4">دفع فوري وآمن</p>
-                      
-                      {selectedPaymentMethod === 'paypal' && (
-                        <div className="mt-4">
-                          <PayPalButton 
-                            amount={totalPrice.toString()} 
-                            currency="SAR" 
-                            intent="capture"
-                          />
-                        </div>
-                      )}
+                      <p className="text-gray-300 mb-4">قريباً</p>
+                      <div className="text-center p-2 bg-blue-900/20 rounded-lg border border-blue-400/30">
+                        <p className="text-blue-300 text-xs">
+                          متاح قريباً
+                        </p>
+                      </div>
                     </div>
                   </div>
 
