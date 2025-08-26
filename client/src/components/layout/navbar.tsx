@@ -15,7 +15,6 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "الرئيسية" },
     { href: "/services", label: "الخدمات" },
-    { href: "/website-form", label: "إنشاء موقع" },
     { href: "/about", label: "من نحن" }
   ];
 
