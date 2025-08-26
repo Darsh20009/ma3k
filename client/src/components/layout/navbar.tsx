@@ -15,6 +15,8 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "الرئيسية" },
     { href: "/services", label: "الخدمات" },
+    { href: "/portfolio", label: "أعمالنا" },
+    { href: "/contact", label: "تواصل معنا" },
     { href: "/about", label: "من نحن" }
   ];
 
@@ -77,6 +79,18 @@ export default function Navbar() {
 
             {/* Cart & Menu Toggle */}
             <div className="flex items-center space-x-4 space-x-reverse">
+              {/* Employee Login */}
+              <Link href="/employee-login">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="hidden md:flex items-center p-2 rounded-lg glass-morphism hover:bg-amber-400/10 transition-colors"
+                >
+                  <User className="w-5 h-5 text-gray-300 mr-2" />
+                  <span className="text-gray-300 text-sm">موظفين</span>
+                </motion.div>
+              </Link>
+              
               {/* Cart Icon */}
               <Link href="/cart">
                 <motion.div

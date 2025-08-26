@@ -17,6 +17,10 @@ import SimplePayment from "@/pages/simple-payment";
 import CreativePayment from "@/pages/creative-payment";
 import About from "@/pages/about";
 import PrivacyPolicy from "@/pages/privacy-policy";
+import Portfolio from "@/pages/portfolio";
+import Contact from "@/pages/contact";
+import EmployeeLogin from "@/pages/employee-login";
+import EmployeeDashboard from "@/pages/employee-dashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,7 +28,8 @@ function Router() {
     <div className="min-h-screen royal-gradient">
       <Navbar />
       <Switch>
-        <Route path="/" component={SplashScreen} />
+        <Route path="/" component={Home} />
+        <Route path="/splash" component={SplashScreen} />
         <Route path="/welcome" component={WelcomeNew} />
         <Route path="/home-old" component={Home} />
         <Route path="/services" component={ServicesNew} />
@@ -35,6 +40,10 @@ function Router() {
         <Route path="/payment-old" component={Payment} />
         <Route path="/about" component={About} />
         <Route path="/privacy" component={PrivacyPolicy} />
+        <Route path="/portfolio" component={Portfolio} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/employee-login" component={EmployeeLogin} />
+        <Route path="/employee-dashboard" component={EmployeeDashboard} />
         <Route component={NotFound} />
       </Switch>
       <Footer />

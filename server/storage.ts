@@ -372,7 +372,7 @@ export class JsonStorage implements IStorage {
 
   async createService(insertService: InsertService): Promise<Service> {
     const id = randomUUID();
-    const service: Service = { ...insertService, id };
+    const service: Service = { ...insertService, id, originalPrice: insertService.originalPrice || null, subcategory: insertService.subcategory || null, features: insertService.features || null, isActive: insertService.isActive !== undefined ? insertService.isActive : true, isFeatured: insertService.isFeatured !== undefined ? insertService.isFeatured : false };
     this.services.set(id, service);
     this.saveServices();
     return service;
@@ -397,6 +397,7 @@ export class JsonStorage implements IStorage {
       ...insertOrder,
       id,
       orderNumber,
+      description: insertOrder.description || null,
       status: "pending",
       paymentStatus: "pending",
       createdAt: new Date(),
@@ -461,6 +462,7 @@ export class JsonStorage implements IStorage {
     const consultation: Consultation = {
       ...insertConsultation,
       id,
+      projectType: insertConsultation.projectType || null,
       status: "pending",
       createdAt: new Date(),
     };
@@ -475,7 +477,7 @@ export class JsonStorage implements IStorage {
 
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
     const id = randomUUID();
-    const message: Message = { ...insertMessage, id, createdAt: new Date() };
+    const message: Message = { ...insertMessage, id, phone: insertMessage.phone || null, status: "pending", createdAt: new Date() };
     this.messages.set(id, message);
     this.saveMessages();
     return message;

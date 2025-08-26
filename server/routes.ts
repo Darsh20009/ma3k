@@ -71,11 +71,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const emailContent = generateSpecsEmailContent(specification);
       
       try {
-        await sendOrderNotificationEmail(
-          'ma3k.2025@gmail.com',
-          emailSubject,
-          emailContent
-        );
+        await sendOrderNotificationEmail({
+          orderNumber: specification.specId,
+          customerName: 'طلب مواصفات موقع',
+          customerEmail: 'ma3k.2025@gmail.com',
+          customerPhone: 'غير متوفر',
+          serviceName: specification.websiteName,
+          price: 0,
+          paymentStatus: 'specs-request',
+          paymentMethod: 'لا يوجد',
+          websiteSpecs: specification
+        });
         console.log(`Website specs email sent for order: ${specification.specId}`);
       } catch (emailError) {
         console.error('Failed to send specs email:', emailError);
@@ -158,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           customerPhone: orderData.customerPhone || 'غير متوفر',
           serviceName: orderData.serviceName,
           price: orderData.price,
-          paymentStatus: orderData.paymentStatus || 'pending',
+          paymentStatus: 'pending',
           paymentMethod: orderData.paymentMethod || 'غير محدد',
           websiteSpecs: websiteSpecs
         });
@@ -217,7 +223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             customerEmail: order.customerEmail,
             customerPhone: order.customerPhone,
             serviceName: order.serviceName,
-            price: order.totalPrice,
+            price: order.price,
             paymentStatus: "completed",
             paymentMethod: paymentMethod,
             websiteSpecs: websiteSpecs
@@ -290,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Order not found" });
       }
 
-      const service = await storage.getService(order.serviceId);
+      const service = order.serviceId ? await storage.getService(order.serviceId) : null;
       const invoiceHTML = generateInvoiceHTML(order, service);
       
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -310,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Invoice not found" });
       }
       
-      const order = await storage.getOrder(invoice.orderId);
+      const order = invoice.orderId ? await storage.getOrder(invoice.orderId) : null;
       if (!order) {
         return res.status(404).json({ error: "Order not found" });
       }
