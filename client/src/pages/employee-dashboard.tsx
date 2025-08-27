@@ -377,13 +377,23 @@ export default function EmployeeDashboard() {
                       <h3 className="text-xl font-bold text-white mb-2">لا يوجد اجتماع نشط</h3>
                       <p className="text-gray-300 mb-6">ابدأ اجتماعاً جديداً للتواصل مع فريقك</p>
                       
-                      <Button
-                        onClick={startMeeting}
-                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full"
-                      >
-                        <Video className="w-5 h-5 mr-2" />
-                        بدء اجتماع جديد
-                      </Button>
+                      <div className="space-y-4">
+                        <Button
+                          onClick={startMeeting}
+                          className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full"
+                        >
+                          <Video className="w-5 h-5 mr-2" />
+                          بدء اجتماع سريع
+                        </Button>
+                        <Button
+                          onClick={() => window.open('/ma3k-meet', '_blank')}
+                          variant="outline"
+                          className="border-blue-500 text-blue-400 font-bold py-3 px-8 rounded-full"
+                        >
+                          <Video className="w-5 h-5 mr-2" />
+                          فتح Ma3k Meet الكامل
+                        </Button>
+                      </div>
                     </div>
                   ) : (
                     <div>
