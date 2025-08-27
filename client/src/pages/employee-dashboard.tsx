@@ -397,13 +397,66 @@ export default function EmployeeDashboard() {
                           </div>
                         </div>
                         
-                        {/* Video Area */}
-                        <div className="bg-black rounded-lg h-64 mb-4 flex items-center justify-center">
-                          <div className="text-center">
-                            <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                              <span className="text-black font-bold text-xl">{currentEmployee.name.charAt(0)}</span>
+                        {/* Video Area - Enhanced with Virtual Participants */}
+                        <div className="bg-black rounded-lg h-64 mb-4 p-4">
+                          <div className="grid grid-cols-2 gap-4 h-full">
+                            {/* Main Speaker */}
+                            <div className="flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-2">
+                                  <span className="text-black font-bold text-xl">{currentEmployee.name.charAt(0)}</span>
+                                </div>
+                                <p className="text-white text-sm">{currentEmployee.name}</p>
+                                <div className="flex items-center justify-center gap-1 mt-1">
+                                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                                  <span className="text-red-400 text-xs">يتحدث</span>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-white">{currentEmployee.name}</p>
+                            
+                            {/* Virtual Participants */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center">
+                                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mb-1">
+                                  <span className="text-white font-bold text-sm">AM</span>
+                                </div>
+                                <p className="text-white text-xs">أحمد محمد</p>
+                                <div className="w-1 h-1 bg-green-500 rounded-full mt-1"></div>
+                              </div>
+                              
+                              <div className="bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center">
+                                <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mb-1">
+                                  <span className="text-white font-bold text-sm">FA</span>
+                                </div>
+                                <p className="text-white text-xs">فاطمة علي</p>
+                                <div className="w-1 h-1 bg-green-500 rounded-full mt-1"></div>
+                              </div>
+                              
+                              <div className="bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center">
+                                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mb-1">
+                                  <span className="text-white font-bold text-sm">SA</span>
+                                </div>
+                                <p className="text-white text-xs">سعد الأحمد</p>
+                                <div className="w-1 h-1 bg-yellow-500 rounded-full mt-1"></div>
+                              </div>
+                              
+                              <div className="bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center">
+                                <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center mb-1">
+                                  <Users className="w-5 h-5 text-gray-400" />
+                                </div>
+                                <p className="text-gray-400 text-xs">+2 آخرين</p>
+                                <div className="w-1 h-1 bg-gray-500 rounded-full mt-1"></div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Live Chat Overlay */}
+                          <div className="absolute bottom-2 left-2 bg-gray-900/80 rounded-lg p-2 max-w-48">
+                            <div className="text-xs space-y-1">
+                              <div className="text-blue-400">أحمد: فكرة ممتازة! 👍</div>
+                              <div className="text-purple-400">فاطمة: سأعمل على التصميم</div>
+                              <div className="text-green-400">سعد: متى نبدأ التطوير؟</div>
+                            </div>
                           </div>
                         </div>
                         
@@ -453,33 +506,188 @@ export default function EmployeeDashboard() {
                         </div>
                       </div>
                       
-                      {/* Ma3k Code Tool */}
+                      {/* Ma3k Code Tool - Enhanced */}
                       <div className="bg-gray-800/50 rounded-xl p-6">
-                        <h4 className="text-lg font-bold text-white mb-4">معك كود - أداة الترميز التعاونية</h4>
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-bold text-white">معك كود - أداة الترميز التعاونية</h4>
+                          <Button
+                            size="sm"
+                            onClick={() => window.open('/code-tool', '_blank')}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            فتح الأداة الكاملة
+                          </Button>
+                        </div>
+                        
+                        {/* Live Coding Area */}
                         <div className="bg-gray-900 rounded-lg p-4 mb-4">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-gray-300 text-sm">ملف جديد</span>
-                            <span className="text-gray-400 text-xs">JavaScript</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                              <span className="text-gray-300 text-sm ml-2">ملف جديد</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-400 text-xs">JavaScript</span>
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span className="text-green-400 text-xs">3 مطورين متصلين</span>
+                              </div>
+                            </div>
                           </div>
                           <textarea
                             className="w-full bg-transparent text-green-400 font-mono text-sm resize-none"
-                            rows={8}
-                            placeholder="// اكتب الكود هنا...
-function welcome() {
-  console.log('مرحباً بك في معك كود!');
-}"
+                            rows={10}
+                            defaultValue={`// مرحباً بكم في معك كود التعاوني!
+// يمكن لعدة مطورين العمل معاً هنا
+
+function createWebsite(name, type) {
+    console.log(\`إنشاء موقع \${name} من نوع \${type}\`);
+    return {
+        name: name,
+        type: type,
+        features: ['responsive', 'dark-mode', 'rtl'],
+        generateHTML: function() {
+            return \`<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <title>\${this.name}</title>
+</head>
+<body>
+    <h1>مرحباً بكم في \${this.name}</h1>
+</body>
+</html>\`;
+        }
+    };
+}
+
+// تشغيل المثال
+const myWebsite = createWebsite('موقعي الجديد', 'شخصي');
+console.log(myWebsite.generateHTML());`}
                           />
                         </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="border-green-500 text-green-500">
-                            تشغيل الكود
+                        
+                        {/* Interactive Features */}
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div className="bg-gray-700/50 rounded-lg p-3">
+                            <h5 className="text-white text-sm font-bold mb-2">المطورين المتصلين</h5>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">
+                                  AM
+                                </div>
+                                <span className="text-gray-300 text-xs">أحمد محمد</span>
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs">
+                                  FA
+                                </div>
+                                <span className="text-gray-300 text-xs">فاطمة علي</span>
+                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs">
+                                  SA
+                                </div>
+                                <span className="text-gray-300 text-xs">سعد الأحمد</span>
+                                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-gray-700/50 rounded-lg p-3">
+                            <h5 className="text-white text-sm font-bold mb-2">الدردشة المباشرة</h5>
+                            <div className="space-y-2 max-h-20 overflow-y-auto">
+                              <div className="text-xs">
+                                <span className="text-blue-400">أحمد:</span>
+                                <span className="text-gray-300"> ممتاز! الكود يعمل بشكل رائع</span>
+                              </div>
+                              <div className="text-xs">
+                                <span className="text-purple-400">فاطمة:</span>
+                                <span className="text-gray-300"> سأضيف التصميم CSS</span>
+                              </div>
+                              <div className="text-xs">
+                                <span className="text-green-400">سعد:</span>
+                                <span className="text-gray-300"> هل يمكننا إضافة قاعدة بيانات؟</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Enhanced Action Buttons */}
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-green-500 text-green-500"
+                            onClick={() => toast({ title: "تم تشغيل الكود", description: "النتيجة تظهر في وحدة التحكم" })}
+                          >
+                            <Play className="w-3 h-3 mr-1" />
+                            تشغيل
                           </Button>
-                          <Button size="sm" variant="outline" className="border-blue-500 text-blue-500">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-blue-500 text-blue-500"
+                            onClick={() => toast({ title: "تم المشاركة", description: "تم مشاركة الكود مع الفريق" })}
+                          >
+                            <Share className="w-3 h-3 mr-1" />
                             مشاركة
                           </Button>
-                          <Button size="sm" variant="outline" className="border-amber-500 text-amber-500">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-amber-500 text-amber-500"
+                            onClick={() => toast({ title: "تم الحفظ", description: "تم حفظ الكود بنجاح" })}
+                          >
+                            <Save className="w-3 h-3 mr-1" />
                             حفظ
                           </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-purple-500 text-purple-500"
+                            onClick={() => toast({ title: "دمج الكود", description: "سيتم دمج HTML, CSS, JS" })}
+                          >
+                            <Code2 className="w-3 h-3 mr-1" />
+                            دمج
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-gray-500 text-gray-300"
+                            onClick={() => window.open('/code-tool', '_blank')}
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            معاينة
+                          </Button>
+                        </div>
+                        
+                        {/* Meeting Summary Integration */}
+                        <div className="mt-4 p-3 bg-amber-900/20 border border-amber-500/30 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <h6 className="text-amber-400 font-bold text-sm">ملخص الاجتماع التفاعلي</h6>
+                            <Button size="sm" variant="outline" className="border-amber-500 text-amber-400 text-xs px-2 py-1">
+                              إضافة ملخص
+                            </Button>
+                          </div>
+                          <textarea
+                            placeholder="اكتب ملخص الاجتماع هنا وسيتفاعل أعضاء الفريق معه تلقائياً..."
+                            className="w-full bg-gray-800/50 text-gray-300 p-2 rounded text-xs resize-none"
+                            rows={3}
+                            onChange={(e) => {
+                              if (e.target.value.length > 10) {
+                                setTimeout(() => {
+                                  toast({ 
+                                    title: "تفاعل الفريق", 
+                                    description: "أعضاء الفريق يتفاعلون مع ملخص الاجتماع" 
+                                  });
+                                }, 2000);
+                              }
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
