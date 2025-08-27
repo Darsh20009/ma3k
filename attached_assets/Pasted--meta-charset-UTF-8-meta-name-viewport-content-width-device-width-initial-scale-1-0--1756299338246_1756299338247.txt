@@ -1,0 +1,578 @@
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة دمج وتفكيك الأكواد (وضع داكن)</title>
+    <style>
+        /* --- المتغيرات للثيم الداكن (افتراضي ودائم) --- */
+        :root {
+            --bg-color: #212121;
+            --container-bg: #333;
+            --text-color: #f1f1f1;
+            --border-color: #555;
+            --header-bg: #424242;
+            --button-bg: #5cb85c; /* أخضر داكن */
+            --button-hover-bg: #4cae4c;
+            --secondary-button-bg: #5bc0de; /* أزرق سماوي */
+            --secondary-button-hover-bg: #46b8da;
+            --textarea-bg: #2b2b2b;
+            --textarea-text: #f1f1f1;
+            --textarea-border: #555;
+            --icon-color: #ccc;
+            --shadow-color: rgba(255,255,255,0.1);
+            --link-color: #64b5f6;
+        }
+
+        /* --- الأنماط الأساسية --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* --- حاوية الأداة الرئيسية (للتضمين) --- */
+        /* الكلاس dark-mode سيتم إضافته مباشرة في HTML */
+        #code-tool-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        #code-tool-container h1 {
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2em;
+            position: relative; /* لإبقاء التنسيق كما هو حتى بدون زر */
+        }
+
+        /* --- تم حذف زر الوضع الليلي --- */
+
+        .code-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (min-width: 992px) {
+            .code-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            #full-code-box {
+                grid-column: 1 / -1;
+            }
+            #html-code-box { grid-column: 1 / 2; }
+            #css-code-box  { grid-column: 2 / 3; }
+            #js-code-box   { grid-column: 3 / 4; }
+        }
+
+        .code-box {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--container-bg);
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-header {
+            background-color: var(--header-bg);
+            padding: 12px 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            color: var(--text-color);
+        }
+        .code-header span {
+            font-size: 1.1em;
+        }
+
+        .code-content {
+            width: 100%;
+            min-height: 250px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            padding: 15px;
+            border: none;
+            resize: vertical;
+            background-color: var(--textarea-bg);
+            color: var(--textarea-text);
+            border-top: none;
+            box-sizing: border-box;
+            line-height: 1.5;
+            flex-grow: 1;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .code-content:focus {
+             outline: 2px solid var(--secondary-button-bg);
+             outline-offset: -2px;
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 5px 0;
+            cursor: pointer;
+            border-radius: 6px;
+            width: 100%;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: var(--button-hover-bg);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+        button:active {
+             transform: translateY(0px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0 20px 0;
+            grid-column: 1 / -1;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+
+        .copy-btn {
+            background-color: var(--secondary-button-bg);
+            padding: 6px 12px;
+            font-size: 14px;
+            width: auto;
+            margin: 0;
+        }
+        .copy-btn:hover {
+            background-color: var(--secondary-button-hover-bg);
+            box-shadow: none;
+        }
+        .copy-btn.copied {
+            background-color: #28a745; /* لون أخضر مؤقت عند النسخ */
+        }
+
+        .result-container {
+            margin-top: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .tab {
+            overflow: hidden;
+            background-color: var(--header-bg);
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .tab button {
+            background-color: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: background-color 0.3s, color 0.3s;
+            flex: 1;
+            color: var(--text-color);
+            margin: 0;
+            border-radius: 0;
+            border-right: 1px solid var(--border-color);
+        }
+        .tab button:last-child {
+            border-right: none;
+        }
+
+        .tab button:hover {
+            background-color: var(--border-color);
+             transform: none;
+             box-shadow: none;
+        }
+
+        .tab button.active {
+            background-color: var(--button-bg);
+            color: white;
+        }
+
+        .tabcontent {
+            display: none;
+            background-color: var(--container-bg);
+            transition: background-color 0.3s ease;
+        }
+        .tabcontent.active-tab {
+            display: block;
+        }
+
+        #merged-code .code-header { border-bottom: none; }
+        #merged-code .code-content { border-top: 1px solid var(--border-color); min-height: 350px;}
+
+        #preview .code-header { border-bottom: none; }
+        #preview-frame {
+            width: 100%;
+            height: 450px;
+            border: none;
+            border-top: 1px solid var(--border-color);
+            display: block;
+            background-color: white; /* خلفية بيضاء للمعاينه لضمان وضوح المحتوى */
+        }
+
+        #open-preview-btn {
+            background-color: var(--secondary-button-bg);
+            width: auto;
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-left: 10px; /* هامش يسار */
+        }
+         #open-preview-btn:hover {
+             background-color: var(--secondary-button-hover-bg);
+             box-shadow: none;
+         }
+
+        @media (max-width: 991px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+             #code-tool-container {
+                 padding: 15px;
+             }
+             #code-tool-container h1 {
+                 font-size: 1.6em;
+             }
+             /* تم حذف تنسيق زر التبديل لأنه أزيل */
+        }
+
+    </style>
+
+
+
+    <div id="code-tool-container" class="dark-mode">
+        <h1>
+            أداة دمج وتفكيك الأكواد
+            </h1>
+
+        <div class="code-box" id="full-code-box">
+            <div class="code-header">
+                <span>الكود الكامل المدمج</span>
+                <button class="copy-btn" data-target="full-code">نسخ الكود</button>
+            </div>
+            <textarea id="full-code" class="code-content" placeholder="ألصق الكود الكامل هنا لتفكيكه، أو سيظهر الكود المدمج هنا بعد الدمج..."></textarea>
+        </div>
+
+        <div class="action-buttons">
+            <button id="split-btn">تفكيك الكود إلى أجزاء</button>
+            <button id="merge-btn">دمج الأكواد من الأجزاء</button>
+        </div>
+
+        <div class="code-container">
+            <div class="code-box" id="html-code-box">
+                <div class="code-header">
+                    <span>HTML</span>
+                    <button class="copy-btn" data-target="html-code">نسخ</button>
+                </div>
+                <textarea id="html-code" class="code-content" placeholder="سيتم عرض كود HTML هنا..."></textarea>
+            </div>
+
+            <div class="code-box" id="css-code-box">
+                <div class="code-header">
+                    <span>CSS</span>
+                    <button class="copy-btn" data-target="css-code">نسخ</button>
+                </div>
+                <textarea id="css-code" class="code-content" placeholder="سيتم عرض كود CSS هنا..."></textarea>
+            </div>
+
+            <div class="code-box" id="js-code-box">
+                <div class="code-header">
+                    <span>JavaScript</span>
+                    <button class="copy-btn" data-target="js-code">نسخ</button>
+                </div>
+                <textarea id="js-code" class="code-content" placeholder="سيتم عرض كود JavaScript هنا..."></textarea>
+            </div>
+        </div>
+
+        <div class="result-container">
+            <div class="tab">
+                <button class="tablinks active" onclick="openTab(event, 'merged-code')">الكود المدمج</button>
+                <button class="tablinks" onclick="openTab(event, 'preview')">معاينة النتيجة</button>
+            </div>
+
+            <div id="merged-code" class="tabcontent active-tab">
+                <div class="code-header">
+                    النتيجة النهائية (لصق مباشر في ملف HTML)
+                    <button class="copy-btn" data-target="result-code">نسخ الكود</button>
+                </div>
+                <textarea id="result-code" class="code-content" readonly="" placeholder="سيظهر الكود المدمج هنا بعد الضغط على زر الدمج..."></textarea>
+            </div>
+
+            <div id="preview" class="tabcontent">
+                <div class="code-header">
+                   <span>معاينة النتيجة</span>
+                   <button id="open-preview-btn">فتح المعاينة في نافذة جديدة</button>
+                </div>
+                <iframe id="preview-frame" title="Preview of merged code"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IIFE لحماية النطاق
+        (function() {
+            const fullCodeEl = document.getElementById('full-code');
+            const htmlCodeEl = document.getElementById('html-code');
+            const cssCodeEl = document.getElementById('css-code');
+            const jsCodeEl = document.getElementById('js-code');
+            const resultCodeEl = document.getElementById('result-code');
+            const previewFrame = document.getElementById('preview-frame');
+            const mergeBtn = document.getElementById('merge-btn');
+            const splitBtn = document.getElementById('split-btn');
+            const openPreviewBtn = document.getElementById('open-preview-btn');
+            // تم حذف themeToggleBtn
+            const container = document.getElementById('code-tool-container'); // احتفظنا به لـ querySelector لاحقًا
+
+            // --- وظائف الدمج والتفكيك ---
+
+            function mergeCodes() {
+                const htmlCode = htmlCodeEl.value;
+                const cssCode = cssCodeEl.value;
+                const jsCode = jsCodeEl.value;
+
+                // القالب المحدث للدمج
+                const mergedCode = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>النتيجة المدمجة</title>
+${cssCode ? `    <style>
+${cssCode.trim().split('\n').map(line => `        ${line}`).join('\n')}
+    </style>` : ''}
+</head>
+<body>
+
+${htmlCode.trim().split('\n').map(line => `    ${line}`).join('\n')}
+
+${jsCode ? `    <script>
+${jsCode.trim().split('\n').map(line => `        ${line}`).join('\n')}
+    <\/script>` : ''}
+
+</body>
+</html>`;
+
+                resultCodeEl.value = mergedCode;
+                fullCodeEl.value = mergedCode; // تحديث الكود الكامل أيضاً
+                updatePreview(mergedCode);
+                // التأكد من أن تبويب الكود المدمج هو النشط
+                openTab(null, 'merged-code', true);
+            }
+
+            function splitCode() {
+                const fullCode = fullCodeEl.value;
+                if (!fullCode.trim()) {
+                    alert("الرجاء إدخال الكود الكامل أولاً في الصندوق العلوي.");
+                    return;
+                }
+
+                let html = fullCode;
+                let css = '';
+                let js = '';
+
+                // استخراج CSS
+                const cssMatch = fullCode.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+                if (cssMatch && cssMatch[1]) {
+                    css = cssMatch[1].trim();
+                    html = html.replace(cssMatch[0], ''); // إزالة الجزء المستخرج
+                }
+
+                // استخراج JS (محاولة البحث عن السكربت قبل نهاية body أولاً)
+                const scriptMatchBeforeBody = fullCode.match(/<script[^>]*>([\s\S]*?)<\/script>\s*<\/\s*body/i);
+                 if (scriptMatchBeforeBody && scriptMatchBeforeBody[1]) {
+                    js = scriptMatchBeforeBody[1].trim();
+                    // الإزالة يجب أن تكون دقيقة لتجنب حذف محتوى body إذا كان السكربت هو آخر شيء
+                    const scriptTagFull = scriptMatchBeforeBody[0].substring(0, scriptMatchBeforeBody[0].search(/<\/\s*body/i));
+                    html = html.replace(scriptTagFull, '');
+                } else {
+                    // محاولة البحث عن أي script إذا لم يتم العثور عليه قبل body
+                    const genericScriptMatch = fullCode.match(/<script[^>]*>([\s\S]*?)<\/script>/i);
+                    if(genericScriptMatch && genericScriptMatch[1]) {
+                        js = genericScriptMatch[1].trim();
+                        html = html.replace(genericScriptMatch[0], '');
+                    }
+                }
+
+                // استخراج محتوى body وتنظيف HTML
+                const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                if (bodyMatch && bodyMatch[1]) {
+                    html = bodyMatch[1].trim();
+                } else {
+                    // إذا لم يجد body، محاولة تنظيف العلامات الرئيسية
+                    html = html.replace(/<!DOCTYPE[^>]+>/i, '')
+                               .replace(/<html[^>]*>|<\/html>/gi, '')
+                               .replace(/<head[^>]*>[\s\S]*?<\/head>/i, '')
+                               .replace(/<\/?body[^>]*>/gi, '')
+                               .trim();
+                }
+
+                // *** تم حذف الأسطر التي تسببت في الخطأ ***
+                // html = html.replace(//g, '').replace(//g, '').trim();
+
+                htmlCodeEl.value = html;
+                cssCodeEl.value = css;
+                jsCodeEl.value = js;
+
+                // اختياري: دمج النتائج للتحقق وعرضها
+                mergeCodes();
+                alert('تم تفكيك الكود بنجاح.');
+            }
+
+            function updatePreview(code) {
+                try {
+                     // استخدام srcdoc هو الأفضل للمعاينه المباشرة والآمنة
+                     previewFrame.srcdoc = code;
+                } catch (e) {
+                    console.error("خطأ في تحديث المعاينة:", e);
+                    previewFrame.srcdoc = `<html><body>حدث خطأ أثناء عرض المعاينة: ${e.message}</body></html>`;
+                }
+            }
+
+            // --- وظائف الواجهة والتفاعل ---
+
+            window.openTab = function(evt, tabName, forceActivation = false) {
+                // استخدام container.getElementsByClassName لضمان العمل داخل نطاق الأداة فقط
+                const tabcontent = container.getElementsByClassName("tabcontent");
+                for (let i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                    tabcontent[i].classList.remove("active-tab");
+                }
+
+                const tablinks = container.getElementsByClassName("tablinks");
+                for (let i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+
+                const currentTab = container.querySelector('#' + tabName);
+                if(currentTab) {
+                    currentTab.style.display = "block";
+                    currentTab.classList.add("active-tab");
+                }
+
+                 // تحديث الزر النشط
+                 if (evt && evt.currentTarget) {
+                    evt.currentTarget.className += " active";
+                } else {
+                    // البحث عن الزر يدوياً إذا لم يكن هناك حدث
+                    const correspondingButton = container.querySelector(`.tablinks[onclick*="'${tabName}'"]`);
+                    if (correspondingButton) {
+                        correspondingButton.className += " active";
+                    }
+                }
+            }
+
+            function copyToClipboard(elementId, button) {
+                const element = document.getElementById(elementId);
+                if (!element || !element.value) {
+                    alert('لا يوجد محتوى للنسخ.');
+                    return;
+                }
+                navigator.clipboard.writeText(element.value).then(() => {
+                    const originalText = button.textContent;
+                    button.textContent = 'تم النسخ!';
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('فشل النسخ: ', err);
+                    // محاولة استخدام الطريقة القديمة كاحتياط
+                    try {
+                        element.select();
+                        document.execCommand('copy');
+                        const originalText = button.textContent;
+                        button.textContent = 'تم النسخ!';
+                        button.classList.add('copied');
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                            button.classList.remove('copied');
+                        }, 2000);
+                    } catch (execErr) {
+                        alert('فشل النسخ. يرجى النسخ يدوياً.');
+                        console.error('Fallback copy failed:', execErr);
+                    }
+                });
+            }
+
+             function openPreviewInNewTab() {
+                 const code = resultCodeEl.value;
+                 if (!code.trim()) {
+                     alert("لا يوجد كود لعرضه. قم بدمج الكود أولاً.");
+                     return;
+                 }
+                 try {
+                     const blob = new Blob([code], { type: 'text/html' });
+                     const url = URL.createObjectURL(blob);
+                     const newWindow = window.open(url, '_blank');
+                     if (!newWindow) {
+                         alert("فشل فتح نافذة جديدة. قد يكون متصفحك يمنع النوافذ المنبثقة.");
+                     }
+                     // المتصفح سيتعامل مع revokeObjectURL عند إغلاق النافذة/Blob
+                 } catch (e) {
+                     console.error("خطأ في فتح المعاينة:", e);
+                     alert("حدث خطأ أثناء محاولة فتح المعاينة في نافذة جديدة.");
+                 }
+             }
+
+             // --- تم حذف وظيفة الوضع الليلي toggleTheme ---
+
+             // --- تهيئة الأداة ---
+             function initializeTool() {
+                 // تم حذف استعادة الثيم من localStorage
+
+                 // ربط الأحداث
+                 mergeBtn.addEventListener('click', mergeCodes);
+                 splitBtn.addEventListener('click', splitCode);
+                 openPreviewBtn.addEventListener('click', openPreviewInNewTab);
+                 // تم حذف ربط حدث زر التبديل
+
+                 // ربط أزرار النسخ
+                 const copyButtons = container.querySelectorAll('.copy-btn');
+                 copyButtons.forEach(button => {
+                     button.addEventListener('click', function() {
+                         const targetId = this.getAttribute('data-target');
+                         copyToClipboard(targetId, this);
+                     });
+                 });
+
+                 // تفعيل التاب الأول عند التحميل
+                 openTab(null, 'merged-code', true);
+
+                 console.log("أداة الأكواد جاهزة (وضع داكن دائم)!");
+             }
+
+             // تأكد من تحميل DOM قبل تشغيل التهيئة
+             if (document.readyState === 'loading') {
+                 document.addEventListener('DOMContentLoaded', initializeTool);
+             } else {
+                 initializeTool(); // استدعاء مباشر إذا تم تحميل DOM بالفعل
+             }
+
+        })(); // نهاية IIFE
+    </script>

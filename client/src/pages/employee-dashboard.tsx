@@ -29,7 +29,8 @@ import {
   Eye,
   Plus,
   Trash2,
-  Save
+  Save,
+  Play
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1017,17 +1018,124 @@ function welcome() {
                 className="space-y-6"
               >
                 <div className="glass-card rounded-2xl p-6">
-                  <h2 className="text-2xl font-bold text-white mb-6">معك كود - ملعب البرمجة</h2>
-                  <div className="text-center py-8">
-                    <Code2 className="w-16 h-16 text-green-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-4">أداة البرمجة التفاعلية</h3>
-                    <p className="text-gray-300 mb-6">اكتب وجرب أكوادك بشكل مباشر</p>
+                  <h2 className="text-2xl font-bold text-white mb-6">معك كود - ملعب البرمجة التفاعلي</h2>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Main Tool */}
+                    <div className="bg-gray-800/50 rounded-xl p-6">
+                      <div className="text-center mb-6">
+                        <Code2 className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-bold text-white mb-2">أداة دمج وتفكيك الأكواد</h3>
+                        <p className="text-gray-300 text-sm">أداة متقدمة لدمج HTML, CSS, JS في ملف واحد أو تفكيكها</p>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <Button
+                          onClick={() => window.open('/code-tool', '_blank')}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                        >
+                          <Code2 className="w-4 h-4 mr-2" />
+                          فتح الأداة في صفحة منفصلة
+                        </Button>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-gray-700/50 rounded-lg p-3 text-center">
+                            <p className="text-gray-300 text-xs">دمج الأكواد</p>
+                            <p className="text-white font-bold text-sm">HTML + CSS + JS</p>
+                          </div>
+                          <div className="bg-gray-700/50 rounded-lg p-3 text-center">
+                            <p className="text-gray-300 text-xs">تفكيك الكود</p>
+                            <p className="text-white font-bold text-sm">ملف واحد → أجزاء</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Interactive Features */}
+                    <div className="bg-gray-800/50 rounded-xl p-6">
+                      <div className="text-center mb-6">
+                        <Users className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-bold text-white mb-2">فريق العمل التفاعلي</h3>
+                        <p className="text-gray-300 text-sm">تفاعل مع أعضاء الفريق الافتراضيين</p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            AM
+                          </div>
+                          <div>
+                            <p className="text-white text-sm">أحمد محمد</p>
+                            <p className="text-blue-400 text-xs">مطور</p>
+                          </div>
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            FA
+                          </div>
+                          <div>
+                            <p className="text-white text-sm">فاطمة علي</p>
+                            <p className="text-purple-400 text-xs">مصممة</p>
+                          </div>
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 space-x-reverse">
+                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            SA
+                          </div>
+                          <div>
+                            <p className="text-white text-sm">سعد الأحمد</p>
+                            <p className="text-green-400 text-xs">مدير مشروع</p>
+                          </div>
+                          <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 p-3 bg-gray-700/50 rounded-lg">
+                        <p className="text-gray-300 text-xs">💡 اكتب ملخص اجتماع وشاهد تفاعل الفريق معه</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Quick Access Tools */}
+                  <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <Button
-                      onClick={() => window.open('/tools', '_blank')}
-                      className="bg-green-600 hover:bg-green-700"
+                      variant="outline"
+                      className="h-16 flex-col border-gray-600 text-gray-300"
+                      onClick={() => window.open('/code-tool', '_blank')}
                     >
-                      <Code2 className="w-4 h-4 mr-2" />
-                      فتح ملعب البرمجة
+                      <Code2 className="w-6 h-6 mb-1" />
+                      <span className="text-xs">محرر الأكواد</span>
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="h-16 flex-col border-gray-600 text-gray-300"
+                      onClick={() => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" })}
+                    >
+                      <Users className="w-6 h-6 mb-1" />
+                      <span className="text-xs">غرفة الدردشة</span>
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="h-16 flex-col border-gray-600 text-gray-300"
+                      onClick={() => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" })}
+                    >
+                      <Download className="w-6 h-6 mb-1" />
+                      <span className="text-xs">مكتبة القوالب</span>
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="h-16 flex-col border-gray-600 text-gray-300"
+                      onClick={() => toast({ title: "قريباً", description: "هذه الميزة قيد التطوير" })}
+                    >
+                      <Play className="w-6 h-6 mb-1" />
+                      <span className="text-xs">تشغيل سريع</span>
                     </Button>
                   </div>
                 </div>

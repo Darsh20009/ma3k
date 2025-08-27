@@ -21,6 +21,7 @@ import Portfolio from "@/pages/portfolio";
 import Contact from "@/pages/contact";
 import EmployeeLogin from "@/pages/employee-login";
 import EmployeeDashboard from "@/pages/employee-dashboard";
+import CodeTool from "@/pages/code-tool";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -44,6 +45,7 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/employee-login" component={EmployeeLogin} />
         <Route path="/employee-dashboard" component={EmployeeDashboard} />
+        <Route path="/code-tool" component={CodeTool} />
         <Route component={NotFound} />
       </Switch>
       <Footer />
