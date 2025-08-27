@@ -89,6 +89,7 @@ export default function Ma3kMeet() {
   const [meetingId] = useState(`MA3K-${Date.now().toString().slice(-6)}`);
   const [meetingDuration, setMeetingDuration] = useState(0);
   const [isHost] = useState(true);
+  const [meetingMode, setMeetingMode] = useState<'productivity' | 'creative' | 'gaming' | 'presentation'>('productivity');
   
   // User settings
   const [micEnabled, setMicEnabled] = useState(true);
@@ -386,152 +387,401 @@ const currentMeeting = startMeeting({
 
   if (!isInMeeting) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-4">
-                <Video className="w-8 h-8 text-white" />
-              </div>
-              <h1 className="text-5xl font-bold text-white">Ma3k Meet</h1>
-            </div>
-            <p className="text-xl text-gray-300 mb-2">منصة الاجتماعات الافتراضية المتقدمة</p>
-            <p className="text-gray-400">تعاون، تواصل، وأبدع مع فريقك في بيئة تفاعلية متطورة</p>
-          </motion.div>
-
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        </div>
+        
+        <div className="relative z-10 p-4">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700"
-            >
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
-                <Video className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">اجتماعات عالية الجودة</h3>
-              <p className="text-gray-300 text-sm">فيديو وصوت بجودة 4K مع تقنيات ذكية لتحسين الاتصال</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700"
+              className="text-center mb-16"
             >
-              <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
-                <Code2 className="w-6 h-6 text-white" />
+              <div className="flex items-center justify-center mb-8">
+                <motion.div 
+                  className="w-20 h-20 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mr-6 shadow-2xl"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                >
+                  <Video className="w-10 h-10 text-white" />
+                </motion.div>
+                <div>
+                  <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600">
+                    Ma3k Meet
+                  </h1>
+                  <p className="text-2xl text-white/80 font-light mt-2">مستقبل الاجتماعات الرقمية</p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">التعاون في البرمجة</h3>
-              <p className="text-gray-300 text-sm">شارك وحرر الكود مع فريقك في الوقت الفعلي</p>
+              
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="max-w-4xl mx-auto"
+              >
+                <p className="text-2xl text-gray-200 mb-4 font-light">
+                  🚀 تجربة اجتماعات ثورية بتقنيات الذكاء الاصطناعي
+                </p>
+                <p className="text-lg text-blue-200">
+                  الآن مع الواقع المختلط، الترجمة الفورية، التعاون المباشر في البرمجة، والتحليل الذكي للاجتماعات
+                </p>
+              </motion.div>
             </motion.div>
 
+            {/* Revolutionary Features Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+                className="group"
+              >
+                <div className="bg-gradient-to-br from-cyan-500/20 to-blue-600/20 backdrop-blur-xl rounded-3xl p-8 border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 transform hover:scale-105">
+                  <div className="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                    <Video className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-3">🎥 فيديو 8K مع AR</h3>
+                  <p className="text-cyan-200 text-sm leading-relaxed">فيديو بدقة 8K مع الواقع المعزز والهولوجرام ثلاثي الأبعاد</p>
+                  <div className="mt-4 flex items-center text-cyan-400 text-xs">
+                    <Zap className="w-3 h-3 mr-1" />
+                    <span>مدعوم بالذكاء الاصطناعي</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="group"
+              >
+                <div className="bg-gradient-to-br from-purple-500/20 to-pink-600/20 backdrop-blur-xl rounded-3xl p-8 border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 transform hover:scale-105">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                    <Code2 className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-3">💻 برمجة تعاونية</h3>
+                  <p className="text-purple-200 text-sm leading-relaxed">محرر كود متقدم مع الذكاء الاصطناعي وأدوات التطوير المدمجة</p>
+                  <div className="mt-4 flex items-center text-purple-400 text-xs">
+                    <Star className="w-3 h-3 mr-1" />
+                    <span>تحليل الكود الذكي</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="group"
+              >
+                <div className="bg-gradient-to-br from-green-500/20 to-emerald-600/20 backdrop-blur-xl rounded-3xl p-8 border border-green-500/30 hover:border-green-400/60 transition-all duration-500 transform hover:scale-105">
+                  <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                    <Zap className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-3">🤖 مساعد ذكي</h3>
+                  <p className="text-green-200 text-sm leading-relaxed">ترجمة فورية لـ 150 لغة، ملخصات ذكية، وتحليل المشاعر</p>
+                  <div className="mt-4 flex items-center text-green-400 text-xs">
+                    <Heart className="w-3 h-3 mr-1" />
+                    <span>تحليل المشاعر المتقدم</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: -30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="group"
+              >
+                <div className="bg-gradient-to-br from-orange-500/20 to-red-600/20 backdrop-blur-xl rounded-3xl p-8 border border-orange-500/30 hover:border-orange-400/60 transition-all duration-500 transform hover:scale-105">
+                  <div className="w-16 h-16 bg-gradient-to-r from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-300">
+                    <Layers className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-3">🎮 عوالم ثلاثية</h3>
+                  <p className="text-orange-200 text-sm leading-relaxed">اجتماعات في عوالم ثلاثية الأبعاد مع إمكانيات التخصيص الكاملة</p>
+                  <div className="mt-4 flex items-center text-orange-400 text-xs">
+                    <Coffee className="w-3 h-3 mr-1" />
+                    <span>مساحات افتراضية مخصصة</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Meeting Modes */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mb-12"
             >
-              <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-white" />
+              <h2 className="text-3xl font-bold text-center text-white mb-8">اختر نمط اجتماعك</h2>
+              <div className="grid md:grid-cols-4 gap-6">
+                {[
+                  { 
+                    id: 'productivity', 
+                    name: 'الإنتاجية', 
+                    icon: '💼', 
+                    color: 'from-blue-500 to-cyan-500',
+                    description: 'للاجتماعات المهنية والعروض التقديمية'
+                  },
+                  { 
+                    id: 'creative', 
+                    name: 'الإبداع', 
+                    icon: '🎨', 
+                    color: 'from-purple-500 to-pink-500',
+                    description: 'للعصف الذهني والأفكار الإبداعية'
+                  },
+                  { 
+                    id: 'gaming', 
+                    name: 'الألعاب', 
+                    icon: '🎮', 
+                    color: 'from-green-500 to-emerald-500',
+                    description: 'للاجتماعات التفاعلية والألعاب الجماعية'
+                  },
+                  { 
+                    id: 'presentation', 
+                    name: 'العرض', 
+                    icon: '📊', 
+                    color: 'from-orange-500 to-red-500',
+                    description: 'للعروض التقديمية المتقدمة'
+                  }
+                ].map((mode) => (
+                  <motion.div
+                    key={mode.id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`cursor-pointer rounded-2xl p-6 border-2 transition-all duration-300 ${
+                      meetingMode === mode.id 
+                        ? 'border-white bg-white/10' 
+                        : 'border-white/20 bg-white/5 hover:border-white/40'
+                    }`}
+                    onClick={() => setMeetingMode(mode.id as any)}
+                  >
+                    <div className="text-center">
+                      <div className="text-4xl mb-3">{mode.icon}</div>
+                      <h3 className="text-xl font-bold text-white mb-2">{mode.name}</h3>
+                      <p className="text-gray-300 text-sm">{mode.description}</p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">ذكاء اصطناعي</h3>
-              <p className="text-gray-300 text-sm">ملخصات تلقائية وترجمة فورية ومساعد ذكي</p>
+            </motion.div>
+
+            {/* Advanced Meeting Setup */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-2xl rounded-3xl p-12 border border-white/10 shadow-2xl"
+            >
+              <div className="text-center mb-10">
+                <h2 className="text-4xl font-bold text-white mb-4">🚀 ابدأ تجربة مستقبلية</h2>
+                <p className="text-xl text-gray-300">اجتماع {meetingMode === 'productivity' ? 'مهني متقدم' : meetingMode === 'creative' ? 'إبداعي تفاعلي' : meetingMode === 'gaming' ? 'ترفيهي تفاعلي' : 'عرض تقديمي ثلاثي الأبعاد'}</p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-8 mb-10">
+                <div className="text-center">
+                  <Badge className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-lg px-4 py-2 mb-3">
+                    🆔 {meetingId}
+                  </Badge>
+                  <p className="text-gray-400 text-sm">رقم الاجتماع</p>
+                </div>
+                
+                <div className="text-center">
+                  <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-lg px-4 py-2 mb-3">
+                    👥 {participants.filter(p => p.isOnline).length} متصل
+                  </Badge>
+                  <p className="text-gray-400 text-sm">المشاركون الحاليون</p>
+                </div>
+                
+                <div className="text-center">
+                  <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg px-4 py-2 mb-3">
+                    🌐 عالمي
+                  </Badge>
+                  <p className="text-gray-400 text-sm">التوفر</p>
+                </div>
+              </div>
+              
+              {/* Enhanced Pre-meeting controls */}
+              <div className="flex items-center justify-center gap-6 mb-10">
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setMicEnabled(!micEnabled)}
+                    className={`${micEnabled 
+                      ? "border-green-400 text-green-400 bg-green-400/10 hover:bg-green-400/20" 
+                      : "border-red-400 text-red-400 bg-red-400/10 hover:bg-red-400/20"
+                    } transition-all duration-300 rounded-2xl px-6 py-4`}
+                  >
+                    {micEnabled ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
+                  </Button>
+                </motion.div>
+                
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setCameraEnabled(!cameraEnabled)}
+                    className={`${cameraEnabled 
+                      ? "border-green-400 text-green-400 bg-green-400/10 hover:bg-green-400/20" 
+                      : "border-red-400 text-red-400 bg-red-400/10 hover:bg-red-400/20"
+                    } transition-all duration-300 rounded-2xl px-6 py-4`}
+                  >
+                    {cameraEnabled ? <Camera className="w-6 h-6" /> : <CameraOff className="w-6 h-6" />}
+                  </Button>
+                </motion.div>
+                
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-blue-400 text-blue-400 bg-blue-400/10 hover:bg-blue-400/20 transition-all duration-300 rounded-2xl px-6 py-4"
+                  >
+                    <Settings className="w-6 h-6" />
+                  </Button>
+                </motion.div>
+                
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-purple-400 text-purple-400 bg-purple-400/10 hover:bg-purple-400/20 transition-all duration-300 rounded-2xl px-6 py-4"
+                  >
+                    <Zap className="w-6 h-6" />
+                  </Button>
+                </motion.div>
+              </div>
+              
+              {/* Revolutionary Start Button */}
+              <div className="text-center">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    onClick={startMeeting}
+                    size="lg"
+                    className="bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-700 text-white font-bold py-6 px-16 rounded-3xl text-2xl shadow-2xl transform transition-all duration-300"
+                  >
+                    <Video className="w-8 h-8 mr-4" />
+                    🚀 انطلق للمستقبل
+                    <Zap className="w-8 h-8 ml-4" />
+                  </Button>
+                </motion.div>
+                
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  className="text-gray-400 mt-4"
+                >
+                  ⚡ مدعوم بتقنيات الذكاء الاصطناعي المتقدمة
+                </motion.p>
+              </div>
             </motion.div>
           </div>
-
-          {/* Meeting Setup */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-gray-800/30 rounded-2xl p-8 text-center"
-          >
-            <h2 className="text-2xl font-bold text-white mb-6">ابدأ اجتماعك الآن</h2>
-            
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                رقم الاجتماع: {meetingId}
-              </Badge>
-              <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
-                {participants.filter(p => p.isOnline).length} مشارك متصل
-              </Badge>
-            </div>
-            
-            {/* Pre-meeting controls */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setMicEnabled(!micEnabled)}
-                className={micEnabled ? "border-green-500 text-green-500" : "border-red-500 text-red-500"}
-              >
-                {micEnabled ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCameraEnabled(!cameraEnabled)}
-                className={cameraEnabled ? "border-green-500 text-green-500" : "border-red-500 text-red-500"}
-              >
-                {cameraEnabled ? <Camera className="w-4 h-4" /> : <CameraOff className="w-4 h-4" />}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="icon"
-                className="border-gray-500 text-gray-400"
-              >
-                <Settings className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            <Button
-              onClick={startMeeting}
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-lg"
-            >
-              <Video className="w-6 h-6 mr-3" />
-              بدء الاجتماع
-            </Button>
-          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Meeting Header */}
-      <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 text-white relative overflow-hidden">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute w-full h-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 animate-pulse"></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
+
+      {/* Futuristic Meeting Header */}
+      <div className="relative z-10 bg-gradient-to-r from-gray-900/90 via-gray-800/90 to-gray-900/90 backdrop-blur-xl border-b border-cyan-500/30 px-6 py-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-              <span className="text-red-400 font-medium">مباشر</span>
+          <div className="flex items-center gap-6">
+            <motion.div 
+              className="flex items-center gap-3"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="relative">
+                <div className="w-4 h-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-full animate-pulse shadow-lg"></div>
+                <div className="absolute inset-0 w-4 h-4 bg-red-500 rounded-full animate-ping"></div>
+              </div>
+              <span className="text-red-400 font-bold text-lg">🔴 LIVE</span>
+            </motion.div>
+            
+            <div className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-black text-2xl">
+              Ma3k Meet • {meetingId}
             </div>
-            <div className="text-white font-bold">اجتماع {meetingId}</div>
-            <div className="text-gray-400 text-sm">{formatDuration(meetingDuration)}</div>
+            
+            <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 text-lg">
+              ⏱️ {formatDuration(meetingDuration)}
+            </Badge>
+            
+            <Badge className={`px-4 py-2 text-lg ${
+              meetingMode === 'productivity' ? 'bg-gradient-to-r from-blue-500 to-cyan-500' :
+              meetingMode === 'creative' ? 'bg-gradient-to-r from-purple-500 to-pink-500' :
+              meetingMode === 'gaming' ? 'bg-gradient-to-r from-green-500 to-emerald-500' :
+              'bg-gradient-to-r from-orange-500 to-red-500'
+            }`}>
+              {meetingMode === 'productivity' ? '💼 إنتاجي' :
+               meetingMode === 'creative' ? '🎨 إبداعي' :
+               meetingMode === 'gaming' ? '🎮 تفاعلي' : '📊 عرض'}
+            </Badge>
           </div>
           
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-blue-500/20 text-blue-400">
-              {participants.filter(p => p.isOnline).length} مشارك
+          <div className="flex items-center gap-4">
+            <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 text-lg">
+              👥 {participants.filter(p => p.isOnline).length} مشارك نشط
             </Badge>
             {isRecording && (
-              <Badge variant="secondary" className="bg-red-500/20 text-red-400">
-                يتم التسجيل
-              </Badge>
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 text-lg">
+                  🎥 يتم التسجيل
+                </Badge>
+              </motion.div>
             )}
+            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-4 py-2 text-lg">
+              🤖 AI نشط
+            </Badge>
           </div>
         </div>
+        
+        {/* Live Stats Bar */}
+        <motion.div 
+          className="mt-4 flex items-center justify-center gap-8 text-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <div className="flex items-center gap-2 text-cyan-400">
+            <Zap className="w-4 h-4" />
+            <span>جودة 8K</span>
+          </div>
+          <div className="flex items-center gap-2 text-green-400">
+            <Heart className="w-4 h-4" />
+            <span>مراقبة المشاعر</span>
+          </div>
+          <div className="flex items-center gap-2 text-purple-400">
+            <Star className="w-4 h-4" />
+            <span>ترجمة فورية</span>
+          </div>
+          <div className="flex items-center gap-2 text-orange-400">
+            <Coffee className="w-4 h-4" />
+            <span>مساحة افتراضية</span>
+          </div>
+        </motion.div>
       </div>
 
       <div className="flex h-[calc(100vh-80px)]">
