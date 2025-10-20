@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -21,13 +23,30 @@ import {
   MessageCircle,
   Sparkles,
   Crown,
-  Gift
+  Gift,
+  ArrowRight,
+  ArrowLeft,
+  Rocket,
+  ChevronDown
 } from "lucide-react";
 import type { Service } from "@shared/schema";
 
 export default function ServicesNew() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [questionnaireData, setQuestionnaireData] = useState({
+    projectType: "",
+    budget: "",
+    timeline: "",
+    features: [] as string[],
+    name: "",
+    email: "",
+    phone: "",
+    discountCode: ""
+  });
+  const [appliedDiscount, setAppliedDiscount] = useState(0);
   const { addToCart, cart } = useCart();
   const { toast } = useToast();
 
@@ -91,6 +110,80 @@ export default function ServicesNew() {
       case "business": return "from-purple-500 to-purple-600";
       default: return "from-gray-500 to-gray-600";
     }
+  };
+
+  const handleApplyDiscount = () => {
+    if (questionnaireData.discountCode.toUpperCase() === "MA3K2030") {
+      setAppliedDiscount(100);
+      toast({
+        title: "تم تطبيق كود الخصم! 🎉",
+        description: "تم تفعيل خصم 100% على جميع الخدمات",
+      });
+    } else if (questionnaireData.discountCode) {
+      toast({
+        title: "كود غير صحيح",
+        description: "يرجى التحقق من كود الخصم",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleNextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleQuestionnaireSubmit = () => {
+    if (!questionnaireData.name || !questionnaireData.email || !questionnaireData.phone) {
+      toast({
+        title: "خطأ",
+        description: "يرجى ملء جميع البيانات الشخصية",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const message = `
+🎯 طلب خدمة جديد من الاستبيان الذكي
+
+📋 نوع المشروع: ${questionnaireData.projectType}
+💰 الميزانية: ${questionnaireData.budget}
+⏰ المدة الزمنية: ${questionnaireData.timeline}
+✨ المميزات: ${questionnaireData.features.join(", ")}
+
+👤 بيانات العميل:
+الاسم: ${questionnaireData.name}
+البريد: ${questionnaireData.email}
+الهاتف: ${questionnaireData.phone}
+
+${appliedDiscount > 0 ? `🎁 كود الخصم: ${questionnaireData.discountCode} (${appliedDiscount}%)` : ""}
+    `.trim();
+
+    const whatsappUrl = `https://wa.me/+201155201921?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+
+    toast({
+      title: "تم الإرسال بنجاح! ✨",
+      description: "سنتواصل معك قريباً",
+    });
+
+    setShowQuestionnaire(false);
+  };
+
+  const toggleFeature = (feature: string) => {
+    setQuestionnaireData(prev => ({
+      ...prev,
+      features: prev.features.includes(feature)
+        ? prev.features.filter(f => f !== feature)
+        : [...prev.features, feature]
+    }));
   };
 
   if (isLoading) {

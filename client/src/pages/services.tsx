@@ -76,8 +76,11 @@ export default function Services() {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
         <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-300">جاري تحميل الخدمات...</p>
+          <div 
+            className="animate-spin w-12 h-12 border-4 border-t-transparent rounded-full mx-auto mb-4"
+            style={{ borderColor: "var(--ma3k-green)", borderTopColor: "transparent" }}
+          ></div>
+          <p style={{ color: "var(--ma3k-beige-dark)" }}>جاري تحميل الخدمات...</p>
         </div>
       </div>
     );
@@ -94,8 +97,16 @@ export default function Services() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="luxury-h1 text-amber-400 mb-6">خدماتنا الرقمية</h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <h1 
+              className="luxury-h1 mb-6"
+              style={{ color: "var(--ma3k-green)" }}
+            >
+              خدماتنا الرقمية
+            </h1>
+            <p 
+              className="text-xl max-w-3xl mx-auto leading-relaxed"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
               اكتشف مجموعة واسعة من الخدمات الرقمية المتقدمة التي نقدمها لتحقيق أهدافك وتطوير عملك
             </p>
           </motion.div>
@@ -165,16 +176,28 @@ export default function Services() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="bg-amber-400/10 text-amber-400">
+              <Badge 
+                variant="secondary" 
+                style={{ 
+                  backgroundColor: "var(--ma3k-green-light)", 
+                  color: "var(--ma3k-green)" 
+                }}
+              >
                 {filteredServices.length} خدمة متوفرة
               </Badge>
               {searchTerm && (
-                <Badge variant="outline" className="border-gray-600">
+                <Badge 
+                  variant="outline" 
+                  style={{ borderColor: "var(--ma3k-beige-dark)" }}
+                >
                   البحث: {searchTerm}
                 </Badge>
               )}
               {selectedCategory !== "all" && (
-                <Badge variant="outline" className="border-gray-600">
+                <Badge 
+                  variant="outline" 
+                  style={{ borderColor: "var(--ma3k-beige-dark)" }}
+                >
                   الفئة: {selectedCategory}
                 </Badge>
               )}

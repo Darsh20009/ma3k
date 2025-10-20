@@ -125,10 +125,13 @@ export default function About() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen" style={{ background: "linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary))" }}>
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20" />
+        <div 
+          className="absolute inset-0" 
+          style={{ background: "linear-gradient(to right, var(--ma3k-green-light), var(--ma3k-teal-light))" }}
+        />
         <div className="container mx-auto px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -136,12 +139,22 @@ export default function About() {
             transition={{ duration: 1 }}
             className="text-center"
           >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-              <span className="bg-gradient-to-r from-amber-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span 
+                style={{ 
+                  background: "linear-gradient(to right, var(--ma3k-green), var(--ma3k-teal))",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text"
+                }}
+              >
                 من نحن
               </span>
             </h1>
-            <p className="text-2xl text-purple-200 max-w-4xl mx-auto leading-relaxed">
+            <p 
+              className="text-2xl max-w-4xl mx-auto leading-relaxed"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
               نحن فريق من الخبراء المبدعين نسعى لتحويل أفكارك الرقمية إلى حقيقة مذهلة
             </p>
             <motion.div

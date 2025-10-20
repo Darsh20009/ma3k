@@ -59,28 +59,10 @@ export default function ContactFloat() {
         animate={{ scale: 1 }}
         transition={{ delay: 1 }}
       >
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl"
-          style={{
-            background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
-            boxShadow: "0 0 30px var(--glow-teal), 0 0 60px var(--glow-green)"
-          }}
-          data-testid="button-contact-float"
-        >
-          {isOpen ? (
-            <X className="w-8 h-8 text-white" />
-          ) : (
-            <MessageCircle className="w-8 h-8 text-white" />
-          )}
-        </motion.button>
-
-        {/* نبض دائري */}
+        {/* نبض دائري خلف الزر */}
         {!isOpen && (
           <motion.div
-            className="absolute inset-0 rounded-full"
+            className="absolute inset-0 rounded-full -z-10"
             style={{
               background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))"
             }}
@@ -94,6 +76,24 @@ export default function ContactFloat() {
             }}
           />
         )}
+
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative w-16 h-16 rounded-full flex items-center justify-center shadow-2xl"
+          style={{
+            background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+            boxShadow: "0 0 30px var(--glow-teal), 0 0 60px var(--glow-green)"
+          }}
+          data-testid="button-contact-float"
+        >
+          {isOpen ? (
+            <X className="w-8 h-8 text-white" />
+          ) : (
+            <MessageCircle className="w-8 h-8 text-white" />
+          )}
+        </motion.button>
       </motion.div>
 
       {/* قائمة الخيارات */}
