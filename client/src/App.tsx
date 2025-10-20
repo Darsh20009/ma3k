@@ -6,9 +6,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
+import ContactFloat from "@/components/layout/contact-float";
 import Home from "@/pages/home";
+import HomeNew from "@/pages/home-new";
 import SplashScreen from "@/pages/splash-screen";
 import WelcomeNew from "@/pages/welcome-new";
+import DigitalWelcome from "@/pages/digital-welcome";
 import Services from "@/pages/services";
 import ServicesNew from "@/pages/services-new";
 import Cart from "@/pages/cart";
@@ -23,17 +26,21 @@ import EmployeeLogin from "@/pages/employee-login";
 import EmployeeDashboard from "@/pages/employee-dashboard";
 import CodeTool from "@/pages/code-tool";
 import Ma3kMeet from "@/pages/ma3k-meet";
+import Courses from "@/pages/courses";
+import Login from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <div className="min-h-screen royal-gradient">
       <Navbar />
+      <ContactFloat />
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/" component={HomeNew} />
+        <Route path="/home-old" component={Home} />
+        <Route path="/digital-welcome" component={DigitalWelcome} />
         <Route path="/splash" component={SplashScreen} />
         <Route path="/welcome" component={WelcomeNew} />
-        <Route path="/home-old" component={Home} />
         <Route path="/services" component={ServicesNew} />
         <Route path="/services-old" component={Services} />
         <Route path="/cart" component={Cart} />
@@ -44,6 +51,8 @@ function Router() {
         <Route path="/privacy" component={PrivacyPolicy} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/contact" component={Contact} />
+        <Route path="/courses" component={Courses} />
+        <Route path="/login" component={Login} />
         <Route path="/employee-login" component={EmployeeLogin} />
         <Route path="/employee-dashboard" component={EmployeeDashboard} />
         <Route path="/code-tool" component={CodeTool} />
