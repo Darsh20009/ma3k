@@ -71,6 +71,118 @@ export const messages = pgTable("messages", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const students = pgTable("students", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  phone: text("phone").notNull(),
+  age: integer("age").notNull(),
+  selectedLanguage: text("selected_language").notNull(),
+  learningGoal: text("learning_goal"),
+  freeCoursesTaken: integer("free_courses_taken").default(0),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const clients = pgTable("clients", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  phone: text("phone"),
+  websiteType: text("website_type"),
+  budget: text("budget"),
+  websiteIdea: text("website_idea"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const employees = pgTable("employees", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  position: text("position").notNull(),
+  jobTitle: text("job_title").notNull(),
+  photoUrl: text("photo_url"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const courses = pgTable("courses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  language: text("language").notNull(), // Python, Java, Front-End, Back-End, etc.
+  description: text("description").notNull(),
+  price: integer("price").default(0), // 0 for free courses
+  originalPrice: integer("original_price"), // Original price before discount
+  isFree: boolean("is_free").default(true),
+  content: jsonb("content"), // Course content, lessons, etc.
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const enrollments = pgTable("enrollments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  studentId: varchar("student_id").references(() => students.id).notNull(),
+  courseId: varchar("course_id").references(() => courses.id).notNull(),
+  progress: integer("progress").default(0), // Progress percentage
+  status: text("status").default("active"), // active, completed, dropped
+  quizScores: jsonb("quiz_scores"), // Scores for quizzes
+  finalExamScore: integer("final_exam_score"),
+  enrolledAt: timestamp("enrolled_at").default(sql`CURRENT_TIMESTAMP`),
+  completedAt: timestamp("completed_at"),
+});
+
+export const certificates = pgTable("certificates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  certificateNumber: text("certificate_number").notNull().unique(),
+  studentId: varchar("student_id").references(() => students.id).notNull(),
+  courseId: varchar("course_id").references(() => courses.id).notNull(),
+  studentName: text("student_name").notNull(),
+  courseName: text("course_name").notNull(),
+  finalScore: integer("final_score").notNull(),
+  status: text("status").default("pending"), // pending, approved, rejected
+  approvedBy: text("approved_by"),
+  issuedAt: timestamp("issued_at").default(sql`CURRENT_TIMESTAMP`),
+  approvedAt: timestamp("approved_at"),
+});
+
+export const projects = pgTable("projects", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  clientId: varchar("client_id").references(() => clients.id).notNull(),
+  orderId: varchar("order_id").references(() => orders.id),
+  projectName: text("project_name").notNull(),
+  websiteIdea: text("website_idea").notNull(),
+  status: text("status").default("analysis"), // analysis, design, backend, deployment, completed
+  daysRemaining: integer("days_remaining"),
+  targetDate: timestamp("target_date"),
+  domain: text("domain"),
+  email: text("email"),
+  toolsUsed: text("tools_used").array(),
+  assignedEmployees: text("assigned_employees").array(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const discountCodes = pgTable("discount_codes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: text("code").notNull().unique(),
+  discountPercentage: integer("discount_percentage").notNull(),
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const employeeTasks = pgTable("employee_tasks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id").references(() => employees.id).notNull(),
+  projectId: varchar("project_id").references(() => projects.id).notNull(),
+  isCompleted: boolean("is_completed").default(false),
+  hoursRemaining: integer("hours_remaining"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -115,6 +227,89 @@ export const insertMessageSchema = createInsertSchema(messages).pick({
   message: true,
 });
 
+export const insertStudentSchema = createInsertSchema(students).pick({
+  fullName: true,
+  email: true,
+  password: true,
+  phone: true,
+  age: true,
+  selectedLanguage: true,
+  learningGoal: true,
+});
+
+export const insertClientSchema = createInsertSchema(clients).pick({
+  fullName: true,
+  email: true,
+  password: true,
+  phone: true,
+  websiteType: true,
+  budget: true,
+  websiteIdea: true,
+});
+
+export const insertEmployeeSchema = createInsertSchema(employees).pick({
+  fullName: true,
+  email: true,
+  password: true,
+  position: true,
+  jobTitle: true,
+  photoUrl: true,
+});
+
+export const insertCourseSchema = createInsertSchema(courses).pick({
+  name: true,
+  language: true,
+  description: true,
+  price: true,
+  originalPrice: true,
+  isFree: true,
+  content: true,
+  isActive: true,
+});
+
+export const insertEnrollmentSchema = createInsertSchema(enrollments).pick({
+  studentId: true,
+  courseId: true,
+});
+
+export const insertCertificateSchema = createInsertSchema(certificates).pick({
+  certificateNumber: true,
+  studentId: true,
+  courseId: true,
+  studentName: true,
+  courseName: true,
+  finalScore: true,
+});
+
+export const insertProjectSchema = createInsertSchema(projects).pick({
+  clientId: true,
+  orderId: true,
+  projectName: true,
+  websiteIdea: true,
+  status: true,
+  daysRemaining: true,
+  targetDate: true,
+  domain: true,
+  email: true,
+  toolsUsed: true,
+  assignedEmployees: true,
+});
+
+export const insertDiscountCodeSchema = createInsertSchema(discountCodes).pick({
+  code: true,
+  discountPercentage: true,
+  isActive: true,
+  expiresAt: true,
+});
+
+export const insertEmployeeTaskSchema = createInsertSchema(employeeTasks).pick({
+  employeeId: true,
+  projectId: true,
+  isCompleted: true,
+  hoursRemaining: true,
+  notes: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -127,3 +322,21 @@ export type Consultation = typeof consultations.$inferSelect;
 export type InsertConsultation = z.infer<typeof insertConsultationSchema>;
 export type Message = typeof messages.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Student = typeof students.$inferSelect;
+export type InsertStudent = z.infer<typeof insertStudentSchema>;
+export type Client = typeof clients.$inferSelect;
+export type InsertClient = z.infer<typeof insertClientSchema>;
+export type Employee = typeof employees.$inferSelect;
+export type InsertEmployee = z.infer<typeof insertEmployeeSchema>;
+export type Course = typeof courses.$inferSelect;
+export type InsertCourse = z.infer<typeof insertCourseSchema>;
+export type Enrollment = typeof enrollments.$inferSelect;
+export type InsertEnrollment = z.infer<typeof insertEnrollmentSchema>;
+export type Certificate = typeof certificates.$inferSelect;
+export type InsertCertificate = z.infer<typeof insertCertificateSchema>;
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = z.infer<typeof insertProjectSchema>;
+export type DiscountCode = typeof discountCodes.$inferSelect;
+export type InsertDiscountCode = z.infer<typeof insertDiscountCodeSchema>;
+export type EmployeeTask = typeof employeeTasks.$inferSelect;
+export type InsertEmployeeTask = z.infer<typeof insertEmployeeTaskSchema>;

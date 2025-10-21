@@ -1,7 +1,17 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertOrderSchema, insertConsultationSchema, insertMessageSchema } from "@shared/schema";
+import { 
+  insertOrderSchema, 
+  insertConsultationSchema, 
+  insertMessageSchema,
+  insertStudentSchema,
+  insertClientSchema,
+  insertEnrollmentSchema,
+  insertCertificateSchema,
+  insertProjectSchema,
+  insertEmployeeTaskSchema
+} from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { sendOrderNotificationEmail } from "./email";
 import { generateInvoiceHTML } from "./invoice-generator";
@@ -286,6 +296,384 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(invoiceHtml);
     } catch (error) {
       res.status(500).json({ error: "Failed to generate invoice download" });
+    }
+  });
+
+  // Auth routes
+  app.post("/api/auth/register-student", async (req, res) => {
+    try {
+      const studentData = insertStudentSchema.parse(req.body);
+      
+      const existingStudent = await storage.getStudentByEmail(studentData.email);
+      if (existingStudent) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+      
+      const student = await storage.createStudent(studentData);
+      res.status(201).json(student);
+    } catch (error) {
+      console.error('Error registering student:', error);
+      res.status(400).json({ error: "Invalid student data" });
+    }
+  });
+
+  app.post("/api/auth/register-client", async (req, res) => {
+    try {
+      const clientData = insertClientSchema.parse(req.body);
+      
+      const existingClient = await storage.getClientByEmail(clientData.email);
+      if (existingClient) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+      
+      const client = await storage.createClient(clientData);
+      res.status(201).json(client);
+    } catch (error) {
+      console.error('Error registering client:', error);
+      res.status(400).json({ error: "Invalid client data" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+
+      const student = await storage.getStudentByEmail(email);
+      if (student && student.password === password) {
+        const { password: _, ...userWithoutPassword } = student;
+        return res.json({ user: userWithoutPassword, type: "student" });
+      }
+
+      const client = await storage.getClientByEmail(email);
+      if (client && client.password === password) {
+        const { password: _, ...userWithoutPassword } = client;
+        return res.json({ user: userWithoutPassword, type: "client" });
+      }
+
+      const employee = await storage.getEmployeeByEmail(email);
+      if (employee && employee.password === password) {
+        const { password: _, ...userWithoutPassword } = employee;
+        return res.json({ user: userWithoutPassword, type: "employee" });
+      }
+
+      res.status(401).json({ error: "Invalid email or password" });
+    } catch (error) {
+      console.error('Error during login:', error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // Students routes
+  app.get("/api/students/:id", async (req, res) => {
+    try {
+      const student = await storage.getStudent(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch student" });
+    }
+  });
+
+  app.get("/api/students/email/:email", async (req, res) => {
+    try {
+      const student = await storage.getStudentByEmail(req.params.email);
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch student" });
+    }
+  });
+
+  // Clients routes
+  app.get("/api/clients/:id", async (req, res) => {
+    try {
+      const client = await storage.getClient(req.params.id);
+      if (!client) {
+        return res.status(404).json({ error: "Client not found" });
+      }
+      res.json(client);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch client" });
+    }
+  });
+
+  app.get("/api/clients/:id/projects", async (req, res) => {
+    try {
+      const projects = await storage.getClientProjects(req.params.id);
+      res.json(projects);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch client projects" });
+    }
+  });
+
+  // Employees routes
+  app.get("/api/employees/:id", async (req, res) => {
+    try {
+      const employee = await storage.getEmployee(req.params.id);
+      if (!employee) {
+        return res.status(404).json({ error: "Employee not found" });
+      }
+      res.json(employee);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch employee" });
+    }
+  });
+
+  app.get("/api/employees/:id/tasks", async (req, res) => {
+    try {
+      const tasks = await storage.getEmployeeTasks(req.params.id);
+      res.json(tasks);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch employee tasks" });
+    }
+  });
+
+  app.put("/api/employees/:id/photo", async (req, res) => {
+    try {
+      const { photoUrl } = req.body;
+      if (!photoUrl) {
+        return res.status(400).json({ error: "Photo URL is required" });
+      }
+      
+      const employee = await storage.updateEmployeePhoto(req.params.id, photoUrl);
+      if (!employee) {
+        return res.status(404).json({ error: "Employee not found" });
+      }
+      res.json(employee);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update employee photo" });
+    }
+  });
+
+  // Courses routes
+  app.get("/api/courses", async (req, res) => {
+    try {
+      const courses = await storage.getCourses();
+      res.json(courses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch courses" });
+    }
+  });
+
+  app.get("/api/courses/:id", async (req, res) => {
+    try {
+      const course = await storage.getCourse(req.params.id);
+      if (!course) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+      res.json(course);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch course" });
+    }
+  });
+
+  app.post("/api/courses/enroll", async (req, res) => {
+    try {
+      const enrollmentData = insertEnrollmentSchema.parse(req.body);
+      const enrollment = await storage.createEnrollment(enrollmentData);
+      res.status(201).json(enrollment);
+    } catch (error) {
+      console.error('Error enrolling student:', error);
+      res.status(400).json({ error: "Invalid enrollment data" });
+    }
+  });
+
+  app.get("/api/enrollments/student/:studentId", async (req, res) => {
+    try {
+      const enrollments = await storage.getStudentEnrollments(req.params.studentId);
+      res.json(enrollments);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch student enrollments" });
+    }
+  });
+
+  app.put("/api/enrollments/:id/progress", async (req, res) => {
+    try {
+      const { progress } = req.body;
+      if (typeof progress !== 'number' || progress < 0 || progress > 100) {
+        return res.status(400).json({ error: "Invalid progress value (must be 0-100)" });
+      }
+      const enrollment = await storage.updateEnrollmentProgress(req.params.id, progress);
+      if (!enrollment) {
+        return res.status(404).json({ error: "Enrollment not found" });
+      }
+      res.json(enrollment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update enrollment progress" });
+    }
+  });
+
+  app.put("/api/enrollments/:id/exam-score", async (req, res) => {
+    try {
+      const { score } = req.body;
+      if (typeof score !== 'number' || score < 0 || score > 100) {
+        return res.status(400).json({ error: "Invalid score value (must be 0-100)" });
+      }
+      const enrollment = await storage.updateEnrollmentExamScore(req.params.id, score);
+      if (!enrollment) {
+        return res.status(404).json({ error: "Enrollment not found" });
+      }
+      res.json(enrollment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update exam score" });
+    }
+  });
+
+  app.put("/api/enrollments/:id/complete", async (req, res) => {
+    try {
+      const enrollment = await storage.completeEnrollment(req.params.id);
+      if (!enrollment) {
+        return res.status(404).json({ error: "Enrollment not found" });
+      }
+      res.json(enrollment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to complete enrollment" });
+    }
+  });
+
+  // Certificates routes
+  app.get("/api/certificates/number/:certificateNumber", async (req, res) => {
+    try {
+      const certificate = await storage.getCertificateByNumber(req.params.certificateNumber);
+      if (!certificate) {
+        return res.status(404).json({ error: "Certificate not found" });
+      }
+      res.json(certificate);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch certificate" });
+    }
+  });
+
+  app.get("/api/certificates/student/:studentId", async (req, res) => {
+    try {
+      const certificates = await storage.getStudentCertificates(req.params.studentId);
+      res.json(certificates);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch student certificates" });
+    }
+  });
+
+  app.post("/api/certificates", async (req, res) => {
+    try {
+      const certificateData = insertCertificateSchema.parse(req.body);
+      const certificate = await storage.createCertificate(certificateData);
+      res.status(201).json(certificate);
+    } catch (error) {
+      console.error('Error creating certificate:', error);
+      res.status(400).json({ error: "Invalid certificate data" });
+    }
+  });
+
+  // Projects routes
+  app.post("/api/projects", async (req, res) => {
+    try {
+      const projectData = insertProjectSchema.parse(req.body);
+      const project = await storage.createProject(projectData);
+      res.status(201).json(project);
+    } catch (error) {
+      console.error('Error creating project:', error);
+      res.status(400).json({ error: "Invalid project data" });
+    }
+  });
+
+  app.get("/api/projects/:id", async (req, res) => {
+    try {
+      const project = await storage.getProject(req.params.id);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.json(project);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch project" });
+    }
+  });
+
+  app.put("/api/projects/:id/status", async (req, res) => {
+    try {
+      const { status } = req.body;
+      if (!status) {
+        return res.status(400).json({ error: "Status is required" });
+      }
+      
+      const project = await storage.updateProjectStatus(req.params.id, status);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.json(project);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update project status" });
+    }
+  });
+
+  app.put("/api/projects/:id/idea", async (req, res) => {
+    try {
+      const { idea } = req.body;
+      if (!idea) {
+        return res.status(400).json({ error: "Idea is required" });
+      }
+      
+      const project = await storage.updateProjectIdea(req.params.id, idea);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.json(project);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update project idea" });
+    }
+  });
+
+  // Discount codes routes
+  app.post("/api/discount-codes/validate", async (req, res) => {
+    try {
+      const { code } = req.body;
+      if (!code) {
+        return res.status(400).json({ error: "Discount code is required" });
+      }
+      
+      const discountCode = await storage.validateDiscountCode(code);
+      if (!discountCode) {
+        return res.status(404).json({ error: "Invalid or expired discount code" });
+      }
+      res.json(discountCode);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to validate discount code" });
+    }
+  });
+
+  // Employee Tasks routes
+  app.post("/api/employee-tasks", async (req, res) => {
+    try {
+      const taskData = insertEmployeeTaskSchema.parse(req.body);
+      const task = await storage.createEmployeeTask(taskData);
+      res.status(201).json(task);
+    } catch (error) {
+      console.error('Error creating employee task:', error);
+      res.status(400).json({ error: "Invalid employee task data" });
+    }
+  });
+
+  app.put("/api/employee-tasks/:id", async (req, res) => {
+    try {
+      const { isCompleted, hoursRemaining } = req.body;
+      if (typeof isCompleted !== 'boolean') {
+        return res.status(400).json({ error: "isCompleted must be a boolean" });
+      }
+      
+      const task = await storage.updateEmployeeTask(req.params.id, isCompleted, hoursRemaining);
+      if (!task) {
+        return res.status(404).json({ error: "Employee task not found" });
+      }
+      res.json(task);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update employee task" });
     }
   });
 

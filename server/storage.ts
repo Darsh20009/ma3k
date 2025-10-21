@@ -1,7 +1,12 @@
 import {
   type User, type InsertUser, type Service, type InsertService,
   type Order, type InsertOrder, type Consultation, type InsertConsultation,
-  type Message, type InsertMessage, type Invoice
+  type Message, type InsertMessage, type Invoice,
+  type Student, type InsertStudent, type Client, type InsertClient,
+  type Employee, type InsertEmployee, type Course, type InsertCourse,
+  type Enrollment, type InsertEnrollment, type Certificate, type InsertCertificate,
+  type Project, type InsertProject, type DiscountCode, type InsertDiscountCode,
+  type EmployeeTask, type InsertEmployeeTask
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
@@ -37,6 +42,59 @@ export interface IStorage {
   // Messages
   createMessage(message: InsertMessage): Promise<Message>;
   getMessages(): Promise<Message[]>;
+
+  // Students
+  getStudent(id: string): Promise<Student | undefined>;
+  getStudentByEmail(email: string): Promise<Student | undefined>;
+  createStudent(student: InsertStudent): Promise<Student>;
+  updateStudentFreeCourses(id: string, count: number): Promise<Student | undefined>;
+
+  // Clients
+  getClient(id: string): Promise<Client | undefined>;
+  getClientByEmail(email: string): Promise<Client | undefined>;
+  createClient(client: InsertClient): Promise<Client>;
+
+  // Employees
+  getEmployee(id: string): Promise<Employee | undefined>;
+  getEmployeeByEmail(email: string): Promise<Employee | undefined>;
+  createEmployee(employee: InsertEmployee): Promise<Employee>;
+  updateEmployeePhoto(id: string, photoUrl: string): Promise<Employee | undefined>;
+
+  // Courses
+  getCourses(): Promise<Course[]>;
+  getCourse(id: string): Promise<Course | undefined>;
+  createCourse(course: InsertCourse): Promise<Course>;
+
+  // Enrollments
+  getEnrollment(id: string): Promise<Enrollment | undefined>;
+  getStudentEnrollments(studentId: string): Promise<Enrollment[]>;
+  createEnrollment(enrollment: InsertEnrollment): Promise<Enrollment>;
+  updateEnrollmentProgress(id: string, progress: number): Promise<Enrollment | undefined>;
+  updateEnrollmentExamScore(id: string, score: number): Promise<Enrollment | undefined>;
+  completeEnrollment(id: string): Promise<Enrollment | undefined>;
+
+  // Certificates
+  getCertificate(id: string): Promise<Certificate | undefined>;
+  getCertificateByNumber(certificateNumber: string): Promise<Certificate | undefined>;
+  getStudentCertificates(studentId: string): Promise<Certificate[]>;
+  createCertificate(certificate: InsertCertificate): Promise<Certificate>;
+  approveCertificate(id: string, approvedBy: string): Promise<Certificate | undefined>;
+
+  // Projects
+  getProject(id: string): Promise<Project | undefined>;
+  getClientProjects(clientId: string): Promise<Project[]>;
+  createProject(project: InsertProject): Promise<Project>;
+  updateProjectStatus(id: string, status: string): Promise<Project | undefined>;
+  updateProjectIdea(id: string, idea: string): Promise<Project | undefined>;
+
+  // Discount Codes
+  getDiscountCode(code: string): Promise<DiscountCode | undefined>;
+  validateDiscountCode(code: string): Promise<DiscountCode | undefined>;
+
+  // Employee Tasks
+  getEmployeeTasks(employeeId: string): Promise<EmployeeTask[]>;
+  createEmployeeTask(task: InsertEmployeeTask): Promise<EmployeeTask>;
+  updateEmployeeTask(id: string, isCompleted: boolean, hoursRemaining?: number): Promise<EmployeeTask | undefined>;
 }
 
 export class JsonStorage implements IStorage {
@@ -47,11 +105,21 @@ export class JsonStorage implements IStorage {
   private invoices: Map<string, Invoice> = new Map();
   private consultations: Map<string, Consultation> = new Map();
   private messages: Map<string, Message> = new Map();
+  private students: Map<string, Student> = new Map();
+  private clients: Map<string, Client> = new Map();
+  private employees: Map<string, Employee> = new Map();
+  private courses: Map<string, Course> = new Map();
+  private enrollments: Map<string, Enrollment> = new Map();
+  private certificates: Map<string, Certificate> = new Map();
+  private projects: Map<string, Project> = new Map();
+  private discountCodes: Map<string, DiscountCode> = new Map();
+  private employeeTasks: Map<string, EmployeeTask> = new Map();
 
   constructor() {
     this.ensureDataDir();
     this.loadData();
     this.initializeServices();
+    this.initializeDiscountCodes();
   }
 
   private ensureDataDir() {
@@ -67,6 +135,15 @@ export class JsonStorage implements IStorage {
     this.loadInvoices();
     this.loadConsultations();
     this.loadMessages();
+    this.loadStudents();
+    this.loadClients();
+    this.loadEmployees();
+    this.loadCourses();
+    this.loadEnrollments();
+    this.loadCertificates();
+    this.loadProjects();
+    this.loadDiscountCodes();
+    this.loadEmployeeTasks();
   }
 
   private loadUsers() {
@@ -130,6 +207,111 @@ export class JsonStorage implements IStorage {
     }
   }
 
+  private loadStudents() {
+    const filePath = join(this.dataDir, 'students.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((student: Student) => {
+        if (student.createdAt) student.createdAt = new Date(student.createdAt);
+        this.students.set(student.id, student);
+      });
+    }
+  }
+
+  private loadClients() {
+    const filePath = join(this.dataDir, 'clients.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((client: Client) => {
+        if (client.createdAt) client.createdAt = new Date(client.createdAt);
+        this.clients.set(client.id, client);
+      });
+    }
+  }
+
+  private loadEmployees() {
+    const filePath = join(this.dataDir, 'employees.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((employee: Employee) => {
+        if (employee.createdAt) employee.createdAt = new Date(employee.createdAt);
+        this.employees.set(employee.id, employee);
+      });
+    }
+  }
+
+  private loadCourses() {
+    const filePath = join(this.dataDir, 'courses.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((course: Course) => {
+        if (course.createdAt) course.createdAt = new Date(course.createdAt);
+        this.courses.set(course.id, course);
+      });
+    }
+  }
+
+  private loadEnrollments() {
+    const filePath = join(this.dataDir, 'enrollments.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((enrollment: Enrollment) => {
+        if (enrollment.enrolledAt) enrollment.enrolledAt = new Date(enrollment.enrolledAt);
+        if (enrollment.completedAt) enrollment.completedAt = new Date(enrollment.completedAt);
+        this.enrollments.set(enrollment.id, enrollment);
+      });
+    }
+  }
+
+  private loadCertificates() {
+    const filePath = join(this.dataDir, 'certificates.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((certificate: Certificate) => {
+        if (certificate.issuedAt) certificate.issuedAt = new Date(certificate.issuedAt);
+        if (certificate.approvedAt) certificate.approvedAt = new Date(certificate.approvedAt);
+        this.certificates.set(certificate.id, certificate);
+      });
+    }
+  }
+
+  private loadProjects() {
+    const filePath = join(this.dataDir, 'projects.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((project: Project) => {
+        if (project.createdAt) project.createdAt = new Date(project.createdAt);
+        if (project.updatedAt) project.updatedAt = new Date(project.updatedAt);
+        if (project.targetDate) project.targetDate = new Date(project.targetDate);
+        this.projects.set(project.id, project);
+      });
+    }
+  }
+
+  private loadDiscountCodes() {
+    const filePath = join(this.dataDir, 'discountCodes.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((discountCode: DiscountCode) => {
+        if (discountCode.createdAt) discountCode.createdAt = new Date(discountCode.createdAt);
+        if (discountCode.expiresAt) discountCode.expiresAt = new Date(discountCode.expiresAt);
+        this.discountCodes.set(discountCode.id, discountCode);
+      });
+    }
+  }
+
+  private loadEmployeeTasks() {
+    const filePath = join(this.dataDir, 'employeeTasks.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((task: EmployeeTask) => {
+        if (task.createdAt) task.createdAt = new Date(task.createdAt);
+        if (task.updatedAt) task.updatedAt = new Date(task.updatedAt);
+        this.employeeTasks.set(task.id, task);
+      });
+    }
+  }
+
   private saveUsers() {
     const data = Array.from(this.users.values());
     writeFileSync(join(this.dataDir, 'users.json'), JSON.stringify(data, null, 2));
@@ -158,6 +340,51 @@ export class JsonStorage implements IStorage {
   private saveMessages() {
     const data = Array.from(this.messages.values());
     writeFileSync(join(this.dataDir, 'messages.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveStudents() {
+    const data = Array.from(this.students.values());
+    writeFileSync(join(this.dataDir, 'students.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveClients() {
+    const data = Array.from(this.clients.values());
+    writeFileSync(join(this.dataDir, 'clients.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveEmployees() {
+    const data = Array.from(this.employees.values());
+    writeFileSync(join(this.dataDir, 'employees.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveCourses() {
+    const data = Array.from(this.courses.values());
+    writeFileSync(join(this.dataDir, 'courses.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveEnrollments() {
+    const data = Array.from(this.enrollments.values());
+    writeFileSync(join(this.dataDir, 'enrollments.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveCertificates() {
+    const data = Array.from(this.certificates.values());
+    writeFileSync(join(this.dataDir, 'certificates.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveProjects() {
+    const data = Array.from(this.projects.values());
+    writeFileSync(join(this.dataDir, 'projects.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveDiscountCodes() {
+    const data = Array.from(this.discountCodes.values());
+    writeFileSync(join(this.dataDir, 'discountCodes.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveEmployeeTasks() {
+    const data = Array.from(this.employeeTasks.values());
+    writeFileSync(join(this.dataDir, 'employeeTasks.json'), JSON.stringify(data, null, 2));
   }
 
   private initializeServices() {
@@ -344,6 +571,21 @@ export class JsonStorage implements IStorage {
     });
   }
 
+  private initializeDiscountCodes() {
+    if (this.discountCodes.size === 0) {
+      const defaultDiscountCode: DiscountCode = {
+        id: randomUUID(),
+        code: "MA3K2030",
+        discountPercentage: 100,
+        isActive: true,
+        expiresAt: null,
+        createdAt: new Date(),
+      };
+      this.discountCodes.set(defaultDiscountCode.id, defaultDiscountCode);
+      this.saveDiscountCodes();
+    }
+  }
+
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
@@ -397,7 +639,9 @@ export class JsonStorage implements IStorage {
       ...insertOrder,
       id,
       orderNumber,
+      serviceId: insertOrder.serviceId || null,
       description: insertOrder.description || null,
+      paymentMethod: insertOrder.paymentMethod || null,
       status: "pending",
       paymentStatus: "pending",
       createdAt: new Date(),
@@ -485,6 +729,349 @@ export class JsonStorage implements IStorage {
 
   async getMessages(): Promise<Message[]> {
     return Array.from(this.messages.values());
+  }
+
+  async getStudent(id: string): Promise<Student | undefined> {
+    return this.students.get(id);
+  }
+
+  async getStudentByEmail(email: string): Promise<Student | undefined> {
+    return Array.from(this.students.values()).find(
+      (student) => student.email === email,
+    );
+  }
+
+  async createStudent(insertStudent: InsertStudent): Promise<Student> {
+    const id = randomUUID();
+    const student: Student = {
+      ...insertStudent,
+      id,
+      learningGoal: insertStudent.learningGoal || null,
+      freeCoursesTaken: 0,
+      createdAt: new Date(),
+    };
+    this.students.set(id, student);
+    this.saveStudents();
+    return student;
+  }
+
+  async updateStudentFreeCourses(id: string, count: number): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (student) {
+      const updatedStudent = { ...student, freeCoursesTaken: count };
+      this.students.set(id, updatedStudent);
+      this.saveStudents();
+      return updatedStudent;
+    }
+    return undefined;
+  }
+
+  async getClient(id: string): Promise<Client | undefined> {
+    return this.clients.get(id);
+  }
+
+  async getClientByEmail(email: string): Promise<Client | undefined> {
+    return Array.from(this.clients.values()).find(
+      (client) => client.email === email,
+    );
+  }
+
+  async createClient(insertClient: InsertClient): Promise<Client> {
+    const id = randomUUID();
+    const client: Client = {
+      ...insertClient,
+      id,
+      phone: insertClient.phone || null,
+      websiteType: insertClient.websiteType || null,
+      budget: insertClient.budget || null,
+      websiteIdea: insertClient.websiteIdea || null,
+      createdAt: new Date(),
+    };
+    this.clients.set(id, client);
+    this.saveClients();
+    return client;
+  }
+
+  async getEmployee(id: string): Promise<Employee | undefined> {
+    return this.employees.get(id);
+  }
+
+  async getEmployeeByEmail(email: string): Promise<Employee | undefined> {
+    return Array.from(this.employees.values()).find(
+      (employee) => employee.email === email,
+    );
+  }
+
+  async createEmployee(insertEmployee: InsertEmployee): Promise<Employee> {
+    const id = randomUUID();
+    const employee: Employee = {
+      ...insertEmployee,
+      id,
+      photoUrl: insertEmployee.photoUrl || null,
+      createdAt: new Date(),
+    };
+    this.employees.set(id, employee);
+    this.saveEmployees();
+    return employee;
+  }
+
+  async updateEmployeePhoto(id: string, photoUrl: string): Promise<Employee | undefined> {
+    const employee = this.employees.get(id);
+    if (employee) {
+      const updatedEmployee = { ...employee, photoUrl };
+      this.employees.set(id, updatedEmployee);
+      this.saveEmployees();
+      return updatedEmployee;
+    }
+    return undefined;
+  }
+
+  async getCourses(): Promise<Course[]> {
+    return Array.from(this.courses.values()).filter(course => course.isActive);
+  }
+
+  async getCourse(id: string): Promise<Course | undefined> {
+    return this.courses.get(id);
+  }
+
+  async createCourse(insertCourse: InsertCourse): Promise<Course> {
+    const id = randomUUID();
+    const course: Course = {
+      ...insertCourse,
+      id,
+      price: insertCourse.price !== undefined ? insertCourse.price : 0,
+      originalPrice: insertCourse.originalPrice || null,
+      isFree: insertCourse.isFree !== undefined ? insertCourse.isFree : true,
+      content: insertCourse.content || null,
+      isActive: insertCourse.isActive !== undefined ? insertCourse.isActive : true,
+      createdAt: new Date(),
+    };
+    this.courses.set(id, course);
+    this.saveCourses();
+    return course;
+  }
+
+  async getEnrollment(id: string): Promise<Enrollment | undefined> {
+    return this.enrollments.get(id);
+  }
+
+  async getStudentEnrollments(studentId: string): Promise<Enrollment[]> {
+    return Array.from(this.enrollments.values()).filter(
+      (enrollment) => enrollment.studentId === studentId,
+    );
+  }
+
+  async createEnrollment(insertEnrollment: InsertEnrollment): Promise<Enrollment> {
+    const id = randomUUID();
+    const enrollment: Enrollment = {
+      ...insertEnrollment,
+      id,
+      progress: 0,
+      status: "active",
+      quizScores: null,
+      finalExamScore: null,
+      enrolledAt: new Date(),
+      completedAt: null,
+    };
+    this.enrollments.set(id, enrollment);
+    this.saveEnrollments();
+    return enrollment;
+  }
+
+  async updateEnrollmentProgress(id: string, progress: number): Promise<Enrollment | undefined> {
+    const enrollment = this.enrollments.get(id);
+    if (enrollment) {
+      const updatedEnrollment = { ...enrollment, progress };
+      this.enrollments.set(id, updatedEnrollment);
+      this.saveEnrollments();
+      return updatedEnrollment;
+    }
+    return undefined;
+  }
+
+  async updateEnrollmentExamScore(id: string, score: number): Promise<Enrollment | undefined> {
+    const enrollment = this.enrollments.get(id);
+    if (enrollment) {
+      const updatedEnrollment = { ...enrollment, finalExamScore: score };
+      this.enrollments.set(id, updatedEnrollment);
+      this.saveEnrollments();
+      return updatedEnrollment;
+    }
+    return undefined;
+  }
+
+  async completeEnrollment(id: string): Promise<Enrollment | undefined> {
+    const enrollment = this.enrollments.get(id);
+    if (enrollment) {
+      const updatedEnrollment = {
+        ...enrollment,
+        status: "completed",
+        progress: 100,
+        completedAt: new Date(),
+      };
+      this.enrollments.set(id, updatedEnrollment);
+      this.saveEnrollments();
+      return updatedEnrollment;
+    }
+    return undefined;
+  }
+
+  async getCertificate(id: string): Promise<Certificate | undefined> {
+    return this.certificates.get(id);
+  }
+
+  async getCertificateByNumber(certificateNumber: string): Promise<Certificate | undefined> {
+    return Array.from(this.certificates.values()).find(
+      (certificate) => certificate.certificateNumber === certificateNumber,
+    );
+  }
+
+  async getStudentCertificates(studentId: string): Promise<Certificate[]> {
+    return Array.from(this.certificates.values()).filter(
+      (certificate) => certificate.studentId === studentId,
+    );
+  }
+
+  async createCertificate(insertCertificate: InsertCertificate): Promise<Certificate> {
+    const id = randomUUID();
+    const certificate: Certificate = {
+      ...insertCertificate,
+      id,
+      status: "pending",
+      approvedBy: null,
+      issuedAt: new Date(),
+      approvedAt: null,
+    };
+    this.certificates.set(id, certificate);
+    this.saveCertificates();
+    return certificate;
+  }
+
+  async approveCertificate(id: string, approvedBy: string): Promise<Certificate | undefined> {
+    const certificate = this.certificates.get(id);
+    if (certificate) {
+      const updatedCertificate = {
+        ...certificate,
+        status: "approved",
+        approvedBy,
+        approvedAt: new Date(),
+      };
+      this.certificates.set(id, updatedCertificate);
+      this.saveCertificates();
+      return updatedCertificate;
+    }
+    return undefined;
+  }
+
+  async getProject(id: string): Promise<Project | undefined> {
+    return this.projects.get(id);
+  }
+
+  async getClientProjects(clientId: string): Promise<Project[]> {
+    return Array.from(this.projects.values()).filter(
+      (project) => project.clientId === clientId,
+    );
+  }
+
+  async createProject(insertProject: InsertProject): Promise<Project> {
+    const id = randomUUID();
+    const project: Project = {
+      ...insertProject,
+      id,
+      orderId: insertProject.orderId || null,
+      status: insertProject.status || "analysis",
+      daysRemaining: insertProject.daysRemaining || null,
+      targetDate: insertProject.targetDate || null,
+      domain: insertProject.domain || null,
+      email: insertProject.email || null,
+      toolsUsed: insertProject.toolsUsed || null,
+      assignedEmployees: insertProject.assignedEmployees || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.projects.set(id, project);
+    this.saveProjects();
+    return project;
+  }
+
+  async updateProjectStatus(id: string, status: string): Promise<Project | undefined> {
+    const project = this.projects.get(id);
+    if (project) {
+      const updatedProject = { ...project, status, updatedAt: new Date() };
+      this.projects.set(id, updatedProject);
+      this.saveProjects();
+      return updatedProject;
+    }
+    return undefined;
+  }
+
+  async updateProjectIdea(id: string, idea: string): Promise<Project | undefined> {
+    const project = this.projects.get(id);
+    if (project) {
+      const updatedProject = { ...project, websiteIdea: idea, updatedAt: new Date() };
+      this.projects.set(id, updatedProject);
+      this.saveProjects();
+      return updatedProject;
+    }
+    return undefined;
+  }
+
+  async getDiscountCode(code: string): Promise<DiscountCode | undefined> {
+    return Array.from(this.discountCodes.values()).find(
+      (discountCode) => discountCode.code === code,
+    );
+  }
+
+  async validateDiscountCode(code: string): Promise<DiscountCode | undefined> {
+    const discountCode = await this.getDiscountCode(code);
+    if (!discountCode) {
+      return undefined;
+    }
+    if (!discountCode.isActive) {
+      return undefined;
+    }
+    if (discountCode.expiresAt && new Date() > discountCode.expiresAt) {
+      return undefined;
+    }
+    return discountCode;
+  }
+
+  async getEmployeeTasks(employeeId: string): Promise<EmployeeTask[]> {
+    return Array.from(this.employeeTasks.values()).filter(
+      (task) => task.employeeId === employeeId,
+    );
+  }
+
+  async createEmployeeTask(insertTask: InsertEmployeeTask): Promise<EmployeeTask> {
+    const id = randomUUID();
+    const task: EmployeeTask = {
+      ...insertTask,
+      id,
+      isCompleted: insertTask.isCompleted !== undefined ? insertTask.isCompleted : false,
+      hoursRemaining: insertTask.hoursRemaining || null,
+      notes: insertTask.notes || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.employeeTasks.set(id, task);
+    this.saveEmployeeTasks();
+    return task;
+  }
+
+  async updateEmployeeTask(id: string, isCompleted: boolean, hoursRemaining?: number): Promise<EmployeeTask | undefined> {
+    const task = this.employeeTasks.get(id);
+    if (task) {
+      const updatedTask = {
+        ...task,
+        isCompleted,
+        hoursRemaining: hoursRemaining !== undefined ? hoursRemaining : task.hoursRemaining,
+        updatedAt: new Date(),
+      };
+      this.employeeTasks.set(id, updatedTask);
+      this.saveEmployeeTasks();
+      return updatedTask;
+    }
+    return undefined;
   }
 }
 
