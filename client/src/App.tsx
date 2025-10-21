@@ -28,6 +28,11 @@ import CodeTool from "@/pages/code-tool";
 import Ma3kMeet from "@/pages/ma3k-meet";
 import Courses from "@/pages/courses";
 import Login from "@/pages/login";
+import Register from "@/pages/register";
+import MyCourses from "@/pages/my-courses";
+import MyProjects from "@/pages/my-projects";
+import CertSearch from "@/pages/cert-search";
+import EmployeeProfile from "@/pages/employee-profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -53,6 +58,11 @@ function Router() {
         <Route path="/contact" component={Contact} />
         <Route path="/courses" component={Courses} />
         <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/my-courses" component={MyCourses} />
+        <Route path="/my-projects" component={MyProjects} />
+        <Route path="/cert-search" component={CertSearch} />
+        <Route path="/employee-profile" component={EmployeeProfile} />
         <Route path="/employee-login" component={EmployeeLogin} />
         <Route path="/employee-dashboard" component={EmployeeDashboard} />
         <Route path="/code-tool" component={CodeTool} />
