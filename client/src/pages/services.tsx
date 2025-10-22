@@ -25,7 +25,7 @@ export default function Services() {
 
   const handleOrderService = (service: Service) => {
     addToCart(service);
-    
+
     toast({
       title: "تم إضافة الخدمة للسلة",
       description: `تم إضافة ${service.name} إلى سلة التسوق`,
@@ -40,7 +40,7 @@ export default function Services() {
     const matchesSearch = service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          service.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || service.category === selectedCategory;
-    
+
     let matchesPrice = true;
     if (priceRange === "low") matchesPrice = service.price <= 1000;
     else if (priceRange === "mid") matchesPrice = service.price > 1000 && service.price <= 5000;
