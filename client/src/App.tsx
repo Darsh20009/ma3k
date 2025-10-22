@@ -14,6 +14,7 @@ import WelcomeNew from "@/pages/welcome-new";
 import DigitalWelcome from "@/pages/digital-welcome";
 import Services from "@/pages/services";
 import ServicesNew from "@/pages/services-new";
+import ServicesComplete from "@/pages/services-complete";
 import Cart from "@/pages/cart";
 import Payment from "@/pages/payment";
 import SimplePayment from "@/pages/simple-payment";
@@ -27,10 +28,13 @@ import EmployeeDashboard from "@/pages/employee-dashboard";
 import CodeTool from "@/pages/code-tool";
 import Ma3kMeet from "@/pages/ma3k-meet";
 import Courses from "@/pages/courses";
+import CoursesComplete from "@/pages/courses-complete";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import MyCourses from "@/pages/my-courses";
+import MyCoursesComplete from "@/pages/my-courses-complete";
 import MyProjects from "@/pages/my-projects";
+import MyProjectsComplete from "@/pages/my-projects-complete";
 import CertSearch from "@/pages/cert-search";
 import EmployeeProfile from "@/pages/employee-profile";
 import NotFound from "@/pages/not-found";
@@ -46,7 +50,8 @@ function Router() {
         <Route path="/digital-welcome" component={DigitalWelcome} />
         <Route path="/splash" component={SplashScreen} />
         <Route path="/welcome" component={WelcomeNew} />
-        <Route path="/services" component={ServicesNew} />
+        <Route path="/services" component={ServicesComplete} />
+        <Route path="/services-new" component={ServicesNew} />
         <Route path="/services-old" component={Services} />
         <Route path="/cart" component={Cart} />
         <Route path="/payment" component={CreativePayment} />
@@ -56,11 +61,14 @@ function Router() {
         <Route path="/privacy" component={PrivacyPolicy} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/contact" component={Contact} />
-        <Route path="/courses" component={Courses} />
+        <Route path="/courses" component={CoursesComplete} />
+        <Route path="/courses-old" component={Courses} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
-        <Route path="/my-courses" component={MyCourses} />
-        <Route path="/my-projects" component={MyProjects} />
+        <Route path="/my-courses" component={MyCoursesComplete} />
+        <Route path="/my-courses-old" component={MyCourses} />
+        <Route path="/my-projects" component={MyProjectsComplete} />
+        <Route path="/my-projects-old" component={MyProjects} />
         <Route path="/cert-search" component={CertSearch} />
         <Route path="/employee-profile" component={EmployeeProfile} />
         <Route path="/employee-login" component={EmployeeLogin} />

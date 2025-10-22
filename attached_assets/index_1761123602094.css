@@ -174,13 +174,6 @@
       0 0 40px var(--glow-green),
       0 0 80px var(--glow-green);
   }
-  
-  .emerald-glow {
-    box-shadow: 
-      0 0 20px var(--glow-green),
-      0 0 40px var(--glow-teal),
-      0 0 60px var(--glow-green);
-  }
 }
 
 @keyframes luxury-flow {

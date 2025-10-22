@@ -374,7 +374,7 @@ ${appliedDiscount > 0 ? `🎁 كود الخصم: ${questionnaireData.discountCod
                           {service.price} ريال
                         </div>
                       </div>
-                      {service.popular && (
+                      {service.isFeatured && (
                         <div className="flex flex-col items-center">
                           <Crown className="w-6 h-6 text-amber-400 mb-1" />
                           <span className="text-xs text-amber-400 font-bold">الأكثر طلباً</span>

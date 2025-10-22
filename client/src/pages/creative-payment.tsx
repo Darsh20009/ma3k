@@ -1,5 +1,3 @@
-// pages/payment.tsx
-
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useCart } from "@/context/CartContext";
@@ -7,92 +5,248 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { CreditCard, MessageSquare, Tag, CheckCircle } from "lucide-react";
+import { CreditCard, MessageSquare, Tag, CheckCircle, ShoppingBag } from "lucide-react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-// ... (بقية الإعدادات والمتغيرات تبقى كما هي)
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || "YOUR_CLIENT_ID";
 const WHATSAPP_NUMBER = "+201155201921";
 
 export default function PaymentPage() {
-  // ... (كل الأكواد المنطقية داخل الدالة تبقى كما هي بدون تغيير)
-  const [cartItems, setCartItems] = useState([]);
-  const [customerInfo, setCustomerInfo] = useState(null);
+  const [, setLocation] = useLocation();
+  const { cart, clearCart } = useCart();
+  const { toast } = useToast();
   const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const finalPrice = Math.max(0, subtotal - discountAmount);
-  // ... etc
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // التغيير فقط في الجزء الخاص بالعرض (return)
+  const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+  const finalPrice = Math.max(0, subtotal - discountAmount);
+
+  useEffect(() => {
+    if (cart.length === 0) {
+      toast({
+        title: "السلة فارغة",
+        description: "يرجى إضافة خدمات قبل المتابعة للدفع",
+        variant: "destructive"
+      });
+      setLocation("/services");
+    }
+  }, [cart, setLocation, toast]);
+
+  const handleApplyDiscount = () => {
+    if (discountCode.toUpperCase() === "MA3K2030") {
+      setDiscountAmount(subtotal);
+      toast({
+        title: "تم تطبيق الخصم! 🎉",
+        description: "خصم 100% - الخدمة مجانية!",
+      });
+    } else {
+      toast({
+        title: "كود غير صحيح",
+        description: "يرجى التحقق من كود الخصم",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleWhatsAppPayment = () => {
+    const items = cart.map(item => `• ${item.name} - ${item.price} ريال`).join("\n");
+    const message = `
+🛒 طلب جديد من الموقع
+
+📋 الخدمات:
+${items}
+
+💰 الإجمالي قبل الخصم: ${subtotal} ريال
+${discountAmount > 0 ? `🎁 الخصم: ${discountAmount} ريال\n💵 المبلغ النهائي: ${finalPrice} ريال` : ''}
+
+أرغب في إكمال الدفع عبر STC Pay أو التحويل البنكي.
+    `.trim();
+
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+
+    toast({
+      title: "تم التوجيه! ✨",
+      description: "سنتواصل معك عبر واتساب",
+    });
+  };
+
+  const handleOrderSuccess = (paymentMethod: string, paymentDetails?: any) => {
+    setIsProcessing(true);
+
+    const orderData = {
+      items: cart,
+      subtotal,
+      discount: discountAmount,
+      finalPrice,
+      paymentMethod,
+      paymentDetails,
+      orderDate: new Date().toISOString()
+    };
+
+    localStorage.setItem(`ma3k_order_${Date.now()}`, JSON.stringify(orderData));
+
+    toast({
+      title: "تم إتمام الطلب بنجاح! 🎉",
+      description: "شكراً لثقتك في معك",
+    });
+
+    clearCart();
+    setTimeout(() => {
+      setLocation("/");
+    }, 2000);
+  };
+
   return (
     <PayPalScriptProvider options={{ "client-id": PAYPAL_CLIENT_ID, currency: "SAR" }}>
-      <div className="min-h-screen royal-gradient pt-20 pb-20 px-4">
+      <div className="min-h-screen royal-gradient pt-24 pb-20 px-4">
         <div className="container mx-auto max-w-5xl">
           <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }}>
             <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-ma3k-beige mb-3">
+              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl mx-auto mb-6 flex items-center justify-center teal-glow">
+                <ShoppingBag className="w-10 h-10 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-green-400 to-amber-400 mb-3">
                 إتمام الطلب
               </h1>
-              <p className="text-xl text-ma3k-beige-dark">
+              <p className="text-xl text-gray-300">
                 أنت على بعد خطوة واحدة من تحقيق مشروعك
               </p>
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-5 gap-10 items-start">
-            {/* Payment Options */}
+          <div className="grid lg:grid-cols-5 gap-8 items-start">
             <motion.div 
               initial={{ opacity: 0, x: -30 }} 
               animate={{ opacity: 1, x: 0 }} 
               transition={{ delay: 0.2 }}
               className="lg:col-span-3"
             >
-              <div className="glass-card p-8 rounded-3xl">
-                <h2 className="text-2xl font-bold text-white mb-6">اختر طريقة الدفع</h2>
+              <div className="glass-card p-8 rounded-3xl border-2 border-green-500/20">
+                <h2 className="text-2xl font-bold text-green-400 mb-6 flex items-center gap-2">
+                  <CreditCard className="w-6 h-6" />
+                  اختر طريقة الدفع
+                </h2>
                 <div className="space-y-6">
-                  {/* WhatsApp Option */}
-                  <div className="p-4 border-2 border-transparent hover:border-green-400 bg-white/5 rounded-2xl transition-all">
-                    <h3 className="font-bold text-lg text-green-400 mb-2">الدفع عبر واتساب</h3>
-                    <p className="text-ma3k-beige-dark mb-4">
+                  <div className="p-6 border-2 border-green-500/30 hover:border-green-400 bg-green-500/10 rounded-2xl transition-all">
+                    <h3 className="font-bold text-xl text-green-400 mb-2 flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5" />
+                      الدفع عبر واتساب
+                    </h3>
+                    <p className="text-gray-300 mb-4">
                       للدفع عبر STC Pay أو التحويل البنكي. سيتم توجيهك للمحادثة مع كامل تفاصيل الطلب.
                     </p>
-                    <Button onClick={handleWhatsAppPayment} className="bg-green-500 hover:bg-green-600 text-white w-full">
+                    <Button
+                      onClick={handleWhatsAppPayment}
+                      className="bg-green-500 hover:bg-green-600 text-white w-full green-glow"
+                      data-testid="button-whatsapp-payment"
+                    >
                       <MessageSquare className="ml-2"/> إكمال عبر واتساب
                     </Button>
                   </div>
-                  {/* PayPal Option */}
-                  <div className="p-4 border-2 border-transparent hover:border-blue-400 bg-white/5 rounded-2xl transition-all">
-                    <h3 className="font-bold text-lg text-blue-400 mb-2">الدفع عبر الموقع (PayPal)</h3>
-                    <p className="text-ma3k-beige-dark mb-4">
+
+                  <div className="p-6 border-2 border-blue-500/30 hover:border-blue-400 bg-blue-500/10 rounded-2xl transition-all">
+                    <h3 className="font-bold text-xl text-blue-400 mb-2">الدفع عبر الموقع (PayPal)</h3>
+                    <p className="text-gray-300 mb-4">
                       الدفع الآمن والمباشر باستخدام PayPal.
                     </p>
                     {finalPrice === 0 ? (
-                      <Button onClick={() => handleOrderSuccess("Free (Discount)")} className="w-full btn-ma3k">
+                      <Button
+                        onClick={() => handleOrderSuccess("Free (Discount)")}
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
+                        data-testid="button-free-order"
+                      >
                         <CheckCircle className="ml-2"/> تأكيد الطلب المجاني
                       </Button>
                     ) : (
-                      <PayPalButtons key={finalPrice} style={{ layout: "vertical", label: "pay" }} disabled={isProcessing} createOrder={(data, actions) => actions.order.create({ purchase_units: [{ amount: { value: finalPrice.toString(), currency_code: "SAR" } }] })} onApprove={async (data, actions) => { const details = await actions.order.capture(); handleOrderSuccess("PayPal", details); }}/>
+                      <PayPalButtons
+                        key={finalPrice}
+                        style={{ layout: "vertical", label: "pay" }}
+                        disabled={isProcessing}
+                        createOrder={(data, actions) => {
+                          return actions.order.create({
+                            purchase_units: [{
+                              amount: {
+                                value: finalPrice.toString(),
+                                currency_code: "SAR"
+                              }
+                            }]
+                          });
+                        }}
+                        onApprove={async (data, actions) => {
+                          const details = await actions.order?.capture();
+                          handleOrderSuccess("PayPal", details);
+                        }}
+                      />
                     )}
                   </div>
                 </div>
               </div>
             </motion.div>
 
-            {/* Order Summary */}
             <motion.div 
               initial={{ opacity: 0, x: 30 }} 
               animate={{ opacity: 1, x: 0 }} 
               transition={{ delay: 0.4 }}
-              className="lg:col-span-2 sticky top-24"
+              className="lg:col-span-2"
             >
-              <div className="glass-card p-8 rounded-3xl">
-                <h2 className="text-2xl font-bold text-white mb-6">ملخص الطلب</h2>
-                {/* ... The rest of the summary JSX ... */}
-                 <div className="flex justify-between text-2xl font-bold text-ma3k-green mt-3">
-                  <span>الإجمالي</span>
-                  <span>{finalPrice} ر.س</span>
+              <div className="glass-card p-8 rounded-3xl border-2 border-amber-500/20">
+                <h2 className="text-2xl font-bold text-amber-400 mb-6">ملخص الطلب</h2>
+                
+                <div className="space-y-3 mb-6">
+                  {cart.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                      <span className="text-white">{item.name}</span>
+                      <span className="text-green-400 font-bold">{item.price} ريال</span>
+                    </div>
+                  ))}
+                </div>
+
+                <Separator className="my-6 bg-gray-600" />
+
+                <div className="space-y-3">
+                  <div className="flex justify-between text-gray-400">
+                    <span>المجموع</span>
+                    <span>{subtotal} ريال</span>
+                  </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-green-400">
+                      <span>الخصم</span>
+                      <span>-{discountAmount} ريال</span>
+                    </div>
+                  )}
+                  <Separator className="my-3 bg-gray-600" />
+                  <div className="flex justify-between text-2xl font-bold text-amber-400">
+                    <span>الإجمالي</span>
+                    <span>{finalPrice} ريال</span>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label className="text-white mb-2 block flex items-center gap-2">
+                    <Tag className="w-4 h-4" />
+                    كود الخصم
+                  </label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={discountCode}
+                      onChange={(e) => setDiscountCode(e.target.value)}
+                      placeholder="MA3K2030"
+                      className="bg-gray-800/50 border-gray-600 text-white"
+                      data-testid="input-discount-code"
+                    />
+                    <Button
+                      onClick={handleApplyDiscount}
+                      variant="outline"
+                      className="text-amber-400 border-amber-500"
+                      data-testid="button-apply-discount"
+                    >
+                      تطبيق
+                    </Button>
+                  </div>
                 </div>
               </div>
             </motion.div>
