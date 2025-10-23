@@ -648,6 +648,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Lessons routes
+  app.get("/api/courses/:courseId/lessons", async (req, res) => {
+    try {
+      const lessons = await storage.getCourseLessons(req.params.courseId);
+      res.json(lessons);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch lessons" });
+    }
+  });
+
+  app.get("/api/lessons/:id", async (req, res) => {
+    try {
+      const lesson = await storage.getLesson(req.params.id);
+      if (!lesson) {
+        return res.status(404).json({ error: "Lesson not found" });
+      }
+      res.json(lesson);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch lesson" });
+    }
+  });
+
+  // Lesson progress routes
+  app.post("/api/lesson-progress", async (req, res) => {
+    try {
+      const { enrollmentId, lessonId, isCompleted } = req.body;
+      const progress = await storage.updateLessonProgress(enrollmentId, lessonId, isCompleted);
+      res.status(201).json(progress);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update lesson progress" });
+    }
+  });
+
+  app.get("/api/enrollments/:enrollmentId/progress", async (req, res) => {
+    try {
+      const progress = await storage.getEnrollmentProgress(req.params.enrollmentId);
+      res.json(progress);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch enrollment progress" });
+    }
+  });
+
+  // Quizzes routes
+  app.get("/api/lessons/:lessonId/quiz", async (req, res) => {
+    try {
+      const quiz = await storage.getLessonQuiz(req.params.lessonId);
+      if (!quiz) {
+        return res.status(404).json({ error: "Quiz not found" });
+      }
+      res.json(quiz);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch quiz" });
+    }
+  });
+
+  app.get("/api/courses/:courseId/final-exam", async (req, res) => {
+    try {
+      const exam = await storage.getCourseFinalExam(req.params.courseId);
+      if (!exam) {
+        return res.status(404).json({ error: "Final exam not found" });
+      }
+      res.json(exam);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch final exam" });
+    }
+  });
+
+  // Quiz attempts routes
+  app.post("/api/quiz-attempts", async (req, res) => {
+    try {
+      const { enrollmentId, quizId, answers, score, passed } = req.body;
+      const attempt = await storage.createQuizAttempt({
+        enrollmentId,
+        quizId,
+        answers,
+        score,
+        passed
+      });
+      res.status(201).json(attempt);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create quiz attempt" });
+    }
+  });
+
+  app.get("/api/enrollments/:enrollmentId/quiz-attempts", async (req, res) => {
+    try {
+      const attempts = await storage.getEnrollmentQuizAttempts(req.params.enrollmentId);
+      res.json(attempts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch quiz attempts" });
+    }
+  });
+
   // Employee Tasks routes
   app.post("/api/employee-tasks", async (req, res) => {
     try {
