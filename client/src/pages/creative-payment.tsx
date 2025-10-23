@@ -122,99 +122,99 @@ export default function PaymentPage() {
     }
   };
 
-  if (!PAYPAL_CLIENT_ID) {
-    return (
-      <div className="min-h-screen royal-gradient pt-24 pb-20 px-4 flex items-center justify-center">
-        <div className="glass-card p-8 rounded-3xl border-2 border-red-500/20 max-w-md text-center">
-          <h2 className="text-2xl font-bold text-red-400 mb-4">خطأ في الإعداد</h2>
-          <p className="text-gray-300">
-            معرف PayPal غير مكون. يرجى التواصل مع الدعم الفني.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const isPayPalAvailable = !!PAYPAL_CLIENT_ID;
 
-  return (
-    <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID, currency: "SAR" }}>
-      <div className="min-h-screen royal-gradient pt-24 pb-20 px-4">
-        <div className="container mx-auto max-w-5xl">
-          <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="text-center mb-12">
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl mx-auto mb-6 flex items-center justify-center teal-glow">
-                <ShoppingBag className="w-10 h-10 text-white" />
+  const PaymentContent = () => (
+    <div className="min-h-screen royal-gradient pt-24 pb-20 px-4">
+      <div className="container mx-auto max-w-5xl">
+        <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="text-center mb-12">
+            <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl mx-auto mb-6 flex items-center justify-center teal-glow">
+              <ShoppingBag className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-green-400 to-amber-400 mb-3">
+              إتمام الطلب
+            </h1>
+            <p className="text-xl text-gray-300">
+              أنت على بعد خطوة واحدة من تحقيق مشروعك
+            </p>
+          </div>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-5 gap-8 items-start">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-3"
+          >
+            <div className="glass-card p-8 rounded-3xl border-2 border-green-500/20">
+              <h2 className="text-2xl font-bold text-green-400 mb-6 flex items-center gap-2">
+                <CreditCard className="w-6 h-6" />
+                اختر طريقة الدفع
+              </h2>
+              <div className="space-y-6">
+                <div className="p-6 border-2 border-blue-500/30 hover:border-blue-400 bg-blue-500/10 rounded-2xl transition-all">
+                  <h3 className="font-bold text-xl text-blue-400 mb-2 flex items-center gap-2">
+                    <CreditCard className="w-5 h-5" />
+                    {isPayPalAvailable ? "الدفع عبر PayPal" : "تأكيد الطلب"}
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    {isPayPalAvailable 
+                      ? "الدفع الآمن والمباشر باستخدام بطاقات الائتمان أو PayPal."
+                      : "قم بتأكيد طلبك وسنتواصل معك لترتيب الدفع."}
+                  </p>
+                  {finalPrice === 0 ? (
+                    <Button
+                      onClick={() => handleOrderSuccess("Free (Discount)")}
+                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
+                      data-testid="button-free-order"
+                      disabled={isProcessing}
+                    >
+                      <CheckCircle className="ml-2"/> تأكيد الطلب المجاني
+                    </Button>
+                  ) : isPayPalAvailable ? (
+                    <PayPalButtons
+                      key={finalPrice}
+                      style={{ layout: "vertical", label: "pay" }}
+                      disabled={isProcessing}
+                      createOrder={(data, actions) => {
+                        return actions.order.create({
+                          intent: "CAPTURE",
+                          purchase_units: [{
+                            amount: {
+                              value: finalPrice.toString(),
+                              currency_code: "SAR"
+                            }
+                          }]
+                        });
+                      }}
+                      onApprove={async (data, actions) => {
+                        const details = await actions.order?.capture();
+                        handleOrderSuccess("PayPal", details);
+                      }}
+                    />
+                  ) : (
+                    <Button
+                      onClick={() => handleOrderSuccess("Pending Payment")}
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+                      disabled={isProcessing}
+                    >
+                      <CheckCircle className="ml-2"/> 
+                      {isProcessing ? "جاري المعالجة..." : "تأكيد الطلب"}
+                    </Button>
+                  )}
+                </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-green-400 to-amber-400 mb-3">
-                إتمام الطلب
-              </h1>
-              <p className="text-xl text-gray-300">
-                أنت على بعد خطوة واحدة من تحقيق مشروعك
-              </p>
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-5 gap-8 items-start">
             <motion.div 
-              initial={{ opacity: 0, x: -30 }} 
-              animate={{ opacity: 1, x: 0 }} 
-              transition={{ delay: 0.2 }}
-              className="lg:col-span-3"
-            >
-              <div className="glass-card p-8 rounded-3xl border-2 border-green-500/20">
-                <h2 className="text-2xl font-bold text-green-400 mb-6 flex items-center gap-2">
-                  <CreditCard className="w-6 h-6" />
-                  اختر طريقة الدفع
-                </h2>
-                <div className="space-y-6">
-                  <div className="p-6 border-2 border-blue-500/30 hover:border-blue-400 bg-blue-500/10 rounded-2xl transition-all">
-                    <h3 className="font-bold text-xl text-blue-400 mb-2 flex items-center gap-2">
-                      <CreditCard className="w-5 h-5" />
-                      الدفع عبر PayPal
-                    </h3>
-                    <p className="text-gray-300 mb-4">
-                      الدفع الآمن والمباشر باستخدام بطاقات الائتمان أو PayPal.
-                    </p>
-                    {finalPrice === 0 ? (
-                      <Button
-                        onClick={() => handleOrderSuccess("Free (Discount)")}
-                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
-                        data-testid="button-free-order"
-                      >
-                        <CheckCircle className="ml-2"/> تأكيد الطلب المجاني
-                      </Button>
-                    ) : (
-                      <PayPalButtons
-                        key={finalPrice}
-                        style={{ layout: "vertical", label: "pay" }}
-                        disabled={isProcessing}
-                        createOrder={(data, actions) => {
-                          return actions.order.create({
-                            intent: "CAPTURE",
-                            purchase_units: [{
-                              amount: {
-                                value: finalPrice.toString(),
-                                currency_code: "SAR"
-                              }
-                            }]
-                          });
-                        }}
-                        onApprove={async (data, actions) => {
-                          const details = await actions.order?.capture();
-                          handleOrderSuccess("PayPal", details);
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              initial={{ opacity: 0, x: 30 }} 
-              animate={{ opacity: 1, x: 0 }} 
-              transition={{ delay: 0.4 }}
-              className="lg:col-span-2"
-            >
+            initial={{ opacity: 0, x: 30 }} 
+            animate={{ opacity: 1, x: 0 }} 
+            transition={{ delay: 0.4 }}
+            className="lg:col-span-2"
+          >
               <div className="glass-card p-8 rounded-3xl border-2 border-amber-500/20">
                 <h2 className="text-2xl font-bold text-amber-400 mb-6">ملخص الطلب</h2>
                 
@@ -273,9 +273,16 @@ export default function PaymentPage() {
                 </div>
               </div>
             </motion.div>
-          </div>
         </div>
       </div>
+    </div>
+  );
+
+  return isPayPalAvailable ? (
+    <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID, currency: "SAR" }}>
+      <PaymentContent />
     </PayPalScriptProvider>
+  ) : (
+    <PaymentContent />
   );
 }
