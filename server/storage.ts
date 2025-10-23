@@ -142,6 +142,94 @@ export class JsonStorage implements IStorage {
     this.initializeServices();
     this.initializeDiscountCodes();
     this.initializeYoussefStudent();
+    this.initializeQodratakClient();
+  }
+
+  private initializeQodratakClient() {
+    // إنشاء حساب العميل
+    const clientId = "client-qodratak";
+    const clientEmail = "qoudratak@gmail.com";
+
+    // التحقق من عدم وجود العميل مسبقاً
+    const existingClient = Array.from(this.clients.values()).find(
+      c => c.email === clientEmail
+    );
+
+    if (!existingClient) {
+      const client = {
+        id: clientId,
+        fullName: "قدراتك",
+        email: clientEmail,
+        phone: null,
+        password: "182009",
+        websiteType: "منصة تعليمية",
+        budget: 2999,
+        websiteIdea: "منصة تعليمية تفاعلية",
+        createdAt: new Date(),
+      };
+      this.clients.set(clientId, client);
+      this.saveClients();
+      console.log('✅ Client account created for Qodratak');
+    }
+
+    // إنشاء طلب المنصة التعليمية
+    const existingOrder = Array.from(this.orders.values()).find(
+      o => o.customerEmail === clientEmail && o.serviceName.includes("منصة تعليمية")
+    );
+
+    let orderId = existingOrder?.id;
+
+    if (!existingOrder) {
+      orderId = randomUUID();
+      const orderNumber = `ORD-${Date.now()}`;
+      const order = {
+        id: orderId,
+        orderNumber: orderNumber,
+        customerName: "قدراتك",
+        customerEmail: clientEmail,
+        customerPhone: "+966532441566",
+        serviceId: "comp-5",
+        serviceName: "منصة تعليمية تفاعلية",
+        price: 2999,
+        description: "منصة تعليمية متكاملة - قدراتك",
+        paymentMethod: "bank_transfer",
+        status: "completed",
+        paymentStatus: "completed",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.orders.set(orderId, order);
+      this.saveOrders();
+      console.log('✅ Order created for Qodratak platform');
+    }
+
+    // إنشاء مشروع المنصة
+    const existingProject = Array.from(this.projects.values()).find(
+      p => p.clientId === clientId
+    );
+
+    if (!existingProject && orderId) {
+      const projectId = randomUUID();
+      const project = {
+        id: projectId,
+        clientId: clientId,
+        orderId: orderId,
+        name: "منصة قدراتك التعليمية",
+        websiteIdea: "منصة تعليمية تفاعلية متكاملة مع كورسات وامتحانات وشهادات",
+        status: "completed",
+        daysRemaining: 0,
+        targetDate: new Date(),
+        domain: "www.qodratak.site",
+        email: clientEmail,
+        toolsUsed: ["React", "TypeScript", "Node.js", "Express"],
+        assignedEmployees: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.projects.set(projectId, project);
+      this.saveProjects();
+      console.log('✅ Project created for Qodratak platform');
+    }
   }
 
   private initializeYoussefStudent() {
