@@ -6,7 +6,8 @@ import {
   type Employee, type InsertEmployee, type Course, type InsertCourse,
   type Enrollment, type InsertEnrollment, type Certificate, type InsertCertificate,
   type Project, type InsertProject, type DiscountCode, type InsertDiscountCode,
-  type EmployeeTask, type InsertEmployeeTask
+  type EmployeeTask, type InsertEmployeeTask,
+  type Lesson, type LessonProgress, type Quiz, type QuizAttempt, type InsertQuizAttempt
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
@@ -65,6 +66,22 @@ export interface IStorage {
   getCourse(id: string): Promise<Course | undefined>;
   createCourse(course: InsertCourse): Promise<Course>;
 
+  // Lessons
+  getCourseLessons(courseId: string): Promise<Lesson[]>;
+  getLesson(id: string): Promise<Lesson | undefined>;
+
+  // Lesson Progress
+  updateLessonProgress(enrollmentId: string, lessonId: string, isCompleted: boolean): Promise<LessonProgress>;
+  getEnrollmentProgress(enrollmentId: string): Promise<LessonProgress[]>;
+
+  // Quizzes
+  getLessonQuiz(lessonId: string): Promise<Quiz | undefined>;
+  getCourseFinalExam(courseId: string): Promise<Quiz | undefined>;
+
+  // Quiz Attempts
+  createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt>;
+  getEnrollmentQuizAttempts(enrollmentId: string): Promise<QuizAttempt[]>;
+
   // Enrollments
   getEnrollment(id: string): Promise<Enrollment | undefined>;
   getStudentEnrollments(studentId: string): Promise<Enrollment[]>;
@@ -114,6 +131,10 @@ export class JsonStorage implements IStorage {
   private projects: Map<string, Project> = new Map();
   private discountCodes: Map<string, DiscountCode> = new Map();
   private employeeTasks: Map<string, EmployeeTask> = new Map();
+  private lessons: Map<string, Lesson> = new Map();
+  private lessonProgress: Map<string, LessonProgress> = new Map();
+  private quizzes: Map<string, Quiz> = new Map();
+  private quizAttempts: Map<string, QuizAttempt> = new Map();
 
   constructor() {
     this.ensureDataDir();
@@ -144,6 +165,10 @@ export class JsonStorage implements IStorage {
     this.loadProjects();
     this.loadDiscountCodes();
     this.loadEmployeeTasks();
+    this.loadLessons();
+    this.loadLessonProgress();
+    this.loadQuizzes();
+    this.loadQuizAttempts();
   }
 
   private loadUsers() {
@@ -312,6 +337,51 @@ export class JsonStorage implements IStorage {
     }
   }
 
+  private loadLessons() {
+    const filePath = join(this.dataDir, 'lessons.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((lesson: Lesson) => {
+        if (lesson.createdAt) lesson.createdAt = new Date(lesson.createdAt);
+        this.lessons.set(lesson.id, lesson);
+      });
+    }
+  }
+
+  private loadLessonProgress() {
+    const filePath = join(this.dataDir, 'lessonProgress.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((progress: LessonProgress) => {
+        if (progress.createdAt) progress.createdAt = new Date(progress.createdAt);
+        if (progress.completedAt) progress.completedAt = new Date(progress.completedAt);
+        this.lessonProgress.set(progress.id, progress);
+      });
+    }
+  }
+
+  private loadQuizzes() {
+    const filePath = join(this.dataDir, 'quizzes.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((quiz: Quiz) => {
+        if (quiz.createdAt) quiz.createdAt = new Date(quiz.createdAt);
+        this.quizzes.set(quiz.id, quiz);
+      });
+    }
+  }
+
+  private loadQuizAttempts() {
+    const filePath = join(this.dataDir, 'quizAttempts.json');
+    if (existsSync(filePath)) {
+      const data = JSON.parse(readFileSync(filePath, 'utf8'));
+      data.forEach((attempt: QuizAttempt) => {
+        if (attempt.completedAt) attempt.completedAt = new Date(attempt.completedAt);
+        this.quizAttempts.set(attempt.id, attempt);
+      });
+    }
+  }
+
   private saveUsers() {
     const data = Array.from(this.users.values());
     writeFileSync(join(this.dataDir, 'users.json'), JSON.stringify(data, null, 2));
@@ -385,6 +455,26 @@ export class JsonStorage implements IStorage {
   private saveEmployeeTasks() {
     const data = Array.from(this.employeeTasks.values());
     writeFileSync(join(this.dataDir, 'employeeTasks.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveLessons() {
+    const data = Array.from(this.lessons.values());
+    writeFileSync(join(this.dataDir, 'lessons.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveLessonProgress() {
+    const data = Array.from(this.lessonProgress.values());
+    writeFileSync(join(this.dataDir, 'lessonProgress.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveQuizzes() {
+    const data = Array.from(this.quizzes.values());
+    writeFileSync(join(this.dataDir, 'quizzes.json'), JSON.stringify(data, null, 2));
+  }
+
+  private saveQuizAttempts() {
+    const data = Array.from(this.quizAttempts.values());
+    writeFileSync(join(this.dataDir, 'quizAttempts.json'), JSON.stringify(data, null, 2));
   }
 
   private initializeServices() {
@@ -1072,6 +1162,84 @@ export class JsonStorage implements IStorage {
       return updatedTask;
     }
     return undefined;
+  }
+
+  async getCourseLessons(courseId: string): Promise<Lesson[]> {
+    return Array.from(this.lessons.values()).filter(
+      (lesson) => lesson.courseId === courseId
+    );
+  }
+
+  async getLesson(id: string): Promise<Lesson | undefined> {
+    return this.lessons.get(id);
+  }
+
+  async updateLessonProgress(enrollmentId: string, lessonId: string, isCompleted: boolean): Promise<LessonProgress> {
+    const existing = Array.from(this.lessonProgress.values()).find(
+      (p) => p.enrollmentId === enrollmentId && p.lessonId === lessonId
+    );
+
+    if (existing) {
+      const updated: LessonProgress = {
+        ...existing,
+        isCompleted,
+        completedAt: isCompleted ? new Date() : null,
+      };
+      this.lessonProgress.set(existing.id, updated);
+      this.saveLessonProgress();
+      return updated;
+    }
+
+    const id = randomUUID();
+    const progress: LessonProgress = {
+      id,
+      enrollmentId,
+      lessonId,
+      isCompleted,
+      completedAt: isCompleted ? new Date() : null,
+      createdAt: new Date(),
+    };
+    this.lessonProgress.set(id, progress);
+    this.saveLessonProgress();
+    return progress;
+  }
+
+  async getEnrollmentProgress(enrollmentId: string): Promise<LessonProgress[]> {
+    return Array.from(this.lessonProgress.values()).filter(
+      (progress) => progress.enrollmentId === enrollmentId
+    );
+  }
+
+  async getLessonQuiz(lessonId: string): Promise<Quiz | undefined> {
+    return Array.from(this.quizzes.values()).find(
+      (quiz) => quiz.lessonId === lessonId && !quiz.isFinalExam
+    );
+  }
+
+  async getCourseFinalExam(courseId: string): Promise<Quiz | undefined> {
+    return Array.from(this.quizzes.values()).find(
+      (quiz) => quiz.courseId === courseId && quiz.isFinalExam
+    );
+  }
+
+  async createQuizAttempt(attempt: InsertQuizAttempt): Promise<QuizAttempt> {
+    const id = randomUUID();
+    const quizAttempt: QuizAttempt = {
+      ...attempt,
+      id,
+      passed: attempt.passed !== undefined ? attempt.passed : false,
+      attemptNumber: attempt.attemptNumber !== undefined ? attempt.attemptNumber : 1,
+      completedAt: new Date(),
+    };
+    this.quizAttempts.set(id, quizAttempt);
+    this.saveQuizAttempts();
+    return quizAttempt;
+  }
+
+  async getEnrollmentQuizAttempts(enrollmentId: string): Promise<QuizAttempt[]> {
+    return Array.from(this.quizAttempts.values()).filter(
+      (attempt) => attempt.enrollmentId === enrollmentId
+    );
   }
 }
 
