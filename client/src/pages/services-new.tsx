@@ -7,7 +7,10 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ShoppingCart, 
@@ -34,20 +37,19 @@ import type { Service } from "@shared/schema";
 export default function ServicesNew() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
-  const [questionnaireData, setQuestionnaireData] = useState({
-    projectType: "",
-    budget: "",
-    timeline: "",
-    features: [] as string[],
-    name: "",
+  const [showRegistrationDialog, setShowRegistrationDialog] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [registrationData, setRegistrationData] = useState({
+    fullName: "",
     email: "",
     phone: "",
-    discountCode: ""
+    websiteType: "",
+    budget: "",
+    websiteIdea: "",
+    password: ""
   });
-  const [appliedDiscount, setAppliedDiscount] = useState(0);
   const { addToCart, cart } = useCart();
+  const { isAuthenticated, isClient, registerClient, user } = useAuth();
   const { toast } = useToast();
 
   const { data: services = [], isLoading } = useQuery<Service[]>({
@@ -74,11 +76,71 @@ export default function ServicesNew() {
     : services.filter(service => service.category === selectedCategory);
 
   const handleAddToCart = (service: Service) => {
+    if (!isAuthenticated || !isClient()) {
+      setSelectedService(service);
+      setShowRegistrationDialog(true);
+      return;
+    }
+
     addToCart(service);
     toast({
       title: "تمت الإضافة! ✨",
       description: `تم إضافة ${service.name} إلى السلة`,
     });
+  };
+
+  const handleRegisterAndAddToCart = async () => {
+    if (!registrationData.fullName || !registrationData.email || !registrationData.phone || !registrationData.password) {
+      toast({
+        title: "خطأ",
+        description: "يرجى ملء جميع الحقول المطلوبة",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!registrationData.websiteIdea) {
+      toast({
+        title: "خطأ",
+        description: "يرجى كتابة فكرة الموقع أو الخدمة المطلوبة",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const result = await registerClient(registrationData);
+    
+    if (result.success) {
+      toast({
+        title: "تم إنشاء الحساب بنجاح! ✨",
+        description: "يمكنك الآن إضافة الخدمات للسلة"
+      });
+      
+      if (selectedService) {
+        addToCart(selectedService);
+        toast({
+          title: "تمت الإضافة! ✨",
+          description: `تم إضافة ${selectedService.name} إلى السلة`,
+        });
+      }
+      
+      setShowRegistrationDialog(false);
+      setRegistrationData({
+        fullName: "",
+        email: "",
+        phone: "",
+        websiteType: "",
+        budget: "",
+        websiteIdea: "",
+        password: ""
+      });
+    } else {
+      toast({
+        title: "خطأ في التسجيل",
+        description: result.error || "حدث خطأ أثناء إنشاء الحساب",
+        variant: "destructive"
+      });
+    }
   };
 
   const isInCart = (serviceId: string) => {
@@ -112,80 +174,6 @@ export default function ServicesNew() {
     }
   };
 
-  const handleApplyDiscount = () => {
-    if (questionnaireData.discountCode.toUpperCase() === "MA3K2030") {
-      setAppliedDiscount(100);
-      toast({
-        title: "تم تطبيق كود الخصم! 🎉",
-        description: "تم تفعيل خصم 100% على جميع الخدمات",
-      });
-    } else if (questionnaireData.discountCode) {
-      toast({
-        title: "كود غير صحيح",
-        description: "يرجى التحقق من كود الخصم",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleNextStep = () => {
-    if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handlePrevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleQuestionnaireSubmit = () => {
-    if (!questionnaireData.name || !questionnaireData.email || !questionnaireData.phone) {
-      toast({
-        title: "خطأ",
-        description: "يرجى ملء جميع البيانات الشخصية",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const message = `
-🎯 طلب خدمة جديد من الاستبيان الذكي
-
-📋 نوع المشروع: ${questionnaireData.projectType}
-💰 الميزانية: ${questionnaireData.budget}
-⏰ المدة الزمنية: ${questionnaireData.timeline}
-✨ المميزات: ${questionnaireData.features.join(", ")}
-
-👤 بيانات العميل:
-الاسم: ${questionnaireData.name}
-البريد: ${questionnaireData.email}
-الهاتف: ${questionnaireData.phone}
-
-${appliedDiscount > 0 ? `🎁 كود الخصم: ${questionnaireData.discountCode} (${appliedDiscount}%)` : ""}
-    `.trim();
-
-    const whatsappUrl = `https://wa.me/+201155201921?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-
-    toast({
-      title: "تم الإرسال بنجاح! ✨",
-      description: "سنتواصل معك قريباً",
-    });
-
-    setShowQuestionnaire(false);
-  };
-
-  const toggleFeature = (feature: string) => {
-    setQuestionnaireData(prev => ({
-      ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter(f => f !== feature)
-        : [...prev.features, feature]
-    }));
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-20">
@@ -202,6 +190,124 @@ ${appliedDiscount > 0 ? `🎁 كود الخصم: ${questionnaireData.discountCod
   }
 
   return (
+    <>
+      {/* Registration Dialog */}
+      <Dialog open={showRegistrationDialog} onOpenChange={setShowRegistrationDialog}>
+        <DialogContent className="glass-card border-2 border-amber-500/20 max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-amber-400">
+              تسجيل كعميل
+            </DialogTitle>
+            <DialogDescription className="text-gray-300">
+              يجب التسجيل كعميل قبل إضافة الخدمات للسلة
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-4">
+            <div>
+              <Label htmlFor="fullName" className="text-white">الاسم الكامل *</Label>
+              <Input
+                id="fullName"
+                value={registrationData.fullName}
+                onChange={(e) => setRegistrationData({...registrationData, fullName: e.target.value})}
+                className="bg-gray-800/50 border-gray-600 text-white"
+                placeholder="أدخل اسمك الكامل"
+                data-testid="input-fullname"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="email" className="text-white">البريد الإلكتروني *</Label>
+              <Input
+                id="email"
+                type="email"
+                value={registrationData.email}
+                onChange={(e) => setRegistrationData({...registrationData, email: e.target.value})}
+                className="bg-gray-800/50 border-gray-600 text-white"
+                placeholder="example@email.com"
+                data-testid="input-email"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="phone" className="text-white">رقم الهاتف *</Label>
+              <Input
+                id="phone"
+                value={registrationData.phone}
+                onChange={(e) => setRegistrationData({...registrationData, phone: e.target.value})}
+                className="bg-gray-800/50 border-gray-600 text-white"
+                placeholder="+966XXXXXXXXX"
+                data-testid="input-phone"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="websiteType" className="text-white">نوع المشروع</Label>
+              <Input
+                id="websiteType"
+                value={registrationData.websiteType}
+                onChange={(e) => setRegistrationData({...registrationData, websiteType: e.target.value})}
+                className="bg-gray-800/50 border-gray-600 text-white"
+                placeholder="مثال: موقع تجارة إلكترونية، تطبيق ويب، موقع شخصي"
+                data-testid="input-website-type"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="budget" className="text-white">الميزانية المتوقعة</Label>
+              <Input
+                id="budget"
+                value={registrationData.budget}
+                onChange={(e) => setRegistrationData({...registrationData, budget: e.target.value})}
+                className="bg-gray-800/50 border-gray-600 text-white"
+                placeholder="مثال: 1000 - 5000 ريال"
+                data-testid="input-budget"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="websiteIdea" className="text-white">فكرة الموقع أو الخدمة *</Label>
+              <Textarea
+                id="websiteIdea"
+                value={registrationData.websiteIdea}
+                onChange={(e) => setRegistrationData({...registrationData, websiteIdea: e.target.value})}
+                className="bg-gray-800/50 border-gray-600 text-white min-h-[100px]"
+                placeholder="اشرح فكرة مشروعك أو الخدمة التي تحتاجها..."
+                data-testid="input-website-idea"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="password" className="text-white">كلمة المرور *</Label>
+              <Input
+                id="password"
+                type="password"
+                value={registrationData.password}
+                onChange={(e) => setRegistrationData({...registrationData, password: e.target.value})}
+                className="bg-gray-800/50 border-gray-600 text-white"
+                placeholder="أدخل كلمة مرور قوية"
+                data-testid="input-password"
+              />
+            </div>
+
+            <Button
+              onClick={handleRegisterAndAddToCart}
+              className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold py-3"
+              data-testid="button-register-and-add"
+            >
+              تسجيل وإضافة للسلة
+            </Button>
+
+            <p className="text-center text-gray-400 text-sm">
+              لديك حساب بالفعل؟{" "}
+              <a href="/login" className="text-amber-400 hover:underline">
+                تسجيل الدخول
+              </a>
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 pt-20">
       {/* Animated background elements */}
       <div className="fixed inset-0 pointer-events-none">
@@ -468,5 +574,6 @@ ${appliedDiscount > 0 ? `🎁 كود الخصم: ${questionnaireData.discountCod
         </motion.div>
       </div>
     </div>
+    </>
   );
 }

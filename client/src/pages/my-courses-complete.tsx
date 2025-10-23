@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import {
   BookOpen,
   CheckCircle,
@@ -14,7 +16,8 @@ import {
   Code,
   Play,
   Lock,
-  Trophy
+  Trophy,
+  LogOut
 } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -32,9 +35,25 @@ type Enrollment = {
 export default function MyCoursesComplete() {
   const [, setLocation] = useLocation();
   const [selectedCourse, setSelectedCourse] = useState<Enrollment | null>(null);
+  const { user, isAuthenticated, isLoading, isStudent, logout } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (isLoading) return;
+    
+    if (!isAuthenticated || !isStudent()) {
+      toast({
+        title: "يجب تسجيل الدخول",
+        description: "يرجى تسجيل الدخول كطالب للوصول إلى هذه الصفحة",
+        variant: "destructive"
+      });
+      setLocation("/login");
+    }
+  }, [isAuthenticated, isStudent, isLoading]);
 
   const { data: enrollments = [] } = useQuery<Enrollment[]>({
-    queryKey: ["/api/enrollments"],
+    queryKey: [`/api/enrollments/student/${user?.id}`],
+    enabled: !!user?.id && isStudent(),
   });
 
   const activeCourses = enrollments.filter(e => e.status === "active");
@@ -53,6 +72,20 @@ export default function MyCoursesComplete() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
+          <div className="flex justify-end mb-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                logout();
+                setLocation("/login");
+              }}
+              className="border-red-500 text-red-400 hover:bg-red-500/10"
+              data-testid="button-logout"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              تسجيل الخروج
+            </Button>
+          </div>
           <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl mx-auto mb-4 flex items-center justify-center green-glow">
             <BookOpen className="w-10 h-10 text-white" />
           </div>
@@ -60,6 +93,9 @@ export default function MyCoursesComplete() {
             دوراتي التعليمية
           </h1>
           <p className="text-xl text-gray-300">
+            مرحباً {user?.fullName || "عزيزي الطالب"}
+          </p>
+          <p className="text-lg text-gray-400">
             تابع تقدمك في رحلة تعلم البرمجة
           </p>
         </motion.div>

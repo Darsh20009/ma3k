@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { 
   Users, 
   Video, 
@@ -41,6 +43,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 interface Employee {
@@ -79,8 +82,22 @@ interface Contract {
 
 export default function EmployeeDashboard() {
   const { toast } = useToast();
-  const [currentEmployee, setCurrentEmployee] = useState<any>(null);
+  const { user, isAuthenticated, isLoading, isEmployee, logout } = useAuth();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("dashboard");
+  
+  useEffect(() => {
+    if (isLoading) return;
+    
+    if (!isAuthenticated || !isEmployee()) {
+      toast({
+        title: "يجب تسجيل الدخول",
+        description: "يرجى تسجيل الدخول كموظف للوصول إلى هذه الصفحة",
+        variant: "destructive"
+      });
+      setLocation("/employee-login");
+    }
+  }, [isAuthenticated, isEmployee, isLoading]);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([
     { id: "1", name: "أحمد محمد", password: "emp123", role: "مطور", active: true },

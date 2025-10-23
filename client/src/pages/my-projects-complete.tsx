@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
   Briefcase,
@@ -18,7 +19,8 @@ import {
   MessageCircle,
   CheckCircle,
   Clock,
-  Rocket
+  Rocket,
+  LogOut
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -44,26 +46,26 @@ const statusConfig = {
 export default function MyProjectsComplete() {
   const [editingIdea, setEditingIdea] = useState<string | null>(null);
   const [newIdea, setNewIdea] = useState("");
+  const { user, isAuthenticated, isLoading, isClient, logout } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  // التحقق من تسجيل الدخول
   useEffect(() => {
-    const userId = localStorage.getItem("ma3k_user_id");
-    const userType = localStorage.getItem("ma3k_user_type");
-
-    if (!userId || userType !== "client") {
+    if (isLoading) return;
+    
+    if (!isAuthenticated || !isClient()) {
       toast({
         title: "يجب تسجيل الدخول",
-        description: "يرجى تسجيل الدخول للوصول إلى هذه الصفحة",
+        description: "يرجى تسجيل الدخول كعميل للوصول إلى هذه الصفحة",
         variant: "destructive"
       });
       setLocation("/login");
     }
-  }, []);
+  }, [isAuthenticated, isClient, isLoading]);
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: [`/api/clients/${localStorage.getItem("ma3k_user_id")}/projects`],
+    queryKey: [`/api/clients/${user?.id}/projects`],
+    enabled: !!user?.id && isClient(),
   });
 
   const updateIdeaMutation = useMutation({
@@ -94,7 +96,7 @@ export default function MyProjectsComplete() {
 المشروع: ${project.projectName}
 الفكرة الجديدة: ${newIdea}
 
-العميل: ${localStorage.getItem("ma3k_client_name") || "غير محدد"}
+العميل: ${user?.fullName || "غير محدد"}
     `.trim();
 
     const whatsappUrl = `https://wa.me/+201155201921?text=${encodeURIComponent(message)}`;
@@ -119,25 +121,26 @@ export default function MyProjectsComplete() {
             <Button
               variant="outline"
               onClick={() => {
-                localStorage.clear();
+                logout();
                 setLocation("/login");
               }}
               className="border-red-500 text-red-400 hover:bg-red-500/10"
+              data-testid="button-logout"
             >
               تسجيل الخروج
             </Button>
           </div>
-          <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl mx-auto mb-4 flex items-center justify-center green-glow">
+          <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center purple-glow">
             <Briefcase className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-green-400 mb-4">
-            مشاريعي ومواقعي
+          <h1 className="text-4xl md:text-5xl font-bold text-purple-400 mb-4">
+            مشاريعي
           </h1>
           <p className="text-xl text-gray-300">
-            مرحباً {localStorage.getItem("ma3k_user_name") || "عزيزي العميل"}
+            مرحباً {user?.fullName || "عزيزي العميل"}
           </p>
           <p className="text-lg text-gray-400">
-            تابع حالة مشاريعك وتقدم التطوير
+            تابع تقدم مشاريعك التطويرية
           </p>
         </motion.div>
 
