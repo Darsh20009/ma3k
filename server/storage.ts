@@ -141,6 +141,88 @@ export class JsonStorage implements IStorage {
     this.loadData();
     this.initializeServices();
     this.initializeDiscountCodes();
+    this.initializeYoussefStudent();
+  }
+
+  private initializeYoussefStudent() {
+    // إنشاء حساب الطالب
+    const studentId = "student-youssef-darwish";
+    const studentEmail = "youssefdarwish20009@gmail.com";
+
+    // التحقق من عدم وجود الطالب مسبقاً
+    const existingStudent = Array.from(this.students.values()).find(
+      s => s.email === studentEmail
+    );
+
+    if (!existingStudent) {
+      const student = {
+        id: studentId,
+        fullName: "Youssef Darwish",
+        email: studentEmail,
+        phone: null,
+        password: "182009",
+        age: 16,
+        createdAt: new Date(),
+      };
+      this.students.set(studentId, student);
+      this.saveStudents();
+      console.log('✅ Student account created for Youssef Darwish');
+    }
+
+    // إيجاد كورسات Java و Back-End
+    const javaCourse = Array.from(this.courses.values()).find(
+      c => c.title.toLowerCase().includes('java') || c.language?.toLowerCase() === 'java'
+    );
+
+    const backendCourse = Array.from(this.courses.values()).find(
+      c => c.title.toLowerCase().includes('back') || c.title.toLowerCase().includes('backend')
+    );
+
+    // تسجيل الطالب في كورس Java
+    if (javaCourse) {
+      const javaEnrollmentId = `enrollment-${studentId}-java`;
+      const existingJavaEnrollment = this.enrollments.get(javaEnrollmentId);
+
+      if (!existingJavaEnrollment) {
+        const javaEnrollment = {
+          id: javaEnrollmentId,
+          studentId: studentId,
+          courseId: javaCourse.id,
+          progress: 0,
+          status: "active" as const,
+          quizScores: null,
+          finalExamScore: null,
+          enrolledAt: new Date(),
+          completedAt: null,
+        };
+        this.enrollments.set(javaEnrollmentId, javaEnrollment);
+        console.log('✅ Enrolled in Java course');
+      }
+    }
+
+    // تسجيل الطالب في كورس Back-End
+    if (backendCourse) {
+      const backendEnrollmentId = `enrollment-${studentId}-backend`;
+      const existingBackendEnrollment = this.enrollments.get(backendEnrollmentId);
+
+      if (!existingBackendEnrollment) {
+        const backendEnrollment = {
+          id: backendEnrollmentId,
+          studentId: studentId,
+          courseId: backendCourse.id,
+          progress: 0,
+          status: "active" as const,
+          quizScores: null,
+          finalExamScore: null,
+          enrolledAt: new Date(),
+          completedAt: null,
+        };
+        this.enrollments.set(backendEnrollmentId, backendEnrollment);
+        console.log('✅ Enrolled in Back-End course');
+      }
+    }
+
+    this.saveEnrollments();
   }
 
   private ensureDataDir() {
