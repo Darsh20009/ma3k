@@ -183,6 +183,53 @@ export const employeeTasks = pgTable("employee_tasks", {
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const lessons = pgTable("lessons", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  courseId: varchar("course_id").references(() => courses.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  order: integer("order").notNull(),
+  videoUrl: text("video_url"),
+  content: text("content"),
+  materials: text("materials").array(),
+  duration: integer("duration"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const lessonProgress = pgTable("lesson_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  enrollmentId: varchar("enrollment_id").references(() => enrollments.id).notNull(),
+  lessonId: varchar("lesson_id").references(() => lessons.id).notNull(),
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const quizzes = pgTable("quizzes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  lessonId: varchar("lesson_id").references(() => lessons.id),
+  courseId: varchar("course_id").references(() => courses.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  questions: jsonb("questions").notNull(),
+  passingScore: integer("passing_score").default(70),
+  isFinalExam: boolean("is_final_exam").default(false),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const quizAttempts = pgTable("quiz_attempts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  enrollmentId: varchar("enrollment_id").references(() => enrollments.id).notNull(),
+  quizId: varchar("quiz_id").references(() => quizzes.id).notNull(),
+  answers: jsonb("answers").notNull(),
+  score: integer("score").notNull(),
+  passed: boolean("passed").default(false),
+  attemptNumber: integer("attempt_number").default(1),
+  completedAt: timestamp("completed_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -310,6 +357,44 @@ export const insertEmployeeTaskSchema = createInsertSchema(employeeTasks).pick({
   notes: true,
 });
 
+export const insertLessonSchema = createInsertSchema(lessons).pick({
+  courseId: true,
+  title: true,
+  description: true,
+  order: true,
+  videoUrl: true,
+  content: true,
+  materials: true,
+  duration: true,
+  isActive: true,
+});
+
+export const insertLessonProgressSchema = createInsertSchema(lessonProgress).pick({
+  enrollmentId: true,
+  lessonId: true,
+  isCompleted: true,
+});
+
+export const insertQuizSchema = createInsertSchema(quizzes).pick({
+  lessonId: true,
+  courseId: true,
+  title: true,
+  description: true,
+  questions: true,
+  passingScore: true,
+  isFinalExam: true,
+  isActive: true,
+});
+
+export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).pick({
+  enrollmentId: true,
+  quizId: true,
+  answers: true,
+  score: true,
+  passed: true,
+  attemptNumber: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -340,3 +425,11 @@ export type DiscountCode = typeof discountCodes.$inferSelect;
 export type InsertDiscountCode = z.infer<typeof insertDiscountCodeSchema>;
 export type EmployeeTask = typeof employeeTasks.$inferSelect;
 export type InsertEmployeeTask = z.infer<typeof insertEmployeeTaskSchema>;
+export type Lesson = typeof lessons.$inferSelect;
+export type InsertLesson = z.infer<typeof insertLessonSchema>;
+export type LessonProgress = typeof lessonProgress.$inferSelect;
+export type InsertLessonProgress = z.infer<typeof insertLessonProgressSchema>;
+export type Quiz = typeof quizzes.$inferSelect;
+export type InsertQuiz = z.infer<typeof insertQuizSchema>;
+export type QuizAttempt = typeof quizAttempts.$inferSelect;
+export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;

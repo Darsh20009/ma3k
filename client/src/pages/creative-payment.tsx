@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { CreditCard, MessageSquare, Tag, CheckCircle, ShoppingBag } from "lucide-react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { apiRequest } from "@/lib/queryClient";
 
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || "YOUR_CLIENT_ID";
 const WHATSAPP_NUMBER = "+201155201921";
@@ -19,7 +20,9 @@ export default function PaymentPage() {
   const { toast } = useToast();
   const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountPercentage, setDiscountPercentage] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isValidatingDiscount, setIsValidatingDiscount] = useState(false);
 
   const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
   const finalPrice = Math.max(0, subtotal - discountAmount);
@@ -35,19 +38,41 @@ export default function PaymentPage() {
     }
   }, [cart, setLocation, toast]);
 
-  const handleApplyDiscount = () => {
-    if (discountCode.toUpperCase() === "MA3K2030") {
-      setDiscountAmount(subtotal);
+  const handleApplyDiscount = async () => {
+    if (!discountCode.trim()) {
       toast({
-        title: "تم تطبيق الخصم! 🎉",
-        description: "خصم 100% - الخدمة مجانية!",
-      });
-    } else {
-      toast({
-        title: "كود غير صحيح",
-        description: "يرجى التحقق من كود الخصم",
+        title: "خطأ",
+        description: "يرجى إدخال كود الخصم",
         variant: "destructive"
       });
+      return;
+    }
+
+    setIsValidatingDiscount(true);
+    try {
+      const response = await apiRequest("POST", "/api/discount-codes/validate", { code: discountCode });
+      const data = await response.json();
+      
+      const discountPercent = data.discountPercentage || 0;
+      const calculatedDiscount = Math.round((subtotal * discountPercent) / 100);
+      
+      setDiscountPercentage(discountPercent);
+      setDiscountAmount(calculatedDiscount);
+      
+      toast({
+        title: "تم تطبيق الخصم! 🎉",
+        description: `خصم ${discountPercent}% - تم توفير ${calculatedDiscount} ريال`,
+      });
+    } catch (error) {
+      setDiscountAmount(0);
+      setDiscountPercentage(0);
+      toast({
+        title: "كود غير صحيح",
+        description: "كود الخصم غير صالح أو منتهي الصلاحية",
+        variant: "destructive"
+      });
+    } finally {
+      setIsValidatingDiscount(false);
     }
   };
 
@@ -74,34 +99,55 @@ ${discountAmount > 0 ? `🎁 الخصم: ${discountAmount} ريال\n💵 الم
     });
   };
 
-  const handleOrderSuccess = (paymentMethod: string, paymentDetails?: any) => {
+  const handleOrderSuccess = async (paymentMethod: string, paymentDetails?: any) => {
     setIsProcessing(true);
 
-    const orderData = {
-      items: cart,
-      subtotal,
-      discount: discountAmount,
-      finalPrice,
-      paymentMethod,
-      paymentDetails,
-      orderDate: new Date().toISOString()
-    };
+    try {
+      for (const item of cart) {
+        const orderData = {
+          customerName: "عميل",
+          customerEmail: "customer@example.com",
+          customerPhone: "+966XXXXXXXXX",
+          serviceName: item.name,
+          price: finalPrice > 0 ? Math.round(finalPrice / cart.length) : 0,
+          description: `${item.name} ${discountAmount > 0 ? `- خصم ${discountPercentage}%` : ''}`,
+          paymentMethod: paymentMethod,
+        };
 
-    localStorage.setItem(`ma3k_order_${Date.now()}`, JSON.stringify(orderData));
+        const orderResponse = await apiRequest("POST", "/api/orders", orderData);
+        const order = await orderResponse.json();
+        
+        if (paymentMethod === "PayPal" || paymentMethod === "Free (Discount)") {
+          await apiRequest("PUT", `/api/orders/${order.id}/payment`, {
+            paymentMethod,
+            paymentStatus: "completed"
+          });
+        }
+      }
 
-    toast({
-      title: "تم إتمام الطلب بنجاح! 🎉",
-      description: "شكراً لثقتك في معك",
-    });
+      toast({
+        title: "تم إتمام الطلب بنجاح! 🎉",
+        description: "شكراً لثقتك في معك",
+      });
 
-    clearCart();
-    setTimeout(() => {
-      setLocation("/");
-    }, 2000);
+      clearCart();
+      setTimeout(() => {
+        setLocation("/");
+      }, 2000);
+    } catch (error) {
+      console.error("Order creation error:", error);
+      toast({
+        title: "حدث خطأ",
+        description: "فشل إنشاء الطلب، يرجى المحاولة مرة أخرى",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
-    <PayPalScriptProvider options={{ "client-id": PAYPAL_CLIENT_ID, currency: "SAR" }}>
+    <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID, currency: "SAR" }}>
       <div className="min-h-screen royal-gradient pt-24 pb-20 px-4">
         <div className="container mx-auto max-w-5xl">
           <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }}>
@@ -168,6 +214,7 @@ ${discountAmount > 0 ? `🎁 الخصم: ${discountAmount} ريال\n💵 الم
                         disabled={isProcessing}
                         createOrder={(data, actions) => {
                           return actions.order.create({
+                            intent: "CAPTURE",
                             purchase_units: [{
                               amount: {
                                 value: finalPrice.toString(),
@@ -242,9 +289,10 @@ ${discountAmount > 0 ? `🎁 الخصم: ${discountAmount} ريال\n💵 الم
                       onClick={handleApplyDiscount}
                       variant="outline"
                       className="text-amber-400 border-amber-500"
+                      disabled={isValidatingDiscount}
                       data-testid="button-apply-discount"
                     >
-                      تطبيق
+                      {isValidatingDiscount ? "جاري التحقق..." : "تطبيق"}
                     </Button>
                   </div>
                 </div>
