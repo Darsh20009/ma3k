@@ -73,11 +73,13 @@ export default function Login() {
         // التوجيه حسب نوع المستخدم
         setTimeout(() => {
           if (data.type === "client") {
-            setLocation("/my-projects-complete");
+            window.location.href = "/my-projects-complete";
           } else if (data.type === "student") {
-            setLocation("/my-courses-complete");
+            window.location.href = "/my-courses-complete";
+          } else if (data.type === "employee") {
+            window.location.href = "/employee-dashboard";
           } else {
-            setLocation("/employee-dashboard");
+            window.location.href = "/";
           }
         }, 500);
       } else {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
@@ -48,17 +48,22 @@ export default function MyProjectsComplete() {
   const [, setLocation] = useLocation();
 
   // التحقق من تسجيل الدخول
-  const userId = localStorage.getItem("ma3k_user_id");
-  const userType = localStorage.getItem("ma3k_user_type");
+  useEffect(() => {
+    const userId = localStorage.getItem("ma3k_user_id");
+    const userType = localStorage.getItem("ma3k_user_type");
 
-  // إذا لم يكن المستخدم مسجل دخول أو ليس عميل، توجيهه لصفحة تسجيل الدخول
-  if (!userId || userType !== "client") {
-    setLocation("/login");
-    return null;
-  }
+    if (!userId || userType !== "client") {
+      toast({
+        title: "يجب تسجيل الدخول",
+        description: "يرجى تسجيل الدخول للوصول إلى هذه الصفحة",
+        variant: "destructive"
+      });
+      setLocation("/login");
+    }
+  }, []);
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: [`/api/clients/${userId}/projects`],
+    queryKey: [`/api/clients/${localStorage.getItem("ma3k_user_id")}/projects`],
   });
 
   const updateIdeaMutation = useMutation({
