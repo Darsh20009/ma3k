@@ -1,0 +1,14 @@
+[
+  {
+    "id": "emp-001",
+    "name": "يوسف علي (موظف)",
+    "email": "staff1@email.com",
+    "password": "password123"
+  },
+  {
+    "id": "emp-002",
+    "name": "فاطمة حسن (موظفة)",
+    "email": "staff2@email.com",
+    "password": "password456"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "cli-001",
+    "name": "عبدالله محمد",
+    "email": "client1@email.com",
+    "password": "password123"
+  },
+  {
+    "id": "cli-002",
+    "name": "سارة خالد",
+    "email": "client2@email.com",
+    "password": "password456"
+  }
+]

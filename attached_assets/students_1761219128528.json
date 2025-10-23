@@ -1,0 +1,14 @@
+[
+  {
+    "id": "stu-001",
+    "name": "أحمد فهد",
+    "email": "student1@email.com",
+    "password": "password123"
+  },
+  {
+    "id": "stu-002",
+    "name": "نورة سعد",
+    "email": "student2@email.com",
+    "password": "password456"
+  }
+]
