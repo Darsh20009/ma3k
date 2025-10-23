@@ -63,7 +63,7 @@ export default function NotFound() {
               }}
             >
               404
-            </motion.div>
+            </h1>
           </motion.div>
 
           {/* أيقونة تحذير متحركة */}
