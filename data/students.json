@@ -1,3 +1,4 @@
+
 [
   {
     "id": "student-youssef-darwish",
@@ -6,6 +7,30 @@
     "phone": null,
     "password": "182009",
     "age": 16,
-    "createdAt": "2025-10-23T11:27:27.518Z"
+    "learningGoal": null,
+    "freeCoursesTaken": 0,
+    "createdAt": "2025-01-23T11:27:27.518Z"
+  },
+  {
+    "id": "stu-001",
+    "fullName": "أحمد فهد",
+    "email": "student1@email.com",
+    "phone": null,
+    "password": "password123",
+    "age": null,
+    "learningGoal": null,
+    "freeCoursesTaken": 0,
+    "createdAt": "2025-01-23T10:00:00.000Z"
+  },
+  {
+    "id": "stu-002",
+    "fullName": "نورة سعد",
+    "email": "student2@email.com",
+    "phone": null,
+    "password": "password456",
+    "age": null,
+    "learningGoal": null,
+    "freeCoursesTaken": 0,
+    "createdAt": "2025-01-23T10:00:00.000Z"
   }
 ]

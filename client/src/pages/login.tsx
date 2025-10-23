@@ -35,24 +35,94 @@ export default function Login() {
       return;
     }
 
-    // محاكاة تسجيل الدخول
-    // في الواقع، سيتم التحقق من ملفات JSON (clients.json, students.json, staff.json)
-    
-    toast({
-      title: isLogin ? "تم تسجيل الدخول" : "تم إنشاء الحساب",
-      description: isLogin ? "مرحباً بعودتك!" : "تم إنشاء حسابك بنجاح"
-    });
+    try {
+      if (isLogin) {
+        // تسجيل الدخول
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          })
+        });
 
-    // التوجيه حسب نوع المستخدم
-    setTimeout(() => {
-      if (activeTab === "client") {
-        setLocation("/my-projects");
-      } else if (activeTab === "student") {
-        setLocation("/my-courses");
+        if (!response.ok) {
+          const error = await response.json();
+          toast({
+            title: "خطأ في تسجيل الدخول",
+            description: error.error || "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        const data = await response.json();
+        
+        // حفظ بيانات المستخدم في localStorage
+        localStorage.setItem("ma3k_user_id", data.user.id);
+        localStorage.setItem("ma3k_user_type", data.type);
+        localStorage.setItem("ma3k_user_email", data.user.email);
+        localStorage.setItem("ma3k_user_name", data.user.fullName);
+
+        toast({
+          title: "تم تسجيل الدخول بنجاح! ✨",
+          description: `مرحباً ${data.user.fullName}`
+        });
+
+        // التوجيه حسب نوع المستخدم
+        setTimeout(() => {
+          if (data.type === "client") {
+            setLocation("/my-projects-complete");
+          } else if (data.type === "student") {
+            setLocation("/my-courses-complete");
+          } else {
+            setLocation("/employee-dashboard");
+          }
+        }, 500);
       } else {
-        setLocation("/employee-dashboard");
+        // إنشاء حساب جديد
+        const endpoint = activeTab === "client" ? "/api/auth/register-client" : "/api/auth/register-student";
+        
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: formData.name,
+            email: formData.email,
+            password: formData.password
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          toast({
+            title: "خطأ في إنشاء الحساب",
+            description: error.error || "حدث خطأ، يرجى المحاولة مرة أخرى",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        const data = await response.json();
+        
+        toast({
+          title: "تم إنشاء الحساب بنجاح! 🎉",
+          description: "يمكنك الآن تسجيل الدخول"
+        });
+
+        // العودة لوضع تسجيل الدخول
+        setIsLogin(true);
+        setFormData({ ...formData, password: "", confirmPassword: "" });
       }
-    }, 1000);
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "خطأ",
+        description: "حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى",
+        variant: "destructive"
+      });
+    }
   };
 
   const userTypes = [

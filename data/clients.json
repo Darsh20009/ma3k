@@ -1,3 +1,4 @@
+
 [
   {
     "id": "client-qodratak",
@@ -8,6 +9,28 @@
     "websiteType": "منصة تعليمية",
     "budget": 2999,
     "websiteIdea": "منصة تعليمية تفاعلية",
-    "createdAt": "2025-10-23T11:28:45.864Z"
+    "createdAt": "2025-01-23T11:28:45.864Z"
+  },
+  {
+    "id": "cli-001",
+    "fullName": "عبدالله محمد",
+    "email": "client1@email.com",
+    "phone": null,
+    "password": "password123",
+    "websiteType": null,
+    "budget": null,
+    "websiteIdea": null,
+    "createdAt": "2025-01-23T10:00:00.000Z"
+  },
+  {
+    "id": "cli-002",
+    "fullName": "سارة خالد",
+    "email": "client2@email.com",
+    "phone": null,
+    "password": "password456",
+    "websiteType": null,
+    "budget": null,
+    "websiteIdea": null,
+    "createdAt": "2025-01-23T10:00:00.000Z"
   }
 ]

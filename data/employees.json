@@ -1,0 +1,21 @@
+
+[
+  {
+    "id": "emp-001",
+    "fullName": "يوسف علي (موظف)",
+    "email": "staff1@email.com",
+    "password": "password123",
+    "role": "developer",
+    "photoUrl": null,
+    "createdAt": "2025-01-23T10:00:00.000Z"
+  },
+  {
+    "id": "emp-002",
+    "fullName": "فاطمة حسن (موظفة)",
+    "email": "staff2@email.com",
+    "password": "password456",
+    "role": "designer",
+    "photoUrl": null,
+    "createdAt": "2025-01-23T10:00:00.000Z"
+  }
+]

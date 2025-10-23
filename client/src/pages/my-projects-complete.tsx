@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -44,9 +45,20 @@ export default function MyProjectsComplete() {
   const [editingIdea, setEditingIdea] = useState<string | null>(null);
   const [newIdea, setNewIdea] = useState("");
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  // التحقق من تسجيل الدخول
+  const userId = localStorage.getItem("ma3k_user_id");
+  const userType = localStorage.getItem("ma3k_user_type");
+
+  // إذا لم يكن المستخدم مسجل دخول أو ليس عميل، توجيهه لصفحة تسجيل الدخول
+  if (!userId || userType !== "client") {
+    setLocation("/login");
+    return null;
+  }
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+    queryKey: [`/api/clients/${userId}/projects`],
   });
 
   const updateIdeaMutation = useMutation({
@@ -98,6 +110,18 @@ export default function MyProjectsComplete() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
+          <div className="flex justify-end mb-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                localStorage.clear();
+                setLocation("/login");
+              }}
+              className="border-red-500 text-red-400 hover:bg-red-500/10"
+            >
+              تسجيل الخروج
+            </Button>
+          </div>
           <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl mx-auto mb-4 flex items-center justify-center green-glow">
             <Briefcase className="w-10 h-10 text-white" />
           </div>
@@ -105,6 +129,9 @@ export default function MyProjectsComplete() {
             مشاريعي ومواقعي
           </h1>
           <p className="text-xl text-gray-300">
+            مرحباً {localStorage.getItem("ma3k_user_name") || "عزيزي العميل"}
+          </p>
+          <p className="text-lg text-gray-400">
             تابع حالة مشاريعك وتقدم التطوير
           </p>
         </motion.div>
