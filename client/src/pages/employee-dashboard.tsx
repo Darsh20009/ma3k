@@ -161,24 +161,14 @@ export default function EmployeeDashboard() {
     finalPrice: 0
   });
 
-  useEffect(() => {
-    // التحقق من تسجيل الدخول
-    const employee = localStorage.getItem("employee");
-    if (!employee) {
-      window.location.href = "/employee-login";
-      return;
-    }
-    setCurrentEmployee(JSON.parse(employee));
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem("employee");
+    logout();
     toast({
       title: "تم تسجيل الخروج",
       description: "شكراً لك، أراك قريباً",
     });
     setTimeout(() => {
-      window.location.href = "/";
+      setLocation("/");
     }, 1000);
   };
 
@@ -205,7 +195,7 @@ export default function EmployeeDashboard() {
     const meeting: Meeting = {
       id: Date.now().toString(),
       title: `اجتماع ${new Date().toLocaleTimeString('ar-SA')}`,
-      participants: [currentEmployee?.name || "المشرف"],
+      participants: [user?.fullName || "المشرف"],
       startTime: new Date(),
       isActive: true
     };
@@ -240,7 +230,7 @@ export default function EmployeeDashboard() {
     setNewEmployee({ ...newEmployee, password });
   };
 
-  if (!currentEmployee) {
+  if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="text-white">جاري التحميل...</div>
     </div>;
@@ -254,11 +244,11 @@ export default function EmployeeDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-amber-600 rounded-full flex items-center justify-center">
-                <span className="text-black font-bold">{currentEmployee.name.charAt(0)}</span>
+                <span className="text-black font-bold">{user?.fullName?.charAt(0) || "M"}</span>
               </div>
               <div>
                 <h1 className="text-white font-bold">لوحة تحكم الموظفين</h1>
-                <p className="text-gray-400 text-sm">مرحباً، {currentEmployee.name}</p>
+                <p className="text-gray-400 text-sm">مرحباً، {user?.fullName || "الموظف"}</p>
               </div>
             </div>
             
@@ -453,9 +443,9 @@ export default function EmployeeDashboard() {
                             <div className="flex items-center justify-center">
                               <div className="text-center">
                                 <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-2">
-                                  <span className="text-black font-bold text-xl">{currentEmployee.name.charAt(0)}</span>
+                                  <span className="text-black font-bold text-xl">{user?.fullName?.charAt(0) || "M"}</span>
                                 </div>
-                                <p className="text-white text-sm">{currentEmployee.name}</p>
+                                <p className="text-white text-sm">{user?.fullName || "الموظف"}</p>
                                 <div className="flex items-center justify-center gap-1 mt-1">
                                   <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                                   <span className="text-red-400 text-xs">يتحدث</span>
@@ -3210,7 +3200,7 @@ console.log(myWebsite.generateHTML());`}
                         <div>
                           <label className="block text-gray-300 mb-2">اسم الموظف</label>
                           <Input 
-                            value={currentEmployee.name} 
+                            value={user?.fullName || ""} 
                             disabled 
                             className="bg-gray-700 border-gray-600 text-gray-400"
                           />
@@ -3218,7 +3208,7 @@ console.log(myWebsite.generateHTML());`}
                         <div>
                           <label className="block text-gray-300 mb-2">رقم الموظف</label>
                           <Input 
-                            value={currentEmployee.id} 
+                            value={user?.id || ""} 
                             disabled 
                             className="bg-gray-700 border-gray-600 text-gray-400"
                           />
@@ -3226,7 +3216,7 @@ console.log(myWebsite.generateHTML());`}
                         <div>
                           <label className="block text-gray-300 mb-2">الصلاحية</label>
                           <Input 
-                            value={currentEmployee.role} 
+                            value={user?.type || ""} 
                             disabled 
                             className="bg-gray-700 border-gray-600 text-gray-400"
                           />

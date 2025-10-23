@@ -11,7 +11,7 @@ import { CreditCard, Tag, CheckCircle, ShoppingBag } from "lucide-react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { apiRequest } from "@/lib/queryClient";
 
-const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || "";
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || import.meta.env.PAYPAL_CLIENT_ID || "";
 
 export default function PaymentPage() {
   const [, setLocation] = useLocation();
