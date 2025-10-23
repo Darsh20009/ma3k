@@ -7,12 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { CreditCard, MessageSquare, Tag, CheckCircle, ShoppingBag } from "lucide-react";
+import { CreditCard, Tag, CheckCircle, ShoppingBag } from "lucide-react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { apiRequest } from "@/lib/queryClient";
 
-const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || "YOUR_CLIENT_ID";
-const WHATSAPP_NUMBER = "+201155201921";
+const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID || "";
 
 export default function PaymentPage() {
   const [, setLocation] = useLocation();
@@ -76,29 +75,6 @@ export default function PaymentPage() {
     }
   };
 
-  const handleWhatsAppPayment = () => {
-    const items = cart.map(item => `• ${item.name} - ${item.price} ريال`).join("\n");
-    const message = `
-🛒 طلب جديد من الموقع
-
-📋 الخدمات:
-${items}
-
-💰 الإجمالي قبل الخصم: ${subtotal} ريال
-${discountAmount > 0 ? `🎁 الخصم: ${discountAmount} ريال\n💵 المبلغ النهائي: ${finalPrice} ريال` : ''}
-
-أرغب في إكمال الدفع عبر STC Pay أو التحويل البنكي.
-    `.trim();
-
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-
-    toast({
-      title: "تم التوجيه! ✨",
-      description: "سنتواصل معك عبر واتساب",
-    });
-  };
-
   const handleOrderSuccess = async (paymentMethod: string, paymentDetails?: any) => {
     setIsProcessing(true);
 
@@ -146,6 +122,19 @@ ${discountAmount > 0 ? `🎁 الخصم: ${discountAmount} ريال\n💵 الم
     }
   };
 
+  if (!PAYPAL_CLIENT_ID) {
+    return (
+      <div className="min-h-screen royal-gradient pt-24 pb-20 px-4 flex items-center justify-center">
+        <div className="glass-card p-8 rounded-3xl border-2 border-red-500/20 max-w-md text-center">
+          <h2 className="text-2xl font-bold text-red-400 mb-4">خطأ في الإعداد</h2>
+          <p className="text-gray-300">
+            معرف PayPal غير مكون. يرجى التواصل مع الدعم الفني.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <PayPalScriptProvider options={{ clientId: PAYPAL_CLIENT_ID, currency: "SAR" }}>
       <div className="min-h-screen royal-gradient pt-24 pb-20 px-4">
@@ -177,27 +166,13 @@ ${discountAmount > 0 ? `🎁 الخصم: ${discountAmount} ريال\n💵 الم
                   اختر طريقة الدفع
                 </h2>
                 <div className="space-y-6">
-                  <div className="p-6 border-2 border-green-500/30 hover:border-green-400 bg-green-500/10 rounded-2xl transition-all">
-                    <h3 className="font-bold text-xl text-green-400 mb-2 flex items-center gap-2">
-                      <MessageSquare className="w-5 h-5" />
-                      الدفع عبر واتساب
+                  <div className="p-6 border-2 border-blue-500/30 hover:border-blue-400 bg-blue-500/10 rounded-2xl transition-all">
+                    <h3 className="font-bold text-xl text-blue-400 mb-2 flex items-center gap-2">
+                      <CreditCard className="w-5 h-5" />
+                      الدفع عبر PayPal
                     </h3>
                     <p className="text-gray-300 mb-4">
-                      للدفع عبر STC Pay أو التحويل البنكي. سيتم توجيهك للمحادثة مع كامل تفاصيل الطلب.
-                    </p>
-                    <Button
-                      onClick={handleWhatsAppPayment}
-                      className="bg-green-500 hover:bg-green-600 text-white w-full green-glow"
-                      data-testid="button-whatsapp-payment"
-                    >
-                      <MessageSquare className="ml-2"/> إكمال عبر واتساب
-                    </Button>
-                  </div>
-
-                  <div className="p-6 border-2 border-blue-500/30 hover:border-blue-400 bg-blue-500/10 rounded-2xl transition-all">
-                    <h3 className="font-bold text-xl text-blue-400 mb-2">الدفع عبر الموقع (PayPal)</h3>
-                    <p className="text-gray-300 mb-4">
-                      الدفع الآمن والمباشر باستخدام PayPal.
+                      الدفع الآمن والمباشر باستخدام بطاقات الائتمان أو PayPal.
                     </p>
                     {finalPrice === 0 ? (
                       <Button

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "f2548280-72ed-46b2-b53f-3f6fc8ee1790",
+    "invoiceNumber": "INV-1761221613782",
+    "orderId": "722a6c42-0f04-44c0-a188-49f074f4bde7",
+    "customerName": "عميل",
+    "customerEmail": "customer@example.com",
+    "serviceName": "موقع شخصي أساسي",
+    "amount": 0,
+    "createdAt": "2025-10-23T12:13:33.782Z"
+  }
+]

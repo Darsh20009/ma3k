@@ -44,5 +44,21 @@
     "paymentStatus": "completed",
     "createdAt": "2025-10-23T11:28:45.865Z",
     "updatedAt": "2025-10-23T11:28:45.865Z"
+  },
+  {
+    "customerName": "عميل",
+    "customerEmail": "customer@example.com",
+    "customerPhone": "+966XXXXXXXXX",
+    "serviceName": "موقع شخصي أساسي",
+    "price": 0,
+    "description": "موقع شخصي أساسي - خصم 100%",
+    "paymentMethod": "Free (Discount)",
+    "id": "722a6c42-0f04-44c0-a188-49f074f4bde7",
+    "orderNumber": "ORD-1761221613556",
+    "serviceId": null,
+    "status": "pending",
+    "paymentStatus": "completed",
+    "createdAt": "2025-10-23T12:13:33.556Z",
+    "updatedAt": "2025-10-23T12:13:33.781Z"
   }
 ]
