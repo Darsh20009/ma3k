@@ -2,7 +2,14 @@
 
 Ma3k (معك) is a comprehensive Arabic digital services platform that provides website development, e-commerce solutions, educational programming courses, project management, and employee productivity tools. The platform serves three distinct user types: Students (for educational courses), Clients (for web development projects), and Employees (with administrative tools). It features an innovative website creation form, integrated payment processing (PayPal with USD conversion, Stripe, bank transfers, and Saudi payment methods), automated invoice generation, course management system, and a complete service marketplace with luxury design and Arabic RTL support.
 
-## Recent Changes (October 23, 2025)
+## Recent Changes (November 30, 2025)
+- **Storage System Fix**: Fixed all LSP type errors in storage.ts to match shared schema types
+- **Service Type Alignment**: Updated services-complete.tsx with proper Service type fields using createService helper
+- **Dual Storage System**: Application now supports JSON file storage (default) with automatic switch to PostgreSQL when DATABASE_URL is set
+- **Data Seeding**: Complete data seeding including students, clients, employees, courses, and enrollments
+- **Type Safety**: All schema types now properly aligned across frontend and backend
+
+## Previous Changes (October 23, 2025)
 - **Authentication System Enhancement**: Added `isLoading` state to AuthContext to prevent race conditions during authentication hydration
 - **Protected Pages Fix**: Updated all dashboard pages (students, clients, employees) to properly wait for AuthContext loading before redirecting
 - **Employee Dashboard Modernization**: Removed legacy localStorage-based authentication and migrated to centralized AuthContext
