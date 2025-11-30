@@ -9,24 +9,36 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, CheckCircle, Rocket, ShoppingCart, Info } from "lucide-react";
 import type { Service } from "@shared/schema";
 
-// قائمة الخدمات الكاملة التي قدمتها
+const createService = (id: string, name: string, price: number, originalPrice: number, description: string, category: string): Service => ({
+  id,
+  name,
+  price,
+  originalPrice,
+  description,
+  category,
+  subcategory: null,
+  features: null,
+  isActive: true,
+  isFeatured: false,
+});
+
 const serviceDatabase: { [key: string]: Service[] } = {
   personal: [
-    { id: 'p1', name: 'موقع شخصي أساسي', price: 299, originalPrice: 500, description: 'مثالي لعرض السيرة الذاتية والأعمال الشخصية بتصميم نظيف.' },
-    { id: 'p2', name: 'تطبيق شخصي محترف', price: 599, originalPrice: 900, description: 'للمحترفين والفنانين مع خصائص متقدمة وتصميم عصري.' },
-    { id: 'p3', name: 'متجر شخصي بسيط', price: 449, originalPrice: 700, description: 'لبيع المنتجات الشخصية أو الحرفية مع نظام دفع مدمج.' },
+    createService('p1', 'موقع شخصي أساسي', 299, 500, 'مثالي لعرض السيرة الذاتية والأعمال الشخصية بتصميم نظيف.', 'individuals'),
+    createService('p2', 'تطبيق شخصي محترف', 599, 900, 'للمحترفين والفنانين مع خصائص متقدمة وتصميم عصري.', 'individuals'),
+    createService('p3', 'متجر شخصي بسيط', 449, 700, 'لبيع المنتجات الشخصية أو الحرفية مع نظام دفع مدمج.', 'individuals'),
   ],
   restaurant: [
-    { id: 'r1', name: 'منيو احترافي بدون دفع', price: 50, originalPrice: 199, description: 'منيو إلكتروني أنيق لعرض قائمة الطعام والأسعار فقط.' },
-    { id: 'r2', name: 'منيو احترافي مع الدفع', price: 300, originalPrice: 1230, description: 'يشمل نظام الطلبات والدفع الإلكتروني وتتبع الطلبات.' },
-    { id: 'r3', name: 'نظام حجز الطاولات', price: 399, originalPrice: 600, description: 'نظام ذكي لإدارة المواعيد والإشعارات.' },
-    { id: 'r4', name: 'موقع متكامل للمطعم أو كافيه', price: 2999, originalPrice: 5000, description: 'حل شامل يشمل التوصيل والدفع وإدارة الطاولات ونظام الولاء.' },
+    createService('r1', 'منيو احترافي بدون دفع', 50, 199, 'منيو إلكتروني أنيق لعرض قائمة الطعام والأسعار فقط.', 'restaurants'),
+    createService('r2', 'منيو احترافي مع الدفع', 300, 1230, 'يشمل نظام الطلبات والدفع الإلكتروني وتتبع الطلبات.', 'restaurants'),
+    createService('r3', 'نظام حجز الطاولات', 399, 600, 'نظام ذكي لإدارة المواعيد والإشعارات.', 'restaurants'),
+    createService('r4', 'موقع متكامل للمطعم أو كافيه', 2999, 5000, 'حل شامل يشمل التوصيل والدفع وإدارة الطاولات ونظام الولاء.', 'restaurants'),
   ],
   business: [
-    { id: 'b1', name: 'موقع شركة احترافي', price: 799, originalPrice: 1200, description: 'تصميم عصري ومتجاوب مع 10+ صفحات وتحسين لمحركات البحث.' },
-    { id: 'b2', name: 'متجر إلكتروني شامل', price: 1499, originalPrice: 2500, description: 'متجر متكامل مع إدارة المخزون وأنظمة دفع متعددة وتقارير مفصلة.' },
-    { id: 'b3', name: 'نظام إدارة العملاء (CRM)', price: 999, originalPrice: 1800, description: 'نظام متكامل لإدارة علاقات العملاء وتتبع المبيعات.' },
-    { id: 'b4', name: 'منصة تعليمية تفاعلية', price: 2299, originalPrice: 4000, description: 'منصة متكاملة مع كورسات وامتحانات ونظام شهادات.' },
+    createService('b1', 'موقع شركة احترافي', 799, 1200, 'تصميم عصري ومتجاوب مع 10+ صفحات وتحسين لمحركات البحث.', 'companies'),
+    createService('b2', 'متجر إلكتروني شامل', 1499, 2500, 'متجر متكامل مع إدارة المخزون وأنظمة دفع متعددة وتقارير مفصلة.', 'companies'),
+    createService('b3', 'نظام إدارة العملاء (CRM)', 999, 1800, 'نظام متكامل لإدارة علاقات العملاء وتتبع المبيعات.', 'companies'),
+    createService('b4', 'منصة تعليمية تفاعلية', 2299, 4000, 'منصة متكاملة مع كورسات وامتحانات ونظام شهادات.', 'companies'),
   ],
 };
 

@@ -156,14 +156,14 @@ export class JsonStorage implements IStorage {
     );
 
     if (!existingClient) {
-      const client = {
+      const client: Client = {
         id: clientId,
         fullName: "قدراتك",
         email: clientEmail,
         phone: null,
         password: "182009",
         websiteType: "منصة تعليمية",
-        budget: 2999,
+        budget: "2999",
         websiteIdea: "منصة تعليمية تفاعلية",
         createdAt: new Date(),
       };
@@ -210,11 +210,11 @@ export class JsonStorage implements IStorage {
 
     if (!existingProject && orderId) {
       const projectId = randomUUID();
-      const project = {
+      const project: Project = {
         id: projectId,
         clientId: clientId,
         orderId: orderId,
-        name: "منصة قدراتك التعليمية",
+        projectName: "منصة قدراتك التعليمية",
         websiteIdea: "منصة تعليمية تفاعلية متكاملة مع كورسات وامتحانات وشهادات",
         status: "completed",
         daysRemaining: 0,
@@ -243,13 +243,16 @@ export class JsonStorage implements IStorage {
     );
 
     if (!existingStudent) {
-      const student = {
+      const student: Student = {
         id: studentId,
         fullName: "Youssef Darwish",
         email: studentEmail,
-        phone: null,
+        phone: "",
         password: "182009",
         age: 16,
+        selectedLanguage: "java",
+        learningGoal: null,
+        freeCoursesTaken: 0,
         createdAt: new Date(),
       };
       this.students.set(studentId, student);
@@ -259,11 +262,11 @@ export class JsonStorage implements IStorage {
 
     // إيجاد كورسات Java و Back-End
     const javaCourse = Array.from(this.courses.values()).find(
-      c => c.title.toLowerCase().includes('java') || c.language?.toLowerCase() === 'java'
+      c => c.name.toLowerCase().includes('java') || c.language?.toLowerCase() === 'java'
     );
 
     const backendCourse = Array.from(this.courses.values()).find(
-      c => c.title.toLowerCase().includes('back') || c.title.toLowerCase().includes('backend')
+      c => c.name.toLowerCase().includes('back') || c.name.toLowerCase().includes('backend')
     );
 
     // تسجيل الطالب في كورس Java
