@@ -378,6 +378,12 @@ export default function Payment() {
                     <span className="text-gray-300">المجموع الفرعي:</span>
                     <span className="font-bold text-gray-200">{totalPrice} ر.س</span>
                   </div>
+                  {savings > 0 && (
+                    <div className="flex justify-between text-sm text-green-400">
+                      <span>الخصم ({discountCode?.discountPercentage}%):</span>
+                      <span>-{savings} ر.س</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm text-gray-400">
                     <span>رسوم المعالجة:</span>
                     <span>مجاناً</span>
@@ -388,7 +394,7 @@ export default function Payment() {
                 
                 <div className="flex justify-between text-2xl font-bold text-yellow-400 mb-8">
                   <span>المجموع النهائي:</span>
-                  <span>{totalPrice} ر.س</span>
+                  <span>{discountedPrice} ر.س</span>
                 </div>
 
                 <div className="space-y-4 mb-6 text-sm text-gray-300">
@@ -397,19 +403,17 @@ export default function Payment() {
                   <div><strong className="text-yellow-400">الهاتف:</strong> {customerInfo.phone}</div>
                 </div>
                 
-                {selectedPaymentMethod !== 'paypal' && (
-                  <Button 
-                    onClick={handleProceedWithPayment}
-                    disabled={!selectedPaymentMethod || isProcessing}
-                    className="w-full btn-luxury py-4 text-lg font-bold rounded-2xl"
-                  >
-                    {isProcessing ? (
-                      <span>⏳ جاري المعالجة...</span>
-                    ) : (
-                      <span>🚀 تأكيد وإنشاء الفاتورة</span>
-                    )}
-                  </Button>
-                )}
+                <Button 
+                  onClick={handleProceedWithPayment}
+                  disabled={!selectedPaymentMethod || isProcessing}
+                  className="w-full btn-luxury py-4 text-lg font-bold rounded-2xl"
+                >
+                  {isProcessing ? (
+                    <span>⏳ جاري المعالجة...</span>
+                  ) : (
+                    <span>🚀 تأكيد وإنشاء الفاتورة</span>
+                  )}
+                </Button>
                 
                 <p className="text-center text-xs text-gray-400 mt-4">
                   🔒 معاملة آمنة ومحمية بالكامل
