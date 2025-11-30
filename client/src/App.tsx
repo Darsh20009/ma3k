@@ -8,17 +8,12 @@ import { AuthProvider } from "@/context/AuthContext";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import ContactFloat from "@/components/layout/contact-float";
-import Home from "@/pages/home";
 import HomeNew from "@/pages/home-new";
 import SplashScreen from "@/pages/splash-screen";
 import WelcomeNew from "@/pages/welcome-new";
 import DigitalWelcome from "@/pages/digital-welcome";
-import Services from "@/pages/services";
-import ServicesNew from "@/pages/services-new";
 import ServicesComplete from "@/pages/services-complete";
 import Cart from "@/pages/cart";
-import Payment from "@/pages/payment";
-import SimplePayment from "@/pages/simple-payment";
 import CreativePayment from "@/pages/creative-payment";
 import About from "@/pages/about";
 import PrivacyPolicy from "@/pages/privacy-policy";
@@ -28,16 +23,14 @@ import EmployeeLogin from "@/pages/employee-login";
 import EmployeeDashboard from "@/pages/employee-dashboard";
 import CodeTool from "@/pages/code-tool";
 import Ma3kMeet from "@/pages/ma3k-meet";
-import Courses from "@/pages/courses";
 import CoursesComplete from "@/pages/courses-complete";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
-import MyCourses from "@/pages/my-courses";
 import MyCoursesComplete from "@/pages/my-courses-complete";
-import MyProjects from "@/pages/my-projects";
 import MyProjectsComplete from "@/pages/my-projects-complete";
 import CertSearch from "@/pages/cert-search";
 import EmployeeProfile from "@/pages/employee-profile";
+import WebsiteForm from "@/pages/website-form";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -47,35 +40,28 @@ function Router() {
       <ContactFloat />
       <Switch>
         <Route path="/" component={HomeNew} />
-        <Route path="/home-old" component={Home} />
         <Route path="/digital-welcome" component={DigitalWelcome} />
         <Route path="/splash" component={SplashScreen} />
         <Route path="/welcome" component={WelcomeNew} />
         <Route path="/services" component={ServicesComplete} />
-        <Route path="/services-new" component={ServicesNew} />
-        <Route path="/services-old" component={Services} />
         <Route path="/cart" component={Cart} />
         <Route path="/payment" component={CreativePayment} />
-        <Route path="/payment-simple" component={SimplePayment} />
-        <Route path="/payment-old" component={Payment} />
         <Route path="/about" component={About} />
         <Route path="/privacy" component={PrivacyPolicy} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/contact" component={Contact} />
         <Route path="/courses" component={CoursesComplete} />
-        <Route path="/courses-old" component={Courses} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/my-courses" component={MyCoursesComplete} />
-        <Route path="/my-courses-old" component={MyCourses} />
         <Route path="/my-projects" component={MyProjectsComplete} />
-        <Route path="/my-projects-old" component={MyProjects} />
         <Route path="/cert-search" component={CertSearch} />
         <Route path="/employee-profile" component={EmployeeProfile} />
         <Route path="/employee-login" component={EmployeeLogin} />
         <Route path="/employee-dashboard" component={EmployeeDashboard} />
         <Route path="/code-tool" component={CodeTool} />
         <Route path="/ma3k-meet" component={Ma3kMeet} />
+        <Route path="/website-form" component={WebsiteForm} />
         <Route component={NotFound} />
       </Switch>
       <Footer />

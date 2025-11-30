@@ -99,6 +99,7 @@ export interface IStorage {
 
   // Projects
   getProject(id: string): Promise<Project | undefined>;
+  getAllProjects(): Promise<Project[]>;
   getClientProjects(clientId: string): Promise<Project[]>;
   createProject(project: InsertProject): Promise<Project>;
   updateProjectStatus(id: string, status: string): Promise<Project | undefined>;
@@ -1228,6 +1229,10 @@ export class JsonStorage implements IStorage {
 
   async getProject(id: string): Promise<Project | undefined> {
     return this.projects.get(id);
+  }
+
+  async getAllProjects(): Promise<Project[]> {
+    return Array.from(this.projects.values());
   }
 
   async getClientProjects(clientId: string): Promise<Project[]> {
