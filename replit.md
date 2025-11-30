@@ -3,14 +3,20 @@
 Ma3k (معك) is a comprehensive Arabic digital services platform that provides website development, e-commerce solutions, educational programming courses, project management, and employee productivity tools. The platform serves three distinct user types: Students (for educational courses), Clients (for web development projects), and Employees (with administrative tools). It features an innovative website creation form, integrated payment processing (PayPal with USD conversion, Stripe, bank transfers, and Saudi payment methods), automated invoice generation, course management system, and a complete service marketplace with luxury design and Arabic RTL support.
 
 ## Recent Changes (November 30, 2025)
-- **Portfolio API Integration**: Added GET /api/projects endpoint with dynamic portfolio rendering
-- **App.tsx Cleanup**: Removed duplicate page imports (-old, -new variants) and consolidated to single current versions
-- **Website Form Route**: Added /website-form page for custom website specification generation
-- **Storage System Fix**: Fixed all LSP type errors in storage.ts to match shared schema types
-- **Service Type Alignment**: Updated services-complete.tsx with proper Service type fields using createService helper
-- **Dual Storage System**: Application now supports JSON file storage (default) with automatic switch to PostgreSQL when DATABASE_URL is set
-- **Data Seeding**: Complete data seeding including students, clients, employees, courses, and enrollments
-- **Type Safety**: All schema types now properly aligned across frontend and backend
+
+### Session State Management & Cart Persistence
+- **CartContext Hydration**: Implemented automatic loading of cartItems and discountCode from localStorage on app startup
+- **Persistent Storage**: Cart data now persists across page reloads and browser sessions
+- **Auto-Save System**: CartContext uses useEffect hooks to automatically save items and discounts to localStorage whenever they change
+- **Loading State**: Added isLoading state to cart page to show loading message while data is being restored from storage
+- **Session Recovery**: Customer can close browser and return later - all cart data and customer info preserved
+- **Internal Linking**: Fixed navigation flow - users can now add products, navigate away, and return with cart intact
+
+### Pricing and Checkout Features  
+- **Dynamic Pricing Tiers**: Added step 2.5 in services page for restaurant/café service (monthly: 235 SAR, yearly: 399 SAR)
+- **Discount Integration**: Fixed all discount calculations - payment now uses discountedPrice throughout
+- **Payment Summary**: Added discount display in payment page showing savings amount and percentage
+- **Order Preservation**: Last order details saved in localStorage for user reference
 
 ## Previous Changes (October 23, 2025)
 - **Authentication System Enhancement**: Added `isLoading` state to AuthContext to prevent race conditions during authentication hydration
@@ -23,17 +29,18 @@ Ma3k (معك) is a comprehensive Arabic digital services platform that provides 
 
 # User Preferences
 
-Preferred communication style: Simple, everyday language.
+Preferred communication style: Simple, everyday language. User prefers direct problem-solving without extra explanations.
 
 # System Architecture
 
 ## Frontend Architecture
 - **Framework**: React 18 with TypeScript for type safety and modern development practices
 - **Routing**: Wouter for lightweight client-side routing without the complexity of React Router
-- **State Management**: TanStack Query for server state management, providing caching, background updates, and optimistic updates
+- **State Management**: TanStack Query for server state, CartContext for cart/discount state with localStorage persistence
 - **UI Framework**: Shadcn/ui components built on Radix UI primitives for accessible, customizable components
 - **Styling**: Tailwind CSS with custom CSS variables for consistent theming and Arabic RTL support
 - **Typography**: Tajawal font for Arabic text with Inter as fallback for enhanced readability
+- **Storage**: localStorage for session persistence (cart items, customer info, discount codes)
 
 ## Backend Architecture
 - **Runtime**: Node.js with Express.js framework for RESTful API development
@@ -47,6 +54,7 @@ Preferred communication style: Simple, everyday language.
 - **Local Payment Methods**: Support for Saudi payment systems (STC Pay, UR Pay, Alinma Pay) with manual verification workflow
 - **Bank Transfers**: Traditional bank transfer support with receipt verification via WhatsApp integration
 - **Invoice System**: Automated HTML invoice generation with downloadable receipts for customers
+- **Discount System**: Discount code validation with percentage-based savings and persistent application
 
 ## Data Models
 - **Users**: Basic authentication system with username/password
@@ -56,6 +64,7 @@ Preferred communication style: Simple, everyday language.
 - **Website Forms**: Customer specification collection with HTML/CSS template generation
 - **Consultations**: Customer inquiry and consultation request handling
 - **Messages**: Internal messaging system for customer communication
+- **Discount Codes**: Code-based discounts with percentage values and expiration dates
 
 ## UI/UX Design Patterns
 - **RTL Support**: Full right-to-left layout support for Arabic content
@@ -63,6 +72,7 @@ Preferred communication style: Simple, everyday language.
 - **Component Library**: Consistent design system using Shadcn/ui components
 - **Theme System**: CSS custom properties for flexible theming and brand consistency
 - **Loading States**: Optimistic updates and loading indicators for better user experience
+- **Session Persistence**: Automatic cart and customer data preservation across sessions
 
 # External Dependencies
 
@@ -94,3 +104,5 @@ Preferred communication style: Simple, everyday language.
 - **class-variance-authority**: Type-safe CSS class variants
 - **clsx**: Conditional CSS class composition
 - **nanoid**: Unique ID generation for orders and invoices
+- **Framer Motion**: Animation library for smooth transitions
+- **wouter**: Lightweight routing library for client-side navigation

@@ -17,6 +17,7 @@ export default function CartPage() {
   const { toast } = useToast();
   const [discountInput, setDiscountInput] = useState("");
   const [validateLoading, setValidateLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     email: "",
@@ -26,9 +27,15 @@ export default function CartPage() {
 
   // محاولة استرجاع البيانات عند تحميل الصفحة
   useEffect(() => {
-    const savedCustomer = localStorage.getItem('customerInfo');
-    if (savedCustomer) {
-      setCustomerInfo(JSON.parse(savedCustomer));
+    try {
+      const savedCustomer = localStorage.getItem('customerInfo');
+      if (savedCustomer) {
+        setCustomerInfo(JSON.parse(savedCustomer));
+      }
+    } catch (error) {
+      console.error('خطأ في تحميل بيانات العميل:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -76,6 +83,14 @@ export default function CartPage() {
     // التوجيه إلى صفحة الدفع
     setLocation('/payment');
   };
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-20">
+        <h1 className="text-2xl font-bold">جاري تحميل السلة...</h1>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
