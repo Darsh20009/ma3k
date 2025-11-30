@@ -44,6 +44,13 @@ const serviceDatabase: { [key: string]: Service[] } = {
 
 const MotionCard = motion(Card);
 
+const PRICING_OPTIONS = {
+  r4: [
+    { id: 'r4-monthly', name: 'الخطة الشهرية', price: 235, originalPrice: 470, description: 'اشتراك شهري' },
+    { id: 'r4-yearly', name: 'الخطة السنوية', price: 399, originalPrice: 798, description: 'سنة + سنة متابعة مجانية' }
+  ]
+};
+
 export default function ServicesNew() {
   const { addToCart } = useCart();
   const { toast } = useToast();
@@ -60,7 +67,26 @@ export default function ServicesNew() {
   };
 
   const handleSelectService = (service: Service) => {
-    setSelection({ ...selection, service });
+    // إذا كانت الخدمة r4، أعرض خيارات التسعير
+    if (service.id === 'r4') {
+      setSelection({ ...selection, service });
+      setStep(2.5);
+    } else {
+      setSelection({ ...selection, service });
+      setStep(3);
+    }
+  };
+
+  const handleSelectPricingOption = (pricingOption: any) => {
+    const updatedService: Service = {
+      ...selection.service!,
+      id: pricingOption.id,
+      name: pricingOption.name,
+      price: pricingOption.price,
+      originalPrice: pricingOption.originalPrice,
+      description: pricingOption.description
+    };
+    setSelection({ ...selection, service: updatedService });
     setStep(3);
   };
 
@@ -124,6 +150,28 @@ export default function ServicesNew() {
                   ))}
                 </div>
                  <Button onClick={() => setStep(1)} variant="link" className="mt-4">الرجوع لاختيار المجال</Button>
+              </MotionCard>
+            )}
+
+            {/* Step 2.5: Pricing Selection (for r4 only) */}
+            {step === 2.5 && selection.service && (
+              <MotionCard key="step2.5" variants={cardVariants} initial="hidden" animate="visible" exit="exit" className="card-ma3k p-8">
+                <h3 className="text-2xl font-bold mb-2 text-center">اختر الخطة المناسبة</h3>
+                <p className="text-center text-muted-foreground mb-6">كود الخصم ma3k1winter يوفر لك 50% على جميع الخطط</p>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {PRICING_OPTIONS.r4?.map((option) => (
+                    <div key={option.id} className="p-6 border rounded-xl hover:border-primary transition-all cursor-pointer" onClick={() => handleSelectPricingOption(option)}>
+                      <h4 className="text-lg font-bold mb-2">{option.name}</h4>
+                      <p className="text-muted-foreground text-sm mb-3">{option.description}</p>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-primary">{option.price} ر.س</span>
+                        <span className="text-sm line-through text-muted-foreground">{option.originalPrice} ر.س</span>
+                      </div>
+                      <Button className="w-full mt-4 btn-ma3k">اختر هذه الخطة</Button>
+                    </div>
+                  ))}
+                </div>
+                <Button onClick={() => setStep(2)} variant="link" className="mt-6">رجوع</Button>
               </MotionCard>
             )}
 
