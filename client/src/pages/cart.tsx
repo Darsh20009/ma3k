@@ -8,12 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { ArrowLeft, CreditCard, Check, X } from "lucide-react";
 
 export default function CartPage() {
-  const { items, totalPrice } = useCart();
+  const { items, totalPrice, discountedPrice, discountCode, setDiscountCode } = useCart();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [discountInput, setDiscountInput] = useState("");
+  const [validateLoading, setValidateLoading] = useState(false);
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     email: "",
@@ -29,6 +32,33 @@ export default function CartPage() {
     }
   }, []);
 
+  const handleValidateDiscount = async () => {
+    if (!discountInput.trim()) {
+      toast({ title: "أدخل كود الخصم", variant: "destructive" });
+      return;
+    }
+    
+    try {
+      setValidateLoading(true);
+      const response = await apiRequest("POST", "/api/discount-codes/validate", { code: discountInput });
+      const discount = await response.json();
+      setDiscountCode(discount);
+      setDiscountInput("");
+      toast({
+        title: "✅ تم تطبيق الخصم بنجاح!",
+        description: `توفير: ${(totalPrice - discountedPrice)} ر.س (${discount.discountPercentage}% خصم)`
+      });
+    } catch {
+      toast({
+        title: "❌ كود غير صحيح",
+        description: "كود الخصم غير صالح أو منتهي الصلاحية",
+        variant: "destructive"
+      });
+    } finally {
+      setValidateLoading(false);
+    }
+  };
+
   const handleProceedToPayment = () => {
     if (!customerInfo.name || !customerInfo.phone) {
       toast({
@@ -42,6 +72,9 @@ export default function CartPage() {
     // حفظ البيانات في localStorage لتستخدمها صفحة الدفع
     localStorage.setItem('cartItems', JSON.stringify(items));
     localStorage.setItem('customerInfo', JSON.stringify(customerInfo));
+    if (discountCode) {
+      localStorage.setItem('discountCode', JSON.stringify(discountCode));
+    }
 
     // التوجيه إلى صفحة الدفع
     setLocation('/payment');
@@ -96,7 +129,7 @@ export default function CartPage() {
             <CardHeader>
               <CardTitle>ملخص الطلب</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="space-y-3">
                 {items.map((item) => (
                   <div key={item.service.id} className="flex justify-between">
@@ -105,12 +138,70 @@ export default function CartPage() {
                   </div>
                 ))}
                 <Separator />
-                <div className="flex justify-between text-xl font-bold">
-                  <span>المجموع:</span>
+                <div className="flex justify-between text-lg font-bold">
+                  <span>الإجمالي:</span>
                   <span>{totalPrice} ر.س</span>
                 </div>
               </div>
-              <Button onClick={handleProceedToPayment} className="w-full btn-ma3k text-lg mt-6">
+
+              {/* Discount Code Section */}
+              <Card className="bg-secondary/10 border-secondary p-4">
+                <Label htmlFor="discount" className="text-sm font-semibold">كود الخصم</Label>
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    id="discount"
+                    placeholder="أدخل الكود هنا"
+                    value={discountInput}
+                    onChange={(e) => setDiscountInput(e.target.value)}
+                    disabled={validateLoading || !!discountCode}
+                    data-testid="input-discount-code"
+                  />
+                  <Button
+                    onClick={handleValidateDiscount}
+                    variant={discountCode ? "default" : "outline"}
+                    disabled={validateLoading || !!discountCode}
+                    data-testid="button-apply-discount"
+                  >
+                    {validateLoading ? "..." : discountCode ? <Check className="w-4 h-4" /> : "تطبيق"}
+                  </Button>
+                </div>
+                {discountCode && (
+                  <div className="mt-2 p-2 bg-green-500/10 rounded border border-green-500/30 flex justify-between items-center">
+                    <span className="text-green-700 text-sm">✓ تم تطبيق {discountCode.discountPercentage}% خصم</span>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setDiscountCode(null)}
+                      data-testid="button-remove-discount"
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                )}
+              </Card>
+
+              {discountCode && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span>المجموع قبل الخصم:</span>
+                      <span>{totalPrice} ر.س</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-green-600 font-semibold">
+                      <span>التوفير:</span>
+                      <span>-{totalPrice - discountedPrice} ر.س</span>
+                    </div>
+                    <Separator />
+                    <div className="flex justify-between text-xl font-bold text-green-600">
+                      <span>المجموع بعد الخصم:</span>
+                      <span>{discountedPrice} ر.س</span>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <Button onClick={handleProceedToPayment} className="w-full btn-ma3k text-lg">
                 <CreditCard className="w-5 h-5 ml-2" />
                 المتابعة للدفع
               </Button>

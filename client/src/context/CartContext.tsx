@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import type { Service } from '@shared/schema';
+import type { Service, DiscountCode } from '@shared/schema';
 
 export interface CartItem {
   service: Service;
@@ -10,12 +10,15 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[];
   cart: Service[];
+  discountCode: DiscountCode | null;
   addToCart: (service: Service, customization?: string) => void;
   removeFromCart: (serviceId: string) => void;
   updateQuantity: (serviceId: string, quantity: number) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
+  setDiscountCode: (code: DiscountCode | null) => void;
   totalPrice: number;
+  discountedPrice: number;
   totalItems: number;
 }
 
@@ -23,6 +26,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [discountCode, setDiscountCode] = useState<DiscountCode | null>(null);
 
   const addToCart = (service: Service, customization?: string) => {
     setItems(current => {
@@ -61,23 +65,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
+    setDiscountCode(null);
   };
 
   const totalPrice = items.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
+  const discountedPrice = discountCode 
+    ? Math.round(totalPrice * (100 - discountCode.discountPercentage) / 100)
+    : totalPrice;
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const cart = items.map(item => item.service);
-  const getTotalPrice = () => totalPrice;
+  const getTotalPrice = () => discountedPrice;
 
   return (
     <CartContext.Provider value={{
       items,
       cart,
+      discountCode,
       addToCart,
       removeFromCart,
       updateQuantity,
       clearCart,
       getTotalPrice,
+      setDiscountCode,
       totalPrice,
+      discountedPrice,
       totalItems
     }}>
       {children}
