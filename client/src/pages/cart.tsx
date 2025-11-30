@@ -69,12 +69,9 @@ export default function CartPage() {
       return;
     }
 
-    // حفظ البيانات في localStorage لتستخدمها صفحة الدفع
-    localStorage.setItem('cartItems', JSON.stringify(items));
+    // حفظ بيانات العميل في localStorage
     localStorage.setItem('customerInfo', JSON.stringify(customerInfo));
-    if (discountCode) {
-      localStorage.setItem('discountCode', JSON.stringify(discountCode));
-    }
+    // cartItems و discountCode محفوظة بالفعل في CartContext
 
     // التوجيه إلى صفحة الدفع
     setLocation('/payment');

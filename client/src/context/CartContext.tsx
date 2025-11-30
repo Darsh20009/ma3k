@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { Service, DiscountCode } from '@shared/schema';
 
 export interface CartItem {
@@ -27,6 +27,44 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [discountCode, setDiscountCode] = useState<DiscountCode | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // تحميل البيانات من localStorage عند تحميل التطبيق
+  useEffect(() => {
+    try {
+      const savedItems = localStorage.getItem('cartItems');
+      const savedDiscount = localStorage.getItem('discountCode');
+      
+      if (savedItems) {
+        setItems(JSON.parse(savedItems));
+      }
+      if (savedDiscount) {
+        setDiscountCode(JSON.parse(savedDiscount));
+      }
+    } catch (error) {
+      console.error('خطأ في تحميل بيانات السلة:', error);
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
+
+  // حفظ العناصر في localStorage كلما تغيرت
+  useEffect(() => {
+    if (isHydrated) {
+      localStorage.setItem('cartItems', JSON.stringify(items));
+    }
+  }, [items, isHydrated]);
+
+  // حفظ كود الخصم في localStorage كلما تغير
+  useEffect(() => {
+    if (isHydrated) {
+      if (discountCode) {
+        localStorage.setItem('discountCode', JSON.stringify(discountCode));
+      } else {
+        localStorage.removeItem('discountCode');
+      }
+    }
+  }, [discountCode, isHydrated]);
 
   const addToCart = (service: Service, customization?: string) => {
     setItems(current => {
@@ -66,6 +104,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clearCart = () => {
     setItems([]);
     setDiscountCode(null);
+    localStorage.removeItem('cartItems');
+    localStorage.removeItem('discountCode');
   };
 
   const totalPrice = items.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
