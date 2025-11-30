@@ -92,5 +92,21 @@
     "paymentStatus": "pending",
     "createdAt": "2025-11-30T11:03:12.172Z",
     "updatedAt": "2025-11-30T11:03:12.172Z"
+  },
+  {
+    "customerName": "عميل",
+    "customerEmail": "customer@example.com",
+    "customerPhone": "+966XXXXXXXXX",
+    "serviceName": "الخطة السنوية",
+    "price": 399,
+    "description": "الخطة السنوية ",
+    "paymentMethod": "Pending Payment",
+    "id": "729b6ad0-17a6-4b27-bcd1-a1179c01f4aa",
+    "orderNumber": "ORD-1764501102336",
+    "serviceId": null,
+    "status": "pending",
+    "paymentStatus": "pending",
+    "createdAt": "2025-11-30T11:11:42.336Z",
+    "updatedAt": "2025-11-30T11:11:42.336Z"
   }
 ]

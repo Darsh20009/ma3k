@@ -101,9 +101,15 @@ export default function Payment() {
         description: `رقم الطلب: ${order.orderNumber}`,
       });
 
-      // Clear cart data but keep website specs for potential reuse
-      localStorage.removeItem('cartItems');
-      localStorage.removeItem('customerInfo');
+      // حفظ بيانات الطلب في localStorage للمراجعة لاحقاً
+      localStorage.setItem('lastOrder', JSON.stringify({
+        orderNumber: order.orderNumber,
+        orderId: order.id,
+        invoiceId: invoice.id,
+        timestamp: new Date().toISOString()
+      }));
+      
+      // نحتفظ بـ cartItems و customerInfo للعميل حتى يتمكن من العودة أو الشراء مرة أخرى
 
     } catch (error) {
       toast({
