@@ -67,8 +67,8 @@ export default function Payment() {
         customerEmail: customerInfo.email,
         customerPhone: customerInfo.phone,
         serviceName: cartItems.map(item => `${item.service.name} (${item.quantity}x)`).join(', '),
-        price: totalPrice,
-        description: `${cartItems.length} خدمات - ${customerInfo.notes || 'لا توجد ملاحظات'}`,
+        price: discountedPrice,
+        description: `${cartItems.length} خدمات - ${customerInfo.notes || 'لا توجد ملاحظات'} ${discountCode ? `- كود الخصم: ${discountCode.code}` : ''}`,
         paymentMethod: selectedPaymentMethod,
         websiteSpecs: parsedSpecs
       };
@@ -85,7 +85,7 @@ export default function Payment() {
         customerName: customerInfo.name,
         customerEmail: customerInfo.email,
         serviceName: orderData.serviceName,
-        amount: totalPrice
+        amount: discountedPrice
       };
 
       const invoiceResponse = await apiRequest("POST", "/api/invoices", invoiceData);
@@ -194,7 +194,8 @@ export default function Payment() {
                   </div>
                   <div>
                     <strong className="text-yellow-400">المبلغ الإجمالي:</strong>
-                    <div className="text-2xl font-bold text-gray-200">{totalPrice} ر.س</div>
+                    <div className="text-2xl font-bold text-gray-200">{discountedPrice} ر.س</div>
+                    {discountCode && <div className="text-sm text-green-400">بعد تطبيق الخصم ({discountCode.discountPercentage}%)</div>}
                   </div>
                   <div>
                     <strong className="text-yellow-400">طريقة الدفع:</strong>
