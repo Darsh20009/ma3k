@@ -21,6 +21,7 @@ export default function Payment() {
   const [, setLocation] = useLocation();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({ name: "", email: "", phone: "", notes: "" });
+  const [discountCode, setDiscountCode] = useState<any>(null);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [invoiceGenerated, setInvoiceGenerated] = useState(false);
@@ -32,6 +33,7 @@ export default function Payment() {
   useEffect(() => {
     const savedCart = localStorage.getItem('cartItems');
     const savedCustomer = localStorage.getItem('customerInfo');
+    const savedDiscount = localStorage.getItem('discountCode');
     
     if (!savedCart || !savedCustomer) {
       setLocation('/cart');
@@ -40,9 +42,16 @@ export default function Payment() {
     
     setCartItems(JSON.parse(savedCart));
     setCustomerInfo(JSON.parse(savedCustomer));
+    if (savedDiscount) {
+      setDiscountCode(JSON.parse(savedDiscount));
+    }
   }, [setLocation]);
 
   const totalPrice = cartItems.reduce((sum, item) => sum + (item.service.price * item.quantity), 0);
+  const discountedPrice = discountCode 
+    ? Math.round(totalPrice * (100 - discountCode.discountPercentage) / 100)
+    : totalPrice;
+  const savings = totalPrice - discountedPrice;
 
   const generateInvoice = async () => {
     try {
