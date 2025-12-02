@@ -324,14 +324,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const existingStudent = await storage.getStudentByEmail(studentData.email);
       if (existingStudent) {
-        return res.status(400).json({ error: "Email already registered" });
+        return res.status(400).json({ error: "البريد الإلكتروني مسجل مسبقاً" });
       }
       
-      const student = await storage.createStudent(studentData);
-      res.status(201).json(student);
+      // Hash the password before storing
+      const hashedPassword = await hashPassword(studentData.password);
+      const studentWithHashedPassword = { ...studentData, password: hashedPassword };
+      
+      const student = await storage.createStudent(studentWithHashedPassword);
+      const { password: _, ...studentWithoutPassword } = student;
+      res.status(201).json(studentWithoutPassword);
     } catch (error) {
       console.error('Error registering student:', error);
-      res.status(400).json({ error: "Invalid student data" });
+      res.status(400).json({ error: "بيانات الطالب غير صالحة" });
     }
   });
 
@@ -341,14 +346,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const existingClient = await storage.getClientByEmail(clientData.email);
       if (existingClient) {
-        return res.status(400).json({ error: "Email already registered" });
+        return res.status(400).json({ error: "البريد الإلكتروني مسجل مسبقاً" });
       }
       
-      const client = await storage.createClient(clientData);
-      res.status(201).json(client);
+      // Hash the password before storing
+      const hashedPassword = await hashPassword(clientData.password);
+      const clientWithHashedPassword = { ...clientData, password: hashedPassword };
+      
+      const client = await storage.createClient(clientWithHashedPassword);
+      const { password: _, ...clientWithoutPassword } = client;
+      res.status(201).json(clientWithoutPassword);
     } catch (error) {
       console.error('Error registering client:', error);
-      res.status(400).json({ error: "Invalid client data" });
+      res.status(400).json({ error: "بيانات العميل غير صالحة" });
+    }
+  });
+
+  // Employee registration endpoint
+  app.post("/api/auth/register-employee", async (req, res) => {
+    try {
+      const { fullName, email, password, position, jobTitle, employeeCode } = req.body;
+      
+      // التحقق من رمز الموظف (للأمان) - يتم تخزينه في متغير بيئة
+      const validEmployeeCode = process.env.EMPLOYEE_REGISTRATION_CODE || "MA3K2024";
+      if (!employeeCode || employeeCode !== validEmployeeCode) {
+        return res.status(403).json({ error: "رمز الموظف غير صحيح" });
+      }
+      
+      // التحقق من البيانات المطلوبة
+      if (!fullName || !email || !password) {
+        return res.status(400).json({ error: "جميع الحقول مطلوبة" });
+      }
+      
+      const existingEmployee = await storage.getEmployeeByEmail(email);
+      if (existingEmployee) {
+        return res.status(400).json({ error: "البريد الإلكتروني مسجل مسبقاً" });
+      }
+      
+      // Hash the password before storing
+      const hashedPassword = await hashPassword(password);
+      
+      const employee = await storage.createEmployee({
+        fullName,
+        email,
+        password: hashedPassword,
+        position: position || "موظف",
+        jobTitle: jobTitle || "مطور"
+      });
+      
+      const { password: _, ...employeeWithoutPassword } = employee;
+      res.status(201).json(employeeWithoutPassword);
+    } catch (error) {
+      console.error('Error registering employee:', error);
+      res.status(400).json({ error: "بيانات الموظف غير صالحة" });
     }
   });
 
@@ -357,31 +407,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { email, password } = req.body;
       
       if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
+        return res.status(400).json({ error: "البريد الإلكتروني وكلمة المرور مطلوبان" });
       }
 
+      // Check student
       const student = await storage.getStudentByEmail(email);
-      if (student && student.password === password) {
-        const { password: _, ...userWithoutPassword } = student;
-        return res.json({ user: userWithoutPassword, type: "student" });
+      if (student) {
+        const isValidPassword = await import('./auth').then(m => m.comparePasswords(password, student.password));
+        if (isValidPassword) {
+          const { password: _, ...userWithoutPassword } = student;
+          return res.json({ user: userWithoutPassword, type: "student" });
+        }
       }
 
+      // Check client
       const client = await storage.getClientByEmail(email);
-      if (client && client.password === password) {
-        const { password: _, ...userWithoutPassword } = client;
-        return res.json({ user: userWithoutPassword, type: "client" });
+      if (client) {
+        const isValidPassword = await import('./auth').then(m => m.comparePasswords(password, client.password));
+        if (isValidPassword) {
+          const { password: _, ...userWithoutPassword } = client;
+          return res.json({ user: userWithoutPassword, type: "client" });
+        }
       }
 
+      // Check employee
       const employee = await storage.getEmployeeByEmail(email);
-      if (employee && employee.password === password) {
-        const { password: _, ...userWithoutPassword } = employee;
-        return res.json({ user: userWithoutPassword, type: "employee" });
+      if (employee) {
+        const isValidPassword = await import('./auth').then(m => m.comparePasswords(password, employee.password));
+        if (isValidPassword) {
+          const { password: _, ...userWithoutPassword } = employee;
+          return res.json({ user: userWithoutPassword, type: "employee" });
+        }
       }
 
-      res.status(401).json({ error: "Invalid email or password" });
+      res.status(401).json({ error: "البريد الإلكتروني أو كلمة المرور غير صحيحة" });
     } catch (error) {
       console.error('Error during login:', error);
-      res.status(500).json({ error: "Login failed" });
+      res.status(500).json({ error: "فشل تسجيل الدخول" });
     }
   });
 

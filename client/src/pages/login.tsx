@@ -1,122 +1,63 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { User, GraduationCap, Briefcase, LogIn, UserPlus } from "lucide-react";
+import { User, GraduationCap, Briefcase, LogIn, UserPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 type UserType = "client" | "student" | "employee";
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { login } = useAuth();
   const [activeTab, setActiveTab] = useState<UserType>("client");
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    confirmPassword: "",
-    name: ""
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!isLogin && formData.password !== formData.confirmPassword) {
-      toast({
-        title: "خطأ",
-        description: "كلمات المرور غير متطابقة",
-        variant: "destructive"
-      });
-      return;
-    }
+    setIsLoading(true);
 
     try {
-      if (isLogin) {
-        // تسجيل الدخول
-        const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password
-          })
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          toast({
-            title: "خطأ في تسجيل الدخول",
-            description: error.error || "البريد الإلكتروني أو كلمة المرور غير صحيحة",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        const data = await response.json();
-        
-        // حفظ بيانات المستخدم في localStorage
-        localStorage.setItem("ma3k_user_id", data.user.id);
-        localStorage.setItem("ma3k_user_type", data.type);
-        localStorage.setItem("ma3k_user_email", data.user.email);
-        localStorage.setItem("ma3k_user_name", data.user.fullName);
-
+      const result = await login(formData.email, formData.password);
+      
+      if (!result.success) {
         toast({
-          title: "تم تسجيل الدخول بنجاح! ✨",
-          description: `مرحباً ${data.user.fullName}`
+          title: "خطأ في تسجيل الدخول",
+          description: result.error || "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+          variant: "destructive"
         });
-
-        // التوجيه حسب نوع المستخدم
-        setTimeout(() => {
-          if (data.type === "client") {
-            window.location.href = "/my-projects-complete";
-          } else if (data.type === "student") {
-            window.location.href = "/my-courses-complete";
-          } else if (data.type === "employee") {
-            window.location.href = "/employee-dashboard";
-          } else {
-            window.location.href = "/";
-          }
-        }, 500);
-      } else {
-        // إنشاء حساب جديد
-        const endpoint = activeTab === "client" ? "/api/auth/register-client" : "/api/auth/register-student";
-        
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fullName: formData.name,
-            email: formData.email,
-            password: formData.password
-          })
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          toast({
-            title: "خطأ في إنشاء الحساب",
-            description: error.error || "حدث خطأ، يرجى المحاولة مرة أخرى",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        const data = await response.json();
-        
-        toast({
-          title: "تم إنشاء الحساب بنجاح! 🎉",
-          description: "يمكنك الآن تسجيل الدخول"
-        });
-
-        // العودة لوضع تسجيل الدخول
-        setIsLogin(true);
-        setFormData({ ...formData, password: "", confirmPassword: "" });
+        return;
       }
+
+      const userType = localStorage.getItem("ma3k_user_type");
+      const userName = localStorage.getItem("ma3k_user_name");
+
+      toast({
+        title: "تم تسجيل الدخول بنجاح!",
+        description: `مرحباً ${userName}`
+      });
+
+      setTimeout(() => {
+        if (userType === "client") {
+          setLocation("/my-projects-complete");
+        } else if (userType === "student") {
+          setLocation("/my-courses-complete");
+        } else if (userType === "employee") {
+          setLocation("/employee-dashboard");
+        } else {
+          setLocation("/");
+        }
+      }, 500);
     } catch (error) {
       console.error("Error:", error);
       toast({
@@ -124,6 +65,8 @@ export default function Login() {
         description: "حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى",
         variant: "destructive"
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -169,13 +112,13 @@ export default function Login() {
               backgroundClip: "text",
             }}
           >
-            {isLogin ? "تسجيل الدخول" : "إنشاء حساب جديد"}
+            تسجيل الدخول
           </h1>
           <p 
             className="text-xl"
             style={{ color: "var(--ma3k-beige-dark)" }}
           >
-            اختر نوع الحساب للمتابعة
+            أدخل بياناتك للمتابعة
           </p>
         </motion.div>
 
@@ -223,26 +166,6 @@ export default function Login() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                      {!isLogin && (
-                        <div className="space-y-2">
-                          <Label 
-                            htmlFor="name"
-                            style={{ color: "var(--ma3k-beige)" }}
-                          >
-                            الاسم الكامل
-                          </Label>
-                          <Input
-                            id="name"
-                            required
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="bg-ma3k-dark border-ma3k-teal"
-                            placeholder="أدخل اسمك الكامل"
-                            data-testid="input-name"
-                          />
-                        </div>
-                      )}
-
                       <div className="space-y-2">
                         <Label 
                           htmlFor="email"
@@ -276,31 +199,10 @@ export default function Login() {
                           value={formData.password}
                           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                           className="bg-ma3k-dark border-ma3k-teal"
-                          placeholder="••••••••"
+                          placeholder="أدخل كلمة المرور"
                           data-testid="input-password"
                         />
                       </div>
-
-                      {!isLogin && (
-                        <div className="space-y-2">
-                          <Label 
-                            htmlFor="confirmPassword"
-                            style={{ color: "var(--ma3k-beige)" }}
-                          >
-                            تأكيد كلمة المرور
-                          </Label>
-                          <Input
-                            id="confirmPassword"
-                            type="password"
-                            required
-                            value={formData.confirmPassword}
-                            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                            className="bg-ma3k-dark border-ma3k-teal"
-                            placeholder="••••••••"
-                            data-testid="input-confirm-password"
-                          />
-                        </div>
-                      )}
 
                       <Button
                         type="submit"
@@ -309,17 +211,15 @@ export default function Login() {
                           background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
                           color: "white"
                         }}
+                        disabled={isLoading}
                         data-testid="button-submit"
                       >
-                        {isLogin ? (
+                        {isLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
                           <>
                             <LogIn className="w-5 h-5 ml-2" />
                             تسجيل الدخول
-                          </>
-                        ) : (
-                          <>
-                            <UserPlus className="w-5 h-5 ml-2" />
-                            إنشاء حساب
                           </>
                         )}
                       </Button>
@@ -328,12 +228,12 @@ export default function Login() {
                     <div className="text-center mt-6">
                       <button
                         type="button"
-                        onClick={() => setIsLogin(!isLogin)}
+                        onClick={() => setLocation("/register")}
                         className="text-sm hover:underline"
                         style={{ color: "var(--ma3k-green)" }}
-                        data-testid="button-toggle-mode"
+                        data-testid="button-register"
                       >
-                        {isLogin ? "ليس لديك حساب؟ إنشاء حساب جديد" : "لديك حساب؟ تسجيل الدخول"}
+                        ليس لديك حساب؟ إنشاء حساب جديد
                       </button>
                     </div>
                   </motion.div>
@@ -343,7 +243,6 @@ export default function Login() {
           </Card>
         </motion.div>
 
-        {/* ملاحظة */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -354,7 +253,7 @@ export default function Login() {
             className="text-sm"
             style={{ color: "var(--ma3k-beige-dark)" }}
           >
-            💡 <strong>ملاحظة:</strong> يتم حفظ بيانات كل نوع مستخدم في ملفات منفصلة لضمان الأمان والخصوصية
+            نظام واحد لجميع أنواع المستخدمين - الطلاب والعملاء والموظفين
           </p>
         </motion.div>
       </div>
