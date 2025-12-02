@@ -1421,4 +1421,17 @@ export class JsonStorage implements IStorage {
   }
 }
 
-export const storage = new JsonStorage();
+import { db } from "./db";
+import { DatabaseStorage } from "./database-storage";
+
+let storage: IStorage;
+
+if (db) {
+  storage = new DatabaseStorage();
+  console.log('✅ Using PostgreSQL database storage');
+} else {
+  storage = new JsonStorage();
+  console.log('📁 Using JSON file storage (fallback)');
+}
+
+export { storage };

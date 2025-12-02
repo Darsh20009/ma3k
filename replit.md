@@ -2,7 +2,21 @@
 
 Ma3k (معك) is a comprehensive Arabic digital services platform that provides website development, e-commerce solutions, educational programming courses, project management, and employee productivity tools. The platform serves three distinct user types: Students (for educational courses), Clients (for web development projects), and Employees (with administrative tools). It features an innovative website creation form, integrated payment processing (PayPal with USD conversion, Stripe, bank transfers, and Saudi payment methods), automated invoice generation, course management system, and a complete service marketplace with luxury design and Arabic RTL support.
 
-## Recent Changes (November 30, 2025)
+## Recent Changes (December 2, 2025)
+
+### PostgreSQL Database Migration
+- **Database Storage**: Migrated from JSON file storage to PostgreSQL database using Drizzle ORM
+- **DatabaseStorage Class**: Created new `server/database-storage.ts` implementing IStorage interface with full PostgreSQL support
+- **Auto-Initialization**: Database automatically initializes with default services, courses, and discount codes
+- **Fallback Support**: System falls back to JsonStorage if database is unavailable
+- **Schema Sync**: Database schema pushed using `drizzle-kit push`
+
+### Storage Architecture
+- **Dual Storage System**: Application now supports both PostgreSQL (production) and JSON file (fallback)
+- **Database Storage**: Full CRUD operations for all 17 data models (users, services, orders, etc.)
+- **Type Safety**: Complete TypeScript integration with Drizzle ORM for type-safe database operations
+
+## Previous Changes (November 30, 2025)
 
 ### Session State Management & Cart Persistence
 - **CartContext Hydration**: Implemented automatic loading of cartItems and discountCode from localStorage on app startup
