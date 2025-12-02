@@ -4,6 +4,12 @@ Ma3k (معك) is a comprehensive Arabic digital services platform that provides 
 
 ## Recent Changes (December 2, 2025)
 
+### Authentication Security Hardening
+- **Password Hashing**: All registration endpoints (students, clients, employees) now use scrypt password hashing
+- **Secure Login**: Login route uses comparePasswords for timing-safe password verification
+- **Employee Registration**: Secure registration with environment variable-based access code (EMPLOYEE_REGISTRATION_CODE)
+- **Input Validation**: Added proper validation for all required fields in registration endpoints
+
 ### Session Management & Authentication
 - **Passport.js Integration**: Implemented multi-strategy authentication for students, clients, and employees
 - **PostgreSQL Sessions**: Session storage using connect-pg-simple for production-ready session management
