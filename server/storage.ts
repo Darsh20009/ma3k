@@ -58,6 +58,7 @@ export interface IStorage {
   createClient(client: InsertClient): Promise<Client>;
 
   // Employees
+  getEmployees(): Promise<Employee[]>;
   getEmployee(id: string): Promise<Employee | undefined>;
   getEmployeeByEmail(email: string): Promise<Employee | undefined>;
   createEmployee(employee: InsertEmployee): Promise<Employee>;
@@ -1094,6 +1095,10 @@ export class JsonStorage implements IStorage {
     return client;
   }
 
+  async getEmployees(): Promise<Employee[]> {
+    return Array.from(this.employees.values());
+  }
+
   async getEmployee(id: string): Promise<Employee | undefined> {
     return this.employees.get(id);
   }
@@ -1110,6 +1115,8 @@ export class JsonStorage implements IStorage {
       ...insertEmployee,
       id,
       photoUrl: insertEmployee.photoUrl || null,
+      employeeNumber: insertEmployee.employeeNumber || null,
+      isAdmin: insertEmployee.isAdmin || false,
       createdAt: new Date(),
     };
     this.employees.set(id, employee);

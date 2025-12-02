@@ -362,10 +362,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // توليد رقم موظف فريد
+  async function generateEmployeeNumber(): Promise<string> {
+    const employees = await storage.getEmployees();
+    const year = new Date().getFullYear();
+    const nextNum = employees.length + 1;
+    return `EMP-${year}-${String(nextNum).padStart(4, '0')}`;
+  }
+
   // Employee registration endpoint
   app.post("/api/auth/register-employee", async (req, res) => {
     try {
-      const { fullName, email, password, position, jobTitle, employeeCode } = req.body;
+      const { fullName, email, password, position, jobTitle, employeeCode, isAdmin } = req.body;
       
       // التحقق من رمز الموظف (للأمان) - يتم تخزينه في متغير بيئة
       const validEmployeeCode = process.env.EMPLOYEE_REGISTRATION_CODE || "MA3K2024";
@@ -383,6 +391,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "البريد الإلكتروني مسجل مسبقاً" });
       }
       
+      // توليد رقم موظف فريد
+      const employeeNumber = await generateEmployeeNumber();
+      
       // Hash the password before storing
       const hashedPassword = await hashPassword(password);
       
@@ -391,7 +402,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         password: hashedPassword,
         position: position || "موظف",
-        jobTitle: jobTitle || "مطور"
+        jobTitle: jobTitle || "مطور",
+        employeeNumber,
+        isAdmin: isAdmin || false
       });
       
       const { password: _, ...employeeWithoutPassword } = employee;
@@ -399,6 +412,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error registering employee:', error);
       res.status(400).json({ error: "بيانات الموظف غير صالحة" });
+    }
+  });
+
+  // مسار إضافة موظف من قبل المدير
+  app.post("/api/admin/employees", async (req, res) => {
+    try {
+      const { adminEmail, fullName, email, password, position, jobTitle, isAdmin } = req.body;
+      
+      // التحقق من صلاحية المدير
+      const admin = await storage.getEmployeeByEmail(adminEmail);
+      if (!admin || !admin.isAdmin) {
+        return res.status(403).json({ error: "غير مصرح لك بإضافة موظفين" });
+      }
+      
+      // التحقق من البيانات المطلوبة
+      if (!fullName || !email || !password) {
+        return res.status(400).json({ error: "جميع الحقول مطلوبة" });
+      }
+      
+      const existingEmployee = await storage.getEmployeeByEmail(email);
+      if (existingEmployee) {
+        return res.status(400).json({ error: "البريد الإلكتروني مسجل مسبقاً" });
+      }
+      
+      // توليد رقم موظف فريد
+      const employeeNumber = await generateEmployeeNumber();
+      
+      // Hash the password before storing
+      const hashedPassword = await hashPassword(password);
+      
+      const employee = await storage.createEmployee({
+        fullName,
+        email,
+        password: hashedPassword,
+        position: position || "موظف",
+        jobTitle: jobTitle || "مطور",
+        employeeNumber,
+        isAdmin: isAdmin || false
+      });
+      
+      const { password: _, ...employeeWithoutPassword } = employee;
+      res.status(201).json(employeeWithoutPassword);
+    } catch (error) {
+      console.error('Error adding employee by admin:', error);
+      res.status(400).json({ error: "فشل إضافة الموظف" });
+    }
+  });
+
+  // مسار الحصول على جميع الموظفين (للمدير فقط)
+  app.get("/api/admin/employees", async (req, res) => {
+    try {
+      const adminEmail = req.query.adminEmail as string;
+      
+      if (!adminEmail) {
+        return res.status(400).json({ error: "البريد الإلكتروني للمدير مطلوب" });
+      }
+      
+      const admin = await storage.getEmployeeByEmail(adminEmail);
+      if (!admin || !admin.isAdmin) {
+        return res.status(403).json({ error: "غير مصرح لك بعرض الموظفين" });
+      }
+      
+      const employees = await storage.getEmployees();
+      const employeesWithoutPasswords = employees.map(emp => {
+        const { password: _, ...empWithoutPassword } = emp;
+        return empWithoutPassword;
+      });
+      
+      res.json(employeesWithoutPasswords);
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+      res.status(500).json({ error: "فشل جلب الموظفين" });
     }
   });
 
@@ -1046,6 +1131,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const invoice = await storage.getInvoice(req.params.id);
       if (!invoice) {
         return res.status(404).json({ error: "Invoice not found" });
+      }
+      if (!invoice.orderId) {
+        return res.status(400).json({ error: "Invoice has no associated order" });
       }
       const order = await storage.getOrder(invoice.orderId);
       if (!order) {

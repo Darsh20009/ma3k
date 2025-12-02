@@ -98,12 +98,14 @@ export const clients = pgTable("clients", {
 
 export const employees = pgTable("employees", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeNumber: text("employee_number").unique(),
   fullName: text("full_name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   position: text("position").notNull(),
   jobTitle: text("job_title").notNull(),
   photoUrl: text("photo_url"),
+  isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -301,6 +303,8 @@ export const insertEmployeeSchema = createInsertSchema(employees).pick({
   position: true,
   jobTitle: true,
   photoUrl: true,
+  employeeNumber: true,
+  isAdmin: true,
 });
 
 export const insertCourseSchema = createInsertSchema(courses).pick({
