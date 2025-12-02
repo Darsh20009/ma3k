@@ -395,7 +395,58 @@ export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).pick({
   attemptNumber: true,
 });
 
+// Reviews and Ratings table
+export const reviews = pgTable("reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  userType: text("user_type").notNull(), // 'student', 'client'
+  userName: text("user_name").notNull(),
+  targetId: varchar("target_id").notNull(), // courseId or serviceId
+  targetType: text("target_type").notNull(), // 'course', 'service'
+  rating: integer("rating").notNull(), // 1-5 stars
+  comment: text("comment"),
+  isApproved: boolean("is_approved").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Notifications table for real-time updates
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  userType: text("user_type").notNull(), // 'student', 'client', 'employee'
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  type: text("type").notNull(), // 'order', 'course', 'project', 'certificate', 'payment', 'general'
+  isRead: boolean("is_read").default(false),
+  link: text("link"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Insert schemas for new tables
+export const insertReviewSchema = createInsertSchema(reviews).pick({
+  userId: true,
+  userType: true,
+  userName: true,
+  targetId: true,
+  targetType: true,
+  rating: true,
+  comment: true,
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).pick({
+  userId: true,
+  userType: true,
+  title: true,
+  message: true,
+  type: true,
+  link: true,
+});
+
 // Types
+export type Review = typeof reviews.$inferSelect;
+export type InsertReview = z.infer<typeof insertReviewSchema>;
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Service = typeof services.$inferSelect;

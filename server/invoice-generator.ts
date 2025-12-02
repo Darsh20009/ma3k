@@ -1,4 +1,71 @@
-import type { Order, Service } from "@shared/schema";
+import type { Order, Service, Invoice } from "@shared/schema";
+
+export async function generateInvoicePDF(invoice: Invoice, order: Order): Promise<Buffer> {
+  const html = generateSimplifiedInvoiceHTML(invoice, order);
+  return Buffer.from(html, 'utf-8');
+}
+
+function generateSimplifiedInvoiceHTML(invoice: Invoice, order: Order): string {
+  return `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>فاتورة ${invoice.invoiceNumber}</title>
+    <style>
+        body { font-family: Arial, sans-serif; direction: rtl; padding: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #f59e0b; padding-bottom: 20px; }
+        .logo { font-size: 2.5em; color: #f59e0b; font-weight: bold; }
+        .info { display: flex; justify-content: space-between; margin: 30px 0; }
+        .info-box { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #7c3aed; color: white; padding: 15px; }
+        td { padding: 15px; border-bottom: 1px solid #ddd; }
+        .total { font-size: 1.5em; text-align: center; margin: 30px 0; color: #7c3aed; font-weight: bold; }
+        .footer { text-align: center; color: #666; margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">معك</div>
+        <h1>فاتورة ضريبية</h1>
+        <p>رقم الفاتورة: ${invoice.invoiceNumber}</p>
+        <p>تاريخ الإصدار: ${new Date(invoice.createdAt!).toLocaleDateString('ar-SA')}</p>
+    </div>
+    <div class="info">
+        <div class="info-box">
+            <h3>معلومات العميل</h3>
+            <p>الاسم: ${order.customerName}</p>
+            <p>البريد: ${order.customerEmail}</p>
+            <p>الهاتف: ${order.customerPhone || 'غير محدد'}</p>
+        </div>
+        <div class="info-box">
+            <h3>معلومات الشركة</h3>
+            <p>معك للخدمات الرقمية</p>
+            <p>ma3k.2025@gmail.com</p>
+            <p>+966532441566</p>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr><th>الخدمة</th><th>الوصف</th><th>السعر</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>${order.serviceName}</td>
+                <td>${order.description || 'خدمات رقمية متخصصة'}</td>
+                <td>${invoice.amount} ر.س</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="total">المجموع: ${invoice.amount} ر.س</div>
+    <div class="footer">
+        <p>شكراً لاختياركم خدماتنا</p>
+        <p>معك - نُصمم أحلامك الرقمية</p>
+        <p>رقم الطلب: ${order.orderNumber}</p>
+    </div>
+</body>
+</html>`;
+}
 
 export function generateInvoiceHTML(order: Order, service?: Service): string {
   const currentDate = new Date().toLocaleDateString('ar-SA');

@@ -7,8 +7,10 @@ import {
   type Enrollment, type InsertEnrollment, type Certificate, type InsertCertificate,
   type Project, type InsertProject, type DiscountCode, type InsertDiscountCode,
   type EmployeeTask, type InsertEmployeeTask,
-  type Lesson, type LessonProgress, type Quiz, type QuizAttempt, type InsertQuizAttempt
+  type Lesson, type LessonProgress, type Quiz, type QuizAttempt, type InsertQuizAttempt,
+  type Review, type InsertReview, type Notification, type InsertNotification
 } from "@shared/schema";
+import session from "express-session";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join } from "path";
@@ -113,7 +115,38 @@ export interface IStorage {
   getEmployeeTasks(employeeId: string): Promise<EmployeeTask[]>;
   createEmployeeTask(task: InsertEmployeeTask): Promise<EmployeeTask>;
   updateEmployeeTask(id: string, isCompleted: boolean, hoursRemaining?: number): Promise<EmployeeTask | undefined>;
+
+  // Reviews
+  getReviews(targetId: string, targetType: string): Promise<Review[]>;
+  createReview(review: InsertReview): Promise<Review>;
+  approveReview(id: string): Promise<Review | undefined>;
+  getAverageRating(targetId: string, targetType: string): Promise<number>;
+
+  // Notifications  
+  getUserNotifications(userId: string, userType: string): Promise<Notification[]>;
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  markNotificationAsRead(id: string): Promise<Notification | undefined>;
+  markAllNotificationsAsRead(userId: string, userType: string): Promise<void>;
+  getUnreadNotificationCount(userId: string, userType: string): Promise<number>;
+
+  // Dashboard Stats
+  getDashboardStats(): Promise<{
+    totalOrders: number;
+    totalStudents: number;
+    totalClients: number;
+    totalProjects: number;
+    totalRevenue: number;
+    pendingOrders: number;
+    activeProjects: number;
+    completedCourses: number;
+  }>;
+
+  // Session Store
+  sessionStore?: session.Store;
 }
+
+import createMemoryStore from "memorystore";
+const MemoryStore = createMemoryStore(session);
 
 export class JsonStorage implements IStorage {
   private dataDir = join(process.cwd(), 'data');
@@ -136,8 +169,13 @@ export class JsonStorage implements IStorage {
   private lessonProgress: Map<string, LessonProgress> = new Map();
   private quizzes: Map<string, Quiz> = new Map();
   private quizAttempts: Map<string, QuizAttempt> = new Map();
+  private reviewsMap: Map<string, Review> = new Map();
+  private notificationsMap: Map<string, Notification> = new Map();
+  
+  sessionStore: session.Store;
 
   constructor() {
+    this.sessionStore = new MemoryStore({ checkPeriod: 86400000 });
     this.ensureDataDir();
     this.loadData();
     this.initializeServices();
@@ -1418,6 +1456,112 @@ export class JsonStorage implements IStorage {
     return Array.from(this.quizAttempts.values()).filter(
       (attempt) => attempt.enrollmentId === enrollmentId
     );
+  }
+
+  // Reviews
+  async getReviews(targetId: string, targetType: string): Promise<Review[]> {
+    return Array.from(this.reviewsMap.values()).filter(
+      (review) => review.targetId === targetId && review.targetType === targetType && review.isApproved
+    );
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    const id = randomUUID();
+    const newReview: Review = {
+      ...review,
+      id,
+      isApproved: false,
+      createdAt: new Date(),
+    };
+    this.reviewsMap.set(id, newReview);
+    return newReview;
+  }
+
+  async approveReview(id: string): Promise<Review | undefined> {
+    const review = this.reviewsMap.get(id);
+    if (!review) return undefined;
+    const updated = { ...review, isApproved: true };
+    this.reviewsMap.set(id, updated);
+    return updated;
+  }
+
+  async getAverageRating(targetId: string, targetType: string): Promise<number> {
+    const reviews = Array.from(this.reviewsMap.values()).filter(
+      (review) => review.targetId === targetId && review.targetType === targetType && review.isApproved
+    );
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return Math.round((sum / reviews.length) * 10) / 10;
+  }
+
+  // Notifications
+  async getUserNotifications(userId: string, userType: string): Promise<Notification[]> {
+    return Array.from(this.notificationsMap.values())
+      .filter((n) => n.userId === userId && n.userType === userType)
+      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const id = randomUUID();
+    const newNotification: Notification = {
+      ...notification,
+      id,
+      isRead: false,
+      createdAt: new Date(),
+    };
+    this.notificationsMap.set(id, newNotification);
+    return newNotification;
+  }
+
+  async markNotificationAsRead(id: string): Promise<Notification | undefined> {
+    const notification = this.notificationsMap.get(id);
+    if (!notification) return undefined;
+    const updated = { ...notification, isRead: true };
+    this.notificationsMap.set(id, updated);
+    return updated;
+  }
+
+  async markAllNotificationsAsRead(userId: string, userType: string): Promise<void> {
+    Array.from(this.notificationsMap.values())
+      .filter((n) => n.userId === userId && n.userType === userType)
+      .forEach((n) => {
+        this.notificationsMap.set(n.id, { ...n, isRead: true });
+      });
+  }
+
+  async getUnreadNotificationCount(userId: string, userType: string): Promise<number> {
+    return Array.from(this.notificationsMap.values()).filter(
+      (n) => n.userId === userId && n.userType === userType && !n.isRead
+    ).length;
+  }
+
+  // Dashboard Stats
+  async getDashboardStats(): Promise<{
+    totalOrders: number;
+    totalStudents: number;
+    totalClients: number;
+    totalProjects: number;
+    totalRevenue: number;
+    pendingOrders: number;
+    activeProjects: number;
+    completedCourses: number;
+  }> {
+    const orders = Array.from(this.orders.values());
+    const students = Array.from(this.students.values());
+    const clients = Array.from(this.clients.values());
+    const projects = Array.from(this.projects.values());
+    const enrollments = Array.from(this.enrollments.values());
+
+    return {
+      totalOrders: orders.length,
+      totalStudents: students.length,
+      totalClients: clients.length,
+      totalProjects: projects.length,
+      totalRevenue: orders.filter(o => o.paymentStatus === 'completed').reduce((sum, o) => sum + o.price, 0),
+      pendingOrders: orders.filter(o => o.status === 'pending').length,
+      activeProjects: projects.filter(p => p.status !== 'completed').length,
+      completedCourses: enrollments.filter(e => e.status === 'completed').length,
+    };
   }
 }
 

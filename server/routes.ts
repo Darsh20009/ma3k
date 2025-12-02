@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { 
   insertOrderSchema, 
@@ -10,13 +11,30 @@ import {
   insertEnrollmentSchema,
   insertCertificateSchema,
   insertProjectSchema,
-  insertEmployeeTaskSchema
+  insertEmployeeTaskSchema,
+  insertReviewSchema,
+  insertNotificationSchema
 } from "@shared/schema";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
 import { sendOrderNotificationEmail } from "./email";
-import { generateInvoiceHTML } from "./invoice-generator";
+import { generateInvoiceHTML, generateInvoicePDF } from "./invoice-generator";
+import { setupAuth, hashPassword } from "./auth";
+import passport from "passport";
+
+const connectedClients = new Map<string, WebSocket>();
+
+export function broadcastNotification(userId: string, userType: string, notification: any) {
+  const clientKey = `${userType}:${userId}`;
+  const client = connectedClients.get(clientKey);
+  if (client && client.readyState === WebSocket.OPEN) {
+    client.send(JSON.stringify({ type: 'notification', data: notification }));
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  setupAuth(app);
+
   // PayPal routes
   app.get("/api/paypal/setup", async (req, res) => {
     await loadPaypalDefault(req, res);
@@ -779,7 +797,251 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Authentication Routes
+  app.get("/api/auth/me", (req, res) => {
+    if (req.isAuthenticated()) {
+      res.json({ user: req.user });
+    } else {
+      res.status(401).json({ error: "Not authenticated" });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      res.json({ success: true });
+    });
+  });
+
+  // Student login
+  app.post("/api/auth/student/login", (req, res, next) => {
+    passport.authenticate('student', (err: any, user: any, info: any) => {
+      if (err) {
+        return res.status(500).json({ error: "خطأ في تسجيل الدخول" });
+      }
+      if (!user) {
+        return res.status(401).json({ error: info?.message || "بيانات الدخول غير صحيحة" });
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "خطأ في إنشاء الجلسة" });
+        }
+        return res.json({ success: true, user });
+      });
+    })(req, res, next);
+  });
+
+  // Client login
+  app.post("/api/auth/client/login", (req, res, next) => {
+    passport.authenticate('client', (err: any, user: any, info: any) => {
+      if (err) {
+        return res.status(500).json({ error: "خطأ في تسجيل الدخول" });
+      }
+      if (!user) {
+        return res.status(401).json({ error: info?.message || "بيانات الدخول غير صحيحة" });
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "خطأ في إنشاء الجلسة" });
+        }
+        return res.json({ success: true, user });
+      });
+    })(req, res, next);
+  });
+
+  // Employee login
+  app.post("/api/auth/employee/login", (req, res, next) => {
+    passport.authenticate('employee', (err: any, user: any, info: any) => {
+      if (err) {
+        return res.status(500).json({ error: "خطأ في تسجيل الدخول" });
+      }
+      if (!user) {
+        return res.status(401).json({ error: info?.message || "بيانات الدخول غير صحيحة" });
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          return res.status(500).json({ error: "خطأ في إنشاء الجلسة" });
+        }
+        return res.json({ success: true, user });
+      });
+    })(req, res, next);
+  });
+
+  // Reviews Routes
+  app.get("/api/reviews/:targetType/:targetId", async (req, res) => {
+    try {
+      const { targetType, targetId } = req.params;
+      const reviews = await storage.getReviews(targetId, targetType);
+      res.json(reviews);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch reviews" });
+    }
+  });
+
+  app.post("/api/reviews", async (req, res) => {
+    try {
+      const reviewData = insertReviewSchema.parse(req.body);
+      const review = await storage.createReview(reviewData);
+      res.status(201).json(review);
+    } catch (error) {
+      console.error('Error creating review:', error);
+      res.status(400).json({ error: "Invalid review data" });
+    }
+  });
+
+  app.put("/api/reviews/:id/approve", async (req, res) => {
+    try {
+      const review = await storage.approveReview(req.params.id);
+      if (!review) {
+        return res.status(404).json({ error: "Review not found" });
+      }
+      res.json(review);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve review" });
+    }
+  });
+
+  app.get("/api/reviews/:targetType/:targetId/average", async (req, res) => {
+    try {
+      const { targetType, targetId } = req.params;
+      const average = await storage.getAverageRating(targetId, targetType);
+      res.json({ average });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get average rating" });
+    }
+  });
+
+  // Notifications Routes
+  app.get("/api/notifications/:userType/:userId", async (req, res) => {
+    try {
+      const { userType, userId } = req.params;
+      const notifications = await storage.getUserNotifications(userId, userType);
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch notifications" });
+    }
+  });
+
+  app.post("/api/notifications", async (req, res) => {
+    try {
+      const notificationData = insertNotificationSchema.parse(req.body);
+      const notification = await storage.createNotification(notificationData);
+      broadcastNotification(notificationData.userId, notificationData.userType, notification);
+      res.status(201).json(notification);
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      res.status(400).json({ error: "Invalid notification data" });
+    }
+  });
+
+  app.put("/api/notifications/:id/read", async (req, res) => {
+    try {
+      const notification = await storage.markNotificationAsRead(req.params.id);
+      if (!notification) {
+        return res.status(404).json({ error: "Notification not found" });
+      }
+      res.json(notification);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to mark notification as read" });
+    }
+  });
+
+  app.put("/api/notifications/:userType/:userId/read-all", async (req, res) => {
+    try {
+      const { userType, userId } = req.params;
+      await storage.markAllNotificationsAsRead(userId, userType);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to mark all notifications as read" });
+    }
+  });
+
+  app.get("/api/notifications/:userType/:userId/unread-count", async (req, res) => {
+    try {
+      const { userType, userId } = req.params;
+      const count = await storage.getUnreadNotificationCount(userId, userType);
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get unread count" });
+    }
+  });
+
+  // Dashboard Stats Route
+  app.get("/api/dashboard/stats", async (req, res) => {
+    try {
+      const stats = await storage.getDashboardStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Invoice PDF Route
+  app.get("/api/invoices/:id/pdf", async (req, res) => {
+    try {
+      const invoice = await storage.getInvoice(req.params.id);
+      if (!invoice) {
+        return res.status(404).json({ error: "Invoice not found" });
+      }
+      const order = await storage.getOrder(invoice.orderId);
+      if (!order) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      const pdfBuffer = await generateInvoicePDF(invoice, order);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="invoice-${invoice.invoiceNumber}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      res.status(500).json({ error: "Failed to generate PDF" });
+    }
+  });
+
   const httpServer = createServer(app);
+
+  // Setup WebSocket server with noServer to avoid conflicts with Vite HMR
+  const wss = new WebSocketServer({ noServer: true });
+
+  wss.on('connection', (ws, req) => {
+    console.log('WebSocket client connected');
+
+    ws.on('message', (data) => {
+      try {
+        const message = JSON.parse(data.toString());
+        if (message.type === 'register') {
+          const { userId, userType } = message;
+          if (userId && userType) {
+            connectedClients.set(`${userType}:${userId}`, ws);
+            ws.send(JSON.stringify({ type: 'registered', success: true }));
+          }
+        }
+      } catch (error) {
+        console.error('WebSocket message error:', error);
+      }
+    });
+
+    ws.on('close', () => {
+      connectedClients.forEach((client, key) => {
+        if (client === ws) {
+          connectedClients.delete(key);
+        }
+      });
+    });
+  });
+
+  // Handle WebSocket upgrades only for /ws path
+  httpServer.on('upgrade', (request, socket, head) => {
+    const pathname = new URL(request.url || '', 'http://localhost').pathname;
+    if (pathname === '/ws') {
+      wss.handleUpgrade(request, socket, head, (ws) => {
+        wss.emit('connection', ws, request);
+      });
+    }
+    // Other upgrade requests (like Vite HMR) will be handled by their own handlers
+  });
+
   return httpServer;
 }
 

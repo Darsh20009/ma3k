@@ -4,6 +4,28 @@ Ma3k (معك) is a comprehensive Arabic digital services platform that provides 
 
 ## Recent Changes (December 2, 2025)
 
+### Session Management & Authentication
+- **Passport.js Integration**: Implemented multi-strategy authentication for students, clients, and employees
+- **PostgreSQL Sessions**: Session storage using connect-pg-simple for production-ready session management
+- **Password Security**: Secure password hashing with scrypt and timing-safe comparison
+- **Auth Middleware**: Express-session with passport.js for protected routes
+
+### Reviews/Ratings System
+- **Review Creation**: API for creating reviews with rating (1-5), comment, and reviewer info
+- **Approval Workflow**: Reviews require admin approval before public display
+- **Average Ratings**: Automatic calculation of average ratings for services and courses
+- **Database Storage**: Full PostgreSQL integration for review persistence
+
+### Real-time Notifications
+- **WebSocket Server**: WebSocket support at /ws path for real-time notifications
+- **Notification API**: Full CRUD operations for notifications (create, read, mark as read)
+- **User Notifications**: Notifications scoped by user ID and user type (student/client/employee)
+- **Unread Count**: API endpoint for getting unread notification count
+
+### Dashboard Statistics
+- **Stats API**: New /api/dashboard/stats endpoint providing platform metrics
+- **Metrics Included**: Total orders, students, clients, projects, revenue, pending orders, active projects, completed courses
+
 ### PostgreSQL Database Migration
 - **Database Storage**: Migrated from JSON file storage to PostgreSQL database using Drizzle ORM
 - **DatabaseStorage Class**: Created new `server/database-storage.ts` implementing IStorage interface with full PostgreSQL support
@@ -13,7 +35,7 @@ Ma3k (معك) is a comprehensive Arabic digital services platform that provides 
 
 ### Storage Architecture
 - **Dual Storage System**: Application now supports both PostgreSQL (production) and JSON file (fallback)
-- **Database Storage**: Full CRUD operations for all 17 data models (users, services, orders, etc.)
+- **Database Storage**: Full CRUD operations for all 17 data models (users, services, orders, reviews, notifications, etc.)
 - **Type Safety**: Complete TypeScript integration with Drizzle ORM for type-safe database operations
 
 ## Previous Changes (November 30, 2025)

@@ -1,5 +1,5 @@
-import { eq, and, sql } from "drizzle-orm";
-import { db } from "./db";
+import { eq, and, sql, count, sum, desc } from "drizzle-orm";
+import { db, pool } from "./db";
 import * as schema from "@shared/schema";
 import {
   type User, type InsertUser, type Service, type InsertService,
@@ -10,14 +10,21 @@ import {
   type Enrollment, type InsertEnrollment, type Certificate, type InsertCertificate,
   type Project, type InsertProject, type DiscountCode, type InsertDiscountCode,
   type EmployeeTask, type InsertEmployeeTask,
-  type Lesson, type LessonProgress, type Quiz, type QuizAttempt, type InsertQuizAttempt
+  type Lesson, type LessonProgress, type Quiz, type QuizAttempt, type InsertQuizAttempt,
+  type Review, type InsertReview, type Notification, type InsertNotification
 } from "@shared/schema";
 import type { IStorage } from "./storage";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
+
+const PostgresSessionStore = connectPg(session);
 
 export class DatabaseStorage implements IStorage {
   private initPromise: Promise<void> | null = null;
+  sessionStore: session.Store;
 
   constructor() {
+    this.sessionStore = new PostgresSessionStore({ pool: pool!, createTableIfMissing: true });
     this.initPromise = this.initialize();
   }
 
@@ -583,5 +590,127 @@ export class DatabaseStorage implements IStorage {
       .where(eq(schema.employeeTasks.id, id))
       .returning();
     return result[0];
+  }
+
+  // Reviews
+  async getReviews(targetId: string, targetType: string): Promise<Review[]> {
+    return await db.select().from(schema.reviews)
+      .where(and(
+        eq(schema.reviews.targetId, targetId),
+        eq(schema.reviews.targetType, targetType),
+        eq(schema.reviews.isApproved, true)
+      ));
+  }
+
+  async createReview(review: InsertReview): Promise<Review> {
+    const result = await db.insert(schema.reviews).values({
+      ...review,
+      isApproved: false,
+    }).returning();
+    return result[0];
+  }
+
+  async approveReview(id: string): Promise<Review | undefined> {
+    const result = await db.update(schema.reviews)
+      .set({ isApproved: true })
+      .where(eq(schema.reviews.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getAverageRating(targetId: string, targetType: string): Promise<number> {
+    const reviews = await this.getReviews(targetId, targetType);
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return Math.round((sum / reviews.length) * 10) / 10;
+  }
+
+  // Notifications
+  async getUserNotifications(userId: string, userType: string): Promise<Notification[]> {
+    return await db.select().from(schema.notifications)
+      .where(and(
+        eq(schema.notifications.userId, userId),
+        eq(schema.notifications.userType, userType)
+      ))
+      .orderBy(desc(schema.notifications.createdAt));
+  }
+
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const result = await db.insert(schema.notifications).values({
+      ...notification,
+      isRead: false,
+    }).returning();
+    return result[0];
+  }
+
+  async markNotificationAsRead(id: string): Promise<Notification | undefined> {
+    const result = await db.update(schema.notifications)
+      .set({ isRead: true })
+      .where(eq(schema.notifications.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async markAllNotificationsAsRead(userId: string, userType: string): Promise<void> {
+    await db.update(schema.notifications)
+      .set({ isRead: true })
+      .where(and(
+        eq(schema.notifications.userId, userId),
+        eq(schema.notifications.userType, userType)
+      ));
+  }
+
+  async getUnreadNotificationCount(userId: string, userType: string): Promise<number> {
+    const result = await db.select({ count: count() }).from(schema.notifications)
+      .where(and(
+        eq(schema.notifications.userId, userId),
+        eq(schema.notifications.userType, userType),
+        eq(schema.notifications.isRead, false)
+      ));
+    return result[0]?.count || 0;
+  }
+
+  // Dashboard Stats
+  async getDashboardStats(): Promise<{
+    totalOrders: number;
+    totalStudents: number;
+    totalClients: number;
+    totalProjects: number;
+    totalRevenue: number;
+    pendingOrders: number;
+    activeProjects: number;
+    completedCourses: number;
+  }> {
+    const [ordersResult] = await db.select({ count: count() }).from(schema.orders);
+    const [studentsResult] = await db.select({ count: count() }).from(schema.students);
+    const [clientsResult] = await db.select({ count: count() }).from(schema.clients);
+    const [projectsResult] = await db.select({ count: count() }).from(schema.projects);
+    
+    const [revenueResult] = await db.select({ total: sum(schema.orders.price) })
+      .from(schema.orders)
+      .where(eq(schema.orders.paymentStatus, 'completed'));
+    
+    const [pendingOrdersResult] = await db.select({ count: count() })
+      .from(schema.orders)
+      .where(eq(schema.orders.status, 'pending'));
+    
+    const [activeProjectsResult] = await db.select({ count: count() })
+      .from(schema.projects)
+      .where(sql`${schema.projects.status} != 'completed'`);
+    
+    const [completedCoursesResult] = await db.select({ count: count() })
+      .from(schema.enrollments)
+      .where(eq(schema.enrollments.status, 'completed'));
+
+    return {
+      totalOrders: ordersResult?.count || 0,
+      totalStudents: studentsResult?.count || 0,
+      totalClients: clientsResult?.count || 0,
+      totalProjects: projectsResult?.count || 0,
+      totalRevenue: Number(revenueResult?.total) || 0,
+      pendingOrders: pendingOrdersResult?.count || 0,
+      activeProjects: activeProjectsResult?.count || 0,
+      completedCourses: completedCoursesResult?.count || 0,
+    };
   }
 }
