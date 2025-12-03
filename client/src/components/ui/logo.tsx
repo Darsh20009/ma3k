@@ -1,29 +1,45 @@
+import logoImage from "@assets/Screenshot 2025-08-08 103454_1754640306183.png";
+
 interface LogoProps {
   isDark?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
+  showText?: boolean;
 }
 
-export default function Logo({ isDark = false, size = "md" }: LogoProps) {
+export default function Logo({ isDark = false, size = "md", showText = true }: LogoProps) {
   const sizeClasses = {
-    sm: "w-8 h-8 text-lg",
-    md: "w-10 h-10 text-xl", 
-    lg: "w-12 h-12 text-2xl",
+    sm: "w-8 h-8",
+    md: "w-12 h-12", 
+    lg: "w-16 h-16",
+    xl: "w-24 h-24",
   };
 
   const textSizeClasses = {
-    sm: "text-xl",
-    md: "text-2xl",
-    lg: "text-3xl",
+    sm: "text-lg",
+    md: "text-xl",
+    lg: "text-2xl",
+    xl: "text-3xl",
   };
 
   return (
-    <div className="flex items-center space-x-reverse space-x-3 logo-animation">
-      <div className={`${sizeClasses[size]} bg-gradient-to-br from-primary-500 to-success-500 rounded-lg flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform`}>
-        <i className={`fas fa-rocket ${isDark ? 'text-white' : 'text-white'} ${sizeClasses[size].split(' ')[2]} animate-pulse-slow`}></i>
-      </div>
-      <span className={`${textSizeClasses[size]} font-bold ${isDark ? 'text-white' : 'text-primary-600'} bg-gradient-to-r from-primary-600 to-success-600 bg-clip-text text-transparent`}>
-        معك
-      </span>
+    <div className="flex items-center gap-3">
+      <img 
+        src={logoImage} 
+        alt="معك الرقمية" 
+        className={`${sizeClasses[size]} rounded-full object-cover shadow-lg transition-transform hover:scale-105`}
+        data-testid="img-logo"
+      />
+      {showText && (
+        <div className="flex flex-col">
+          <span 
+            className={`${textSizeClasses[size]} font-bold bg-gradient-to-r from-[#2d8a7a] via-[#5cb85c] to-[#6ec4a3] bg-clip-text text-transparent`}
+            data-testid="text-logo-name"
+          >
+            معك
+          </span>
+          <span className="text-xs text-muted-foreground">الرقمية</span>
+        </div>
+      )}
     </div>
   );
 }

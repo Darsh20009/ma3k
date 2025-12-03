@@ -25,6 +25,7 @@ export const services = pgTable("services", {
 export const orders = pgTable("orders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   orderNumber: text("order_number").notNull().unique(),
+  clientId: varchar("client_id").references(() => clients.id),
   customerName: text("customer_name").notNull(),
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone").notNull(),
@@ -32,9 +33,15 @@ export const orders = pgTable("orders", {
   serviceName: text("service_name").notNull(),
   price: integer("price").notNull(),
   description: text("description"),
-  status: text("status").default("pending"), // pending, paid, in_progress, completed, cancelled
-  paymentMethod: text("payment_method"), // paypal, bank_transfer, stc_pay, ur_pay, alinma_pay
-  paymentStatus: text("payment_status").default("pending"), // pending, completed, failed
+  status: text("status").default("pending"), // pending, awaiting_payment, paid, in_progress, completed, cancelled
+  paymentMethod: text("payment_method"), // bank_transfer, paypal, etisalat_cash
+  paymentStatus: text("payment_status").default("pending"), // pending, awaiting_verification, completed, failed
+  paymentReceiptUrl: text("payment_receipt_url"),
+  paymentReceiptFileName: text("payment_receipt_file_name"),
+  paymentNotes: text("payment_notes"),
+  discountCode: text("discount_code"),
+  discountAmount: integer("discount_amount").default(0),
+  finalAmount: integer("final_amount"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
@@ -43,10 +50,21 @@ export const invoices = pgTable("invoices", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   invoiceNumber: text("invoice_number").notNull().unique(),
   orderId: varchar("order_id").references(() => orders.id),
+  clientId: varchar("client_id").references(() => clients.id),
   customerName: text("customer_name").notNull(),
   customerEmail: text("customer_email").notNull(),
+  customerPhone: text("customer_phone"),
   serviceName: text("service_name").notNull(),
+  serviceDescription: text("service_description"),
+  subtotal: integer("subtotal").notNull(),
+  discountAmount: integer("discount_amount").default(0),
   amount: integer("amount").notNull(),
+  taxAmount: integer("tax_amount").default(0),
+  paymentMethod: text("payment_method"),
+  paymentStatus: text("payment_status").default("pending"), // pending, paid, cancelled, refunded
+  paidAt: timestamp("paid_at"),
+  dueDate: timestamp("due_date"),
+  notes: text("notes"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -251,6 +269,7 @@ export const insertServiceSchema = createInsertSchema(services).pick({
 });
 
 export const insertOrderSchema = createInsertSchema(orders).pick({
+  clientId: true,
   customerName: true,
   customerEmail: true,
   customerPhone: true,
@@ -259,6 +278,12 @@ export const insertOrderSchema = createInsertSchema(orders).pick({
   price: true,
   description: true,
   paymentMethod: true,
+  paymentReceiptUrl: true,
+  paymentReceiptFileName: true,
+  paymentNotes: true,
+  discountCode: true,
+  discountAmount: true,
+  finalAmount: true,
 });
 
 export const insertConsultationSchema = createInsertSchema(consultations).pick({
