@@ -4,6 +4,14 @@ Ma3k (معك) is a comprehensive Arabic digital services platform that provides 
 
 ## Recent Changes (December 3, 2025)
 
+### MongoDB Integration
+- **Primary Database**: MongoDB Atlas now serves as the primary database via Mongoose ODM
+- **Three-Tier Storage**: Priority system: MongoDB (primary) → PostgreSQL (fallback) → JSON (last resort)
+- **Session Management**: MongoDB-backed sessions using connect-mongo for production reliability
+- **Complete Models**: All 17 Mongoose models matching the original Drizzle schema structure
+- **Auto-Initialization**: MongoDB automatically seeds with default services, courses, and discount codes
+- **Connection Handling**: Robust connection management with automatic reconnection
+
 ### Client Dashboard Improvements
 - **Invoice Download**: Added download invoice button for completed orders in client dashboard
 - **Responsive Layout**: Improved orders section with flex-wrap and gap for better mobile responsiveness
@@ -97,9 +105,10 @@ Preferred communication style: Simple, everyday language. User prefers direct pr
 
 ## Backend Architecture
 - **Runtime**: Node.js with Express.js framework for RESTful API development
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations and schema management
-- **Database Provider**: Neon serverless PostgreSQL for scalable cloud database hosting
-- **Session Management**: PostgreSQL-based session storage using connect-pg-simple
+- **Primary Database**: MongoDB Atlas with Mongoose ODM for document-based data storage
+- **Fallback Database**: PostgreSQL with Drizzle ORM (Neon serverless) as secondary storage
+- **Storage Priority**: MongoDB → PostgreSQL → JSON file (three-tier fallback system)
+- **Session Management**: MongoDB-backed sessions using connect-mongo
 - **Development**: Hot module replacement with Vite for fast development cycles
 
 ## Payment Integration
