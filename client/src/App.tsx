@@ -30,6 +30,7 @@ import MyCoursesComplete from "@/pages/my-courses-complete";
 import MyProjectsComplete from "@/pages/my-projects-complete";
 import ClientDashboard from "@/pages/client-dashboard";
 import EmployeeDashboardNew from "@/pages/employee-dashboard-new";
+import AdminDashboard from "@/pages/admin-dashboard";
 import CertSearch from "@/pages/cert-search";
 import EmployeeProfile from "@/pages/employee-profile";
 import WebsiteForm from "@/pages/website-form";
@@ -63,6 +64,7 @@ function Router() {
         <Route path="/employee-profile" component={EmployeeProfile} />
         <Route path="/employee-login" component={EmployeeLogin} />
         <Route path="/employee-dashboard" component={EmployeeDashboard} />
+        <Route path="/admin-dashboard" component={AdminDashboard} />
         <Route path="/code-tool" component={CodeTool} />
         <Route path="/ma3k-meet" component={Ma3kMeet} />
         <Route path="/website-form" component={WebsiteForm} />

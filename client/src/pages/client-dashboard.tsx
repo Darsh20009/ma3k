@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,10 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -28,19 +31,22 @@ import {
   FileText,
   CreditCard,
   Settings,
-  ChevronLeft,
-  ChevronRight,
   Search,
   Code2,
   Palette,
   Server,
   Upload,
   Star,
-  Phone,
-  User,
   TrendingUp,
   Download,
-  Eye
+  Send,
+  Paperclip,
+  Plus,
+  AlertCircle,
+  Lightbulb,
+  File,
+  Image,
+  Trash2
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -74,6 +80,73 @@ type Notification = {
   message: string;
   type: string;
   isRead: boolean;
+  createdAt: string;
+};
+
+type ChatMessage = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  senderType: string;
+  senderName: string;
+  content: string;
+  messageType: string;
+  fileUrl?: string;
+  fileName?: string;
+  isRead: boolean;
+  createdAt: string;
+};
+
+type ChatConversation = {
+  id: string;
+  projectId: string;
+  clientId: string;
+  employeeId?: string;
+  type: string;
+  status: string;
+  lastMessageAt: string;
+};
+
+type ModificationRequest = {
+  id: string;
+  projectId: string;
+  clientId: string;
+  title: string;
+  description: string;
+  priority: string;
+  status: string;
+  assignedTo?: string;
+  attachments?: string[];
+  completedAt?: string;
+  createdAt: string;
+};
+
+type FeatureRequest = {
+  id: string;
+  projectId: string;
+  clientId: string;
+  title: string;
+  description: string;
+  category?: string;
+  priority: string;
+  status: string;
+  estimatedCost?: number;
+  estimatedDays?: number;
+  adminNotes?: string;
+  createdAt: string;
+};
+
+type ProjectFile = {
+  id: string;
+  projectId: string;
+  uploadedBy: string;
+  uploaderType: string;
+  uploaderName: string;
+  fileName: string;
+  fileUrl: string;
+  fileType?: string;
+  fileSize?: number;
+  description?: string;
   createdAt: string;
 };
 
@@ -120,12 +193,34 @@ const statusConfig = {
   }
 };
 
+const priorityConfig = {
+  low: { label: "منخفضة", color: "#22c55e", bgColor: "rgba(34, 197, 94, 0.2)" },
+  medium: { label: "متوسطة", color: "#eab308", bgColor: "rgba(234, 179, 8, 0.2)" },
+  high: { label: "عالية", color: "#f97316", bgColor: "rgba(249, 115, 22, 0.2)" },
+  urgent: { label: "عاجلة", color: "#ef4444", bgColor: "rgba(239, 68, 68, 0.2)" }
+};
+
+const requestStatusConfig = {
+  pending: { label: "قيد الانتظار", color: "#eab308", bgColor: "rgba(234, 179, 8, 0.2)" },
+  in_progress: { label: "قيد التنفيذ", color: "#3b82f6", bgColor: "rgba(59, 130, 246, 0.2)" },
+  completed: { label: "مكتمل", color: "#22c55e", bgColor: "rgba(34, 197, 94, 0.2)" },
+  rejected: { label: "مرفوض", color: "#ef4444", bgColor: "rgba(239, 68, 68, 0.2)" },
+  approved: { label: "تمت الموافقة", color: "#22c55e", bgColor: "rgba(34, 197, 94, 0.2)" }
+};
+
 const stages = ["analysis", "design", "backend", "deployment", "completed"] as const;
 
 export default function ClientDashboard() {
   const [activeTab, setActiveTab] = useState("projects");
   const [editingIdea, setEditingIdea] = useState<string | null>(null);
   const [newIdea, setNewIdea] = useState("");
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const [showModificationDialog, setShowModificationDialog] = useState(false);
+  const [showFeatureDialog, setShowFeatureDialog] = useState(false);
+  const [modificationForm, setModificationForm] = useState({ title: "", description: "", priority: "medium" });
+  const [featureForm, setFeatureForm] = useState({ title: "", description: "", category: "functionality", priority: "medium" });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated, isLoading, isClient, logout } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -158,6 +253,39 @@ export default function ClientDashboard() {
     enabled: !!user?.id && isClient(),
   });
 
+  const { data: conversations = [] } = useQuery<ChatConversation[]>({
+    queryKey: ['/api/chat/conversations/client', user?.id],
+    enabled: !!user?.id && isClient(),
+  });
+
+  const { data: modificationRequests = [] } = useQuery<ModificationRequest[]>({
+    queryKey: ['/api/modification-requests/client', user?.id],
+    enabled: !!user?.id && isClient(),
+  });
+
+  const { data: featureRequests = [] } = useQuery<FeatureRequest[]>({
+    queryKey: ['/api/feature-requests/client', user?.id],
+    enabled: !!user?.id && isClient(),
+  });
+
+  const { data: chatMessages = [], refetch: refetchMessages } = useQuery<ChatMessage[]>({
+    queryKey: ['/api/chat/conversations', selectedProject?.id, 'messages'],
+    queryFn: async () => {
+      if (!selectedProject) return [];
+      const conv = conversations.find(c => c.projectId === selectedProject.id);
+      if (!conv) return [];
+      const res = await fetch(`/api/chat/conversations/${conv.id}/messages`);
+      return res.json();
+    },
+    enabled: !!selectedProject && conversations.length > 0,
+    refetchInterval: 5000,
+  });
+
+  const { data: projectFiles = [] } = useQuery<ProjectFile[]>({
+    queryKey: ['/api/project-files', selectedProject?.id],
+    enabled: !!selectedProject?.id,
+  });
+
   const updateIdeaMutation = useMutation({
     mutationFn: async ({ id, websiteIdea }: { id: string; websiteIdea: string }) => {
       return await apiRequest("PATCH", `/api/projects/${id}`, { websiteIdea });
@@ -172,21 +300,110 @@ export default function ClientDashboard() {
     }
   });
 
+  const sendMessageMutation = useMutation({
+    mutationFn: async (data: { conversationId: string; content: string }) => {
+      return await apiRequest("POST", "/api/chat/messages", {
+        ...data,
+        senderId: user?.id,
+        senderType: "client",
+        senderName: user?.fullName || "عميل",
+        messageType: "text"
+      });
+    },
+    onSuccess: () => {
+      setNewMessage("");
+      refetchMessages();
+      toast({ title: "تم إرسال الرسالة" });
+    }
+  });
+
+  const createConversationMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      return await apiRequest("POST", "/api/chat/conversations", {
+        projectId,
+        clientId: user?.id,
+        type: "project"
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations/client', user?.id] });
+    }
+  });
+
+  const createModificationMutation = useMutation({
+    mutationFn: async (data: { projectId: string; title: string; description: string; priority: string }) => {
+      return await apiRequest("POST", "/api/modification-requests", {
+        ...data,
+        clientId: user?.id
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/modification-requests/client', user?.id] });
+      setShowModificationDialog(false);
+      setModificationForm({ title: "", description: "", priority: "medium" });
+      toast({ title: "تم إرسال طلب التعديل بنجاح" });
+    }
+  });
+
+  const createFeatureMutation = useMutation({
+    mutationFn: async (data: { projectId: string; title: string; description: string; category: string; priority: string }) => {
+      return await apiRequest("POST", "/api/feature-requests", {
+        ...data,
+        clientId: user?.id
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/feature-requests/client', user?.id] });
+      setShowFeatureDialog(false);
+      setFeatureForm({ title: "", description: "", category: "functionality", priority: "medium" });
+      toast({ title: "تم إرسال طلب الميزة بنجاح" });
+    }
+  });
+
   const handleUpdateIdea = (project: Project) => {
     if (!newIdea.trim()) return;
     updateIdeaMutation.mutate({ id: project.id, websiteIdea: newIdea });
+  };
 
-    const message = `
-تحديث فكرة المشروع
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !selectedProject) return;
+    
+    let conv = conversations.find(c => c.projectId === selectedProject.id);
+    
+    if (!conv) {
+      try {
+        const result = await apiRequest("POST", "/api/chat/conversations", {
+          projectId: selectedProject.id,
+          clientId: user?.id,
+          type: "project"
+        });
+        queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations/client', user?.id] });
+        conv = result;
+      } catch (error) {
+        toast({ title: "خطأ في إنشاء المحادثة", variant: "destructive" });
+        return;
+      }
+    }
+    
+    if (conv) {
+      sendMessageMutation.mutate({ conversationId: conv.id, content: newMessage });
+    }
+  };
 
-المشروع: ${project.projectName}
-الفكرة الجديدة: ${newIdea}
+  const handleCreateModification = () => {
+    if (!selectedProject || !modificationForm.title || !modificationForm.description) return;
+    createModificationMutation.mutate({
+      projectId: selectedProject.id,
+      ...modificationForm
+    });
+  };
 
-العميل: ${user?.fullName || "غير محدد"}
-    `.trim();
-
-    const whatsappUrl = `https://wa.me/+201155201921?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
+  const handleCreateFeature = () => {
+    if (!selectedProject || !featureForm.title || !featureForm.description) return;
+    createFeatureMutation.mutate({
+      projectId: selectedProject.id,
+      ...featureForm
+    });
   };
 
   const getStageIndex = (status: string) => stages.indexOf(status as typeof stages[number]);
@@ -204,6 +421,10 @@ export default function ClientDashboard() {
   const activeProjects = projects.filter(p => p.status !== "completed").length;
   const completedProjects = projects.filter(p => p.status === "completed").length;
   const unreadNotifications = notifications.filter(n => !n.isRead).length;
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
 
   if (isLoading) {
     return (
@@ -251,6 +472,10 @@ export default function ClientDashboard() {
                 <nav className="space-y-2">
                   {[
                     { id: "projects", label: "مشاريعي", icon: Briefcase },
+                    { id: "chat", label: "المراسلات", icon: MessageCircle },
+                    { id: "requests", label: "طلبات التعديل", icon: Edit },
+                    { id: "features", label: "طلب ميزات", icon: Lightbulb },
+                    { id: "files", label: "ملفات المشروع", icon: File },
                     { id: "orders", label: "طلباتي", icon: CreditCard },
                     { id: "notifications", label: "الإشعارات", icon: Bell, badge: unreadNotifications },
                     { id: "settings", label: "الإعدادات", icon: Settings },
@@ -258,9 +483,7 @@ export default function ClientDashboard() {
                     <button
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover-elevate ${
-                        activeTab === item.id ? "" : ""
-                      }`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover-elevate`}
                       style={{
                         background: activeTab === item.id ? "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" : "transparent",
                         color: activeTab === item.id ? "white" : "var(--ma3k-beige)"
@@ -305,7 +528,7 @@ export default function ClientDashboard() {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
                       <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>مشاريعي</h1>
                       <p style={{ color: "var(--ma3k-beige-dark)" }}>تتبع تقدم مشاريعك التطويرية</p>
@@ -363,9 +586,9 @@ export default function ClientDashboard() {
                               }}
                             >
                               <CardHeader className="pb-4">
-                                <div className="flex items-start justify-between gap-4">
+                                <div className="flex items-start justify-between gap-4 flex-wrap">
                                   <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-2">
+                                    <div className="flex items-center gap-3 mb-2 flex-wrap">
                                       <div 
                                         className="w-12 h-12 rounded-xl flex items-center justify-center"
                                         style={{ background: statusInfo.bgColor }}
@@ -420,8 +643,7 @@ export default function ClientDashboard() {
                                     value={statusInfo.progress} 
                                     className="h-3"
                                     style={{ 
-                                      background: "var(--ma3k-darker)",
-                                      ["--progress-color" as string]: statusInfo.color 
+                                      background: "var(--ma3k-darker)"
                                     }}
                                   />
                                 </div>
@@ -452,7 +674,7 @@ export default function ClientDashboard() {
                                             )}
                                           </div>
                                           <span 
-                                            className="text-xs mt-2 text-center"
+                                            className="text-xs mt-2 text-center hidden sm:block"
                                             style={{ 
                                               color: isActive ? stageInfo.color : "var(--ma3k-beige-dark)" 
                                             }}
@@ -541,63 +763,56 @@ export default function ClientDashboard() {
                                 )}
 
                                 <div className="flex flex-wrap gap-3 pt-4 border-t" style={{ borderColor: "var(--ma3k-border)" }}>
-                                  <Dialog>
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        variant="outline"
-                                        onClick={() => {
-                                          setEditingIdea(project.id);
-                                          setNewIdea(project.websiteIdea);
-                                        }}
-                                        style={{ borderColor: "var(--ma3k-teal)", color: "var(--ma3k-teal)" }}
-                                        data-testid={`button-edit-idea-${project.id}`}
-                                      >
-                                        <Edit className="w-4 h-4 ml-2" />
-                                        تعديل الفكرة
-                                      </Button>
-                                    </DialogTrigger>
-                                    <DialogContent style={{ background: "var(--ma3k-dark)", border: "2px solid var(--ma3k-border)" }}>
-                                      <DialogHeader>
-                                        <DialogTitle style={{ color: "var(--ma3k-beige)" }}>
-                                          تعديل فكرة المشروع
-                                        </DialogTitle>
-                                        <DialogDescription style={{ color: "var(--ma3k-beige-dark)" }}>
-                                          سيتم إرسال التعديل مباشرة لفريق التطوير
-                                        </DialogDescription>
-                                      </DialogHeader>
-                                      <Textarea
-                                        value={newIdea}
-                                        onChange={(e) => setNewIdea(e.target.value)}
-                                        className="min-h-[150px]"
-                                        style={{ 
-                                          background: "var(--ma3k-darker)", 
-                                          borderColor: "var(--ma3k-border)",
-                                          color: "var(--ma3k-beige)"
-                                        }}
-                                        placeholder="اشرح التعديلات المطلوبة..."
-                                        data-testid="input-new-idea"
-                                      />
-                                      <DialogFooter>
-                                        <Button
-                                          onClick={() => handleUpdateIdea(project)}
-                                          disabled={updateIdeaMutation.isPending}
-                                          style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))", color: "white" }}
-                                          data-testid="button-submit-idea"
-                                        >
-                                          <MessageCircle className="w-4 h-4 ml-2" />
-                                          {updateIdeaMutation.isPending ? "جاري الإرسال..." : "إرسال التعديل"}
-                                        </Button>
-                                      </DialogFooter>
-                                    </DialogContent>
-                                  </Dialog>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedProject(project);
+                                      setActiveTab("chat");
+                                    }}
+                                    style={{ borderColor: "var(--ma3k-teal)", color: "var(--ma3k-teal)" }}
+                                    data-testid={`button-chat-${project.id}`}
+                                  >
+                                    <MessageCircle className="w-4 h-4 ml-2" />
+                                    المراسلات
+                                  </Button>
 
                                   <Button
                                     variant="outline"
-                                    onClick={() => window.open("https://wa.me/+201155201921", "_blank")}
-                                    style={{ borderColor: "#25d366", color: "#25d366" }}
+                                    onClick={() => {
+                                      setSelectedProject(project);
+                                      setShowModificationDialog(true);
+                                    }}
+                                    style={{ borderColor: "#f97316", color: "#f97316" }}
+                                    data-testid={`button-modification-${project.id}`}
                                   >
-                                    <MessageCircle className="w-4 h-4 ml-2" />
-                                    تواصل مع الفريق
+                                    <Edit className="w-4 h-4 ml-2" />
+                                    طلب تعديل
+                                  </Button>
+
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedProject(project);
+                                      setShowFeatureDialog(true);
+                                    }}
+                                    style={{ borderColor: "#a855f7", color: "#a855f7" }}
+                                    data-testid={`button-feature-${project.id}`}
+                                  >
+                                    <Lightbulb className="w-4 h-4 ml-2" />
+                                    طلب ميزة
+                                  </Button>
+
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setSelectedProject(project);
+                                      setActiveTab("files");
+                                    }}
+                                    style={{ borderColor: "var(--ma3k-green)", color: "var(--ma3k-green)" }}
+                                    data-testid={`button-files-${project.id}`}
+                                  >
+                                    <File className="w-4 h-4 ml-2" />
+                                    الملفات
                                   </Button>
                                 </div>
                               </CardContent>
@@ -607,6 +822,378 @@ export default function ClientDashboard() {
                       })}
                     </div>
                   )}
+                </motion.div>
+              )}
+
+              {activeTab === "chat" && (
+                <motion.div
+                  key="chat"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>المراسلات</h1>
+                    <p style={{ color: "var(--ma3k-beige-dark)" }}>تواصل مع فريق التطوير</p>
+                  </div>
+
+                  <div className="grid lg:grid-cols-3 gap-6">
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardHeader>
+                        <CardTitle style={{ color: "var(--ma3k-beige)" }}>المشاريع</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {projects.map((project) => (
+                          <button
+                            key={project.id}
+                            onClick={() => setSelectedProject(project)}
+                            className={`w-full p-3 rounded-xl text-right transition-all hover-elevate ${selectedProject?.id === project.id ? "" : ""}`}
+                            style={{
+                              background: selectedProject?.id === project.id ? "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" : "var(--ma3k-darker)",
+                              color: selectedProject?.id === project.id ? "white" : "var(--ma3k-beige)"
+                            }}
+                            data-testid={`chat-project-${project.id}`}
+                          >
+                            <div className="font-medium">{project.projectName}</div>
+                            <div className="text-xs opacity-70">{statusConfig[project.status].label}</div>
+                          </button>
+                        ))}
+                      </CardContent>
+                    </Card>
+
+                    <Card className="lg:col-span-2" style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      {selectedProject ? (
+                        <>
+                          <CardHeader className="border-b" style={{ borderColor: "var(--ma3k-border)" }}>
+                            <div className="flex items-center gap-3">
+                              <Avatar>
+                                <AvatarFallback style={{ background: "var(--ma3k-teal)", color: "white" }}>
+                                  {selectedProject.projectName.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <CardTitle style={{ color: "var(--ma3k-beige)" }}>{selectedProject.projectName}</CardTitle>
+                                <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>محادثة مع فريق التطوير</p>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <ScrollArea className="h-80 p-4">
+                            {chatMessages.length === 0 ? (
+                              <div className="text-center py-8">
+                                <MessageCircle className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                                <p style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد رسائل بعد. ابدأ المحادثة!</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                {chatMessages.map((msg) => (
+                                  <div
+                                    key={msg.id}
+                                    className={`flex ${msg.senderType === "client" ? "justify-end" : "justify-start"}`}
+                                  >
+                                    <div
+                                      className="max-w-xs p-3 rounded-xl"
+                                      style={{
+                                        background: msg.senderType === "client" ? "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" : "var(--ma3k-darker)",
+                                        color: msg.senderType === "client" ? "white" : "var(--ma3k-beige)"
+                                      }}
+                                    >
+                                      <p className="text-sm font-medium mb-1">{msg.senderName}</p>
+                                      <p>{msg.content}</p>
+                                      <p className="text-xs opacity-70 mt-1">
+                                        {new Date(msg.createdAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                                <div ref={messagesEndRef} />
+                              </div>
+                            )}
+                          </ScrollArea>
+                          <div className="p-4 border-t flex gap-2" style={{ borderColor: "var(--ma3k-border)" }}>
+                            <Input
+                              value={newMessage}
+                              onChange={(e) => setNewMessage(e.target.value)}
+                              placeholder="اكتب رسالتك..."
+                              className="flex-1"
+                              style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                              data-testid="input-chat-message"
+                            />
+                            <Button
+                              onClick={handleSendMessage}
+                              disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                              style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))", color: "white" }}
+                              data-testid="button-send-message"
+                            >
+                              <Send className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <CardContent className="text-center py-16">
+                          <MessageCircle className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                          <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
+                            اختر مشروعاً للمراسلة
+                          </h3>
+                        </CardContent>
+                      )}
+                    </Card>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === "requests" && (
+                <motion.div
+                  key="requests"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-6"
+                >
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>طلبات التعديل</h1>
+                      <p style={{ color: "var(--ma3k-beige-dark)" }}>تتبع طلبات التعديل على مشاريعك</p>
+                    </div>
+                    {projects.length > 0 && (
+                      <Button
+                        onClick={() => {
+                          setSelectedProject(projects[0]);
+                          setShowModificationDialog(true);
+                        }}
+                        style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))", color: "white" }}
+                        data-testid="button-new-modification"
+                      >
+                        <Plus className="w-4 h-4 ml-2" />
+                        طلب جديد
+                      </Button>
+                    )}
+                  </div>
+
+                  {modificationRequests.length === 0 ? (
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardContent className="text-center py-16">
+                        <Edit className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                        <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
+                          لا توجد طلبات تعديل
+                        </h3>
+                        <p style={{ color: "var(--ma3k-beige-dark)" }}>
+                          يمكنك إرسال طلب تعديل من صفحة المشروع
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="space-y-4">
+                      {modificationRequests.map((request) => {
+                        const priorityInfo = priorityConfig[request.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+                        const statusInfo = requestStatusConfig[request.status as keyof typeof requestStatusConfig] || requestStatusConfig.pending;
+                        return (
+                          <Card key={request.id} style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                            <CardContent className="p-6">
+                              <div className="flex items-start justify-between gap-4 flex-wrap">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                    <h4 className="font-bold text-lg" style={{ color: "var(--ma3k-beige)" }}>{request.title}</h4>
+                                    <Badge style={{ background: priorityInfo.bgColor, color: priorityInfo.color }}>
+                                      {priorityInfo.label}
+                                    </Badge>
+                                    <Badge style={{ background: statusInfo.bgColor, color: statusInfo.color }}>
+                                      {statusInfo.label}
+                                    </Badge>
+                                  </div>
+                                  <p style={{ color: "var(--ma3k-beige-dark)" }}>{request.description}</p>
+                                  <p className="text-sm mt-2" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                    {new Date(request.createdAt).toLocaleDateString('ar-SA')}
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {activeTab === "features" && (
+                <motion.div
+                  key="features"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-6"
+                >
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>طلبات الميزات</h1>
+                      <p style={{ color: "var(--ma3k-beige-dark)" }}>اقترح ميزات جديدة لمشاريعك</p>
+                    </div>
+                    {projects.length > 0 && (
+                      <Button
+                        onClick={() => {
+                          setSelectedProject(projects[0]);
+                          setShowFeatureDialog(true);
+                        }}
+                        style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))", color: "white" }}
+                        data-testid="button-new-feature"
+                      >
+                        <Plus className="w-4 h-4 ml-2" />
+                        طلب ميزة جديدة
+                      </Button>
+                    )}
+                  </div>
+
+                  {featureRequests.length === 0 ? (
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardContent className="text-center py-16">
+                        <Lightbulb className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                        <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
+                          لا توجد طلبات ميزات
+                        </h3>
+                        <p style={{ color: "var(--ma3k-beige-dark)" }}>
+                          يمكنك اقتراح ميزات جديدة لمشاريعك
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="space-y-4">
+                      {featureRequests.map((request) => {
+                        const priorityInfo = priorityConfig[request.priority as keyof typeof priorityConfig] || priorityConfig.medium;
+                        const statusInfo = requestStatusConfig[request.status as keyof typeof requestStatusConfig] || requestStatusConfig.pending;
+                        return (
+                          <Card key={request.id} style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                            <CardContent className="p-6">
+                              <div className="flex items-start justify-between gap-4 flex-wrap">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                    <h4 className="font-bold text-lg" style={{ color: "var(--ma3k-beige)" }}>{request.title}</h4>
+                                    <Badge style={{ background: priorityInfo.bgColor, color: priorityInfo.color }}>
+                                      {priorityInfo.label}
+                                    </Badge>
+                                    <Badge style={{ background: statusInfo.bgColor, color: statusInfo.color }}>
+                                      {statusInfo.label}
+                                    </Badge>
+                                  </div>
+                                  <p style={{ color: "var(--ma3k-beige-dark)" }}>{request.description}</p>
+                                  {request.estimatedCost && (
+                                    <p className="text-sm mt-2" style={{ color: "var(--ma3k-green)" }}>
+                                      التكلفة المتوقعة: {request.estimatedCost} ر.س
+                                    </p>
+                                  )}
+                                  {request.adminNotes && (
+                                    <p className="text-sm mt-2 p-2 rounded" style={{ background: "var(--ma3k-darker)", color: "var(--ma3k-beige)" }}>
+                                      ملاحظات: {request.adminNotes}
+                                    </p>
+                                  )}
+                                  <p className="text-sm mt-2" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                    {new Date(request.createdAt).toLocaleDateString('ar-SA')}
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {activeTab === "files" && (
+                <motion.div
+                  key="files"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>ملفات المشروع</h1>
+                    <p style={{ color: "var(--ma3k-beige-dark)" }}>عرض وتحميل ملفات مشاريعك</p>
+                  </div>
+
+                  <div className="grid lg:grid-cols-3 gap-6">
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardHeader>
+                        <CardTitle style={{ color: "var(--ma3k-beige)" }}>المشاريع</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {projects.map((project) => (
+                          <button
+                            key={project.id}
+                            onClick={() => setSelectedProject(project)}
+                            className={`w-full p-3 rounded-xl text-right transition-all hover-elevate`}
+                            style={{
+                              background: selectedProject?.id === project.id ? "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" : "var(--ma3k-darker)",
+                              color: selectedProject?.id === project.id ? "white" : "var(--ma3k-beige)"
+                            }}
+                            data-testid={`files-project-${project.id}`}
+                          >
+                            <div className="font-medium">{project.projectName}</div>
+                          </button>
+                        ))}
+                      </CardContent>
+                    </Card>
+
+                    <Card className="lg:col-span-2" style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      {selectedProject ? (
+                        <>
+                          <CardHeader>
+                            <CardTitle style={{ color: "var(--ma3k-beige)" }}>ملفات {selectedProject.projectName}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            {projectFiles.length === 0 ? (
+                              <div className="text-center py-8">
+                                <File className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                                <p style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد ملفات حتى الآن</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                {projectFiles.map((file) => (
+                                  <div
+                                    key={file.id}
+                                    className="flex items-center justify-between p-4 rounded-xl"
+                                    style={{ background: "var(--ma3k-darker)" }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      {file.fileType === "image" ? (
+                                        <Image className="w-8 h-8" style={{ color: "var(--ma3k-teal)" }} />
+                                      ) : (
+                                        <FileText className="w-8 h-8" style={{ color: "var(--ma3k-teal)" }} />
+                                      )}
+                                      <div>
+                                        <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>{file.fileName}</p>
+                                        <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                          {file.uploaderName} - {new Date(file.createdAt).toLocaleDateString('ar-SA')}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => window.open(file.fileUrl, '_blank')}
+                                      style={{ borderColor: "var(--ma3k-teal)", color: "var(--ma3k-teal)" }}
+                                    >
+                                      <Download className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
+                        </>
+                      ) : (
+                        <CardContent className="text-center py-16">
+                          <File className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                          <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
+                            اختر مشروعاً لعرض ملفاته
+                          </h3>
+                        </CardContent>
+                      )}
+                    </Card>
+                  </div>
                 </motion.div>
               )}
 
@@ -698,7 +1285,7 @@ export default function ClientDashboard() {
                                 <div>
                                   <h4 className="font-bold" style={{ color: "var(--ma3k-beige)" }}>{order.serviceName}</h4>
                                   <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>
-                                    {order.orderNumber} • {new Date(order.createdAt).toLocaleDateString('ar-SA')}
+                                    {order.orderNumber} - {new Date(order.createdAt).toLocaleDateString('ar-SA')}
                                   </p>
                                 </div>
                               </div>
@@ -824,60 +1411,25 @@ export default function ClientDashboard() {
                     <CardContent className="space-y-4">
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <User className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
-                            <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>الاسم</span>
-                          </div>
+                          <p className="text-sm mb-1" style={{ color: "var(--ma3k-beige-dark)" }}>الاسم</p>
                           <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>{user?.fullName}</p>
                         </div>
                         <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Mail className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
-                            <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>البريد الإلكتروني</span>
-                          </div>
+                          <p className="text-sm mb-1" style={{ color: "var(--ma3k-beige-dark)" }}>البريد الإلكتروني</p>
                           <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>{user?.email}</p>
                         </div>
                         <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Phone className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
-                            <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>الهاتف</span>
-                          </div>
-                          <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>{(user as any)?.phone || "غير محدد"}</p>
+                          <p className="text-sm mb-1" style={{ color: "var(--ma3k-beige-dark)" }}>رقم الهاتف</p>
+                          <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>{user?.phone || "غير محدد"}</p>
                         </div>
                         <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
-                            <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>تاريخ الانضمام</span>
-                          </div>
+                          <p className="text-sm mb-1" style={{ color: "var(--ma3k-beige-dark)" }}>تاريخ التسجيل</p>
                           <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
-                            {(user as any)?.createdAt ? new Date((user as any).createdAt).toLocaleDateString('ar-SA') : "غير محدد"}
+                            {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ar-SA') : "غير محدد"}
                           </p>
                         </div>
                       </div>
                     </CardContent>
-                  </Card>
-
-                  <Card 
-                    className="p-6 text-center"
-                    style={{ 
-                      background: "linear-gradient(135deg, rgba(0, 128, 128, 0.2), rgba(76, 175, 80, 0.2))",
-                      border: "1px solid var(--ma3k-teal)"
-                    }}
-                  >
-                    <MessageCircle className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--ma3k-teal)" }} />
-                    <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
-                      هل تحتاج مساعدة؟
-                    </h3>
-                    <p className="mb-4" style={{ color: "var(--ma3k-beige-dark)" }}>
-                      فريق الدعم الفني متاح للمساعدة على مدار الساعة
-                    </p>
-                    <Button
-                      onClick={() => window.open("https://wa.me/+201155201921", "_blank")}
-                      style={{ background: "#25d366", color: "white" }}
-                    >
-                      <MessageCircle className="w-4 h-4 ml-2" />
-                      تواصل معنا
-                    </Button>
                   </Card>
                 </motion.div>
               )}
@@ -885,6 +1437,135 @@ export default function ClientDashboard() {
           </main>
         </div>
       </div>
+
+      <Dialog open={showModificationDialog} onOpenChange={setShowModificationDialog}>
+        <DialogContent style={{ background: "var(--ma3k-dark)", border: "2px solid var(--ma3k-border)" }}>
+          <DialogHeader>
+            <DialogTitle style={{ color: "var(--ma3k-beige)" }}>طلب تعديل جديد</DialogTitle>
+            <DialogDescription style={{ color: "var(--ma3k-beige-dark)" }}>
+              أرسل طلب تعديل لفريق التطوير
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm block mb-2" style={{ color: "var(--ma3k-beige)" }}>عنوان التعديل</label>
+              <Input
+                value={modificationForm.title}
+                onChange={(e) => setModificationForm({ ...modificationForm, title: e.target.value })}
+                placeholder="مثال: تغيير لون الخلفية"
+                style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                data-testid="input-modification-title"
+              />
+            </div>
+            <div>
+              <label className="text-sm block mb-2" style={{ color: "var(--ma3k-beige)" }}>الوصف التفصيلي</label>
+              <Textarea
+                value={modificationForm.description}
+                onChange={(e) => setModificationForm({ ...modificationForm, description: e.target.value })}
+                placeholder="اشرح التعديل المطلوب بالتفصيل..."
+                className="min-h-[100px]"
+                style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                data-testid="input-modification-description"
+              />
+            </div>
+            <div>
+              <label className="text-sm block mb-2" style={{ color: "var(--ma3k-beige)" }}>الأولوية</label>
+              <Select value={modificationForm.priority} onValueChange={(v) => setModificationForm({ ...modificationForm, priority: v })}>
+                <SelectTrigger style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">منخفضة</SelectItem>
+                  <SelectItem value="medium">متوسطة</SelectItem>
+                  <SelectItem value="high">عالية</SelectItem>
+                  <SelectItem value="urgent">عاجلة</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={handleCreateModification}
+              disabled={createModificationMutation.isPending || !modificationForm.title || !modificationForm.description}
+              style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))", color: "white" }}
+              data-testid="button-submit-modification"
+            >
+              {createModificationMutation.isPending ? "جاري الإرسال..." : "إرسال الطلب"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showFeatureDialog} onOpenChange={setShowFeatureDialog}>
+        <DialogContent style={{ background: "var(--ma3k-dark)", border: "2px solid var(--ma3k-border)" }}>
+          <DialogHeader>
+            <DialogTitle style={{ color: "var(--ma3k-beige)" }}>طلب ميزة جديدة</DialogTitle>
+            <DialogDescription style={{ color: "var(--ma3k-beige-dark)" }}>
+              اقترح ميزة جديدة لمشروعك
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm block mb-2" style={{ color: "var(--ma3k-beige)" }}>عنوان الميزة</label>
+              <Input
+                value={featureForm.title}
+                onChange={(e) => setFeatureForm({ ...featureForm, title: e.target.value })}
+                placeholder="مثال: إضافة نظام تسجيل دخول"
+                style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                data-testid="input-feature-title"
+              />
+            </div>
+            <div>
+              <label className="text-sm block mb-2" style={{ color: "var(--ma3k-beige)" }}>الوصف التفصيلي</label>
+              <Textarea
+                value={featureForm.description}
+                onChange={(e) => setFeatureForm({ ...featureForm, description: e.target.value })}
+                placeholder="اشرح الميزة المطلوبة بالتفصيل..."
+                className="min-h-[100px]"
+                style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                data-testid="input-feature-description"
+              />
+            </div>
+            <div>
+              <label className="text-sm block mb-2" style={{ color: "var(--ma3k-beige)" }}>التصنيف</label>
+              <Select value={featureForm.category} onValueChange={(v) => setFeatureForm({ ...featureForm, category: v })}>
+                <SelectTrigger style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ui">واجهة المستخدم</SelectItem>
+                  <SelectItem value="functionality">وظائف جديدة</SelectItem>
+                  <SelectItem value="integration">تكامل مع خدمات</SelectItem>
+                  <SelectItem value="other">أخرى</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-sm block mb-2" style={{ color: "var(--ma3k-beige)" }}>الأولوية</label>
+              <Select value={featureForm.priority} onValueChange={(v) => setFeatureForm({ ...featureForm, priority: v })}>
+                <SelectTrigger style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">منخفضة</SelectItem>
+                  <SelectItem value="medium">متوسطة</SelectItem>
+                  <SelectItem value="high">عالية</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={handleCreateFeature}
+              disabled={createFeatureMutation.isPending || !featureForm.title || !featureForm.description}
+              style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))", color: "white" }}
+              data-testid="button-submit-feature"
+            >
+              {createFeatureMutation.isPending ? "جاري الإرسال..." : "إرسال الطلب"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

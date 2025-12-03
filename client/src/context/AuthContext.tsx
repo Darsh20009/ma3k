@@ -7,6 +7,9 @@ export interface AuthUser {
   fullName: string;
   email: string;
   type: UserType;
+  role?: string;
+  phone?: string;
+  createdAt?: string;
 }
 
 interface AuthContextType {
@@ -22,6 +25,7 @@ interface AuthContextType {
   isStudent: () => boolean;
   isClient: () => boolean;
   isEmployee: () => boolean;
+  isAdmin: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,13 +40,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedUserType = localStorage.getItem("ma3k_user_type");
     const savedUserName = localStorage.getItem("ma3k_user_name");
     const savedUserEmail = localStorage.getItem("ma3k_user_email");
+    const savedUserRole = localStorage.getItem("ma3k_user_role");
 
     if (savedUserId && savedUserType && savedUserName && savedUserEmail) {
       setUser({
         id: savedUserId,
         fullName: savedUserName,
         email: savedUserEmail,
-        type: savedUserType as UserType
+        type: savedUserType as UserType,
+        role: savedUserRole || undefined
       });
       setUserType(savedUserType as UserType);
     }
@@ -68,7 +74,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: data.user.id,
         fullName: data.user.fullName,
         email: data.user.email,
-        type: data.type
+        type: data.type,
+        role: data.user.role,
+        phone: data.user.phone,
+        createdAt: data.user.createdAt
       };
 
       setUser(authUser);
@@ -78,6 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("ma3k_user_type", data.type);
       localStorage.setItem("ma3k_user_email", data.user.email);
       localStorage.setItem("ma3k_user_name", data.user.fullName);
+      if (data.user.role) localStorage.setItem("ma3k_user_role", data.user.role);
 
       return { success: true };
     } catch (error) {
@@ -164,6 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("ma3k_user_type");
     localStorage.removeItem("ma3k_user_email");
     localStorage.removeItem("ma3k_user_name");
+    localStorage.removeItem("ma3k_user_role");
   };
 
   const checkAuth = (): boolean => {
@@ -182,6 +193,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return userType === "employee";
   };
 
+  const isAdmin = (): boolean => {
+    return userType === "employee" && (user?.role === "admin" || user?.role === "مدير" || user?.role === "مدير النظام");
+  };
+
   const isAuthenticated = !!user;
 
   return (
@@ -197,7 +212,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       checkAuth,
       isStudent,
       isClient,
-      isEmployee
+      isEmployee,
+      isAdmin
     }}>
       {children}
     </AuthContext.Provider>
