@@ -137,7 +137,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/orders", async (req, res) => {
     try {
       const orderData = insertOrderSchema.parse(req.body);
-      const order = await storage.createOrder(orderData);
+      
+      // Validate serviceId and get service details from database for security
+      let validatedOrderData = { ...orderData };
+      if (orderData.serviceId) {
+        const service = await storage.getService(orderData.serviceId);
+        if (service) {
+          // Use service details from database for security - override client-provided values
+          validatedOrderData.serviceName = service.name;
+          validatedOrderData.serviceId = service.id;
+          validatedOrderData.price = service.price; // Enforce price from database
+        } else {
+          // Service not found in database - set serviceId to null
+          // but allow the order with client-provided name/price for custom/cart items
+          console.log(`Service ${orderData.serviceId} not found in database, proceeding without serviceId`);
+          validatedOrderData.serviceId = null;
+        }
+      }
+      
+      // Ensure required fields are present
+      if (!validatedOrderData.serviceName || !validatedOrderData.price) {
+        return res.status(400).json({ error: "يجب تحديد اسم الخدمة والسعر" });
+      }
+      
+      const order = await storage.createOrder(validatedOrderData);
       
       // Try to send email notification (non-blocking)
       if (orderData.customerEmail && orderData.customerName) {
@@ -149,8 +172,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             customerName: orderData.customerName,
             customerEmail: orderData.customerEmail,
             customerPhone: orderData.customerPhone || 'غير متوفر',
-            serviceName: orderData.serviceName,
-            price: orderData.price,
+            serviceName: order.serviceName,
+            price: order.price,
             paymentStatus: 'pending',
             paymentMethod: orderData.paymentMethod || 'غير محدد',
             websiteSpecs: websiteSpecs

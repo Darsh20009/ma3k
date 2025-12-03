@@ -48,7 +48,11 @@ export default function Login() {
       });
 
       setTimeout(() => {
-        if (userType === "client") {
+        const redirectUrl = localStorage.getItem("ma3k_redirect_after_login");
+        if (redirectUrl) {
+          localStorage.removeItem("ma3k_redirect_after_login");
+          setLocation(redirectUrl);
+        } else if (userType === "client") {
           setLocation("/my-projects-complete");
         } else if (userType === "student") {
           setLocation("/my-courses-complete");

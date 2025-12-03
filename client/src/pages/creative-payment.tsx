@@ -109,7 +109,7 @@ const PAYMENT_METHODS: PaymentMethodConfig[] = [
 export default function PaymentPage() {
   const [, setLocation] = useLocation();
   const { cart, clearCart } = useCart();
-  const { user, userType } = useAuth();
+  const { user, userType, isLoading: isAuthLoading } = useAuth();
   const { toast } = useToast();
   
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>(null);
@@ -162,6 +162,20 @@ export default function PaymentPage() {
       setLocation("/services");
     }
   }, [cart, setLocation, toast]);
+
+  useEffect(() => {
+    if (isAuthLoading) return;
+    
+    if (!user || userType !== "client") {
+      toast({
+        title: "يرجى تسجيل الدخول",
+        description: "يجب تسجيل الدخول كعميل للمتابعة للدفع",
+        variant: "destructive"
+      });
+      localStorage.setItem("ma3k_redirect_after_login", "/creative-payment");
+      setLocation("/login");
+    }
+  }, [user, userType, isAuthLoading, setLocation, toast]);
 
   useEffect(() => {
     if (user) {
