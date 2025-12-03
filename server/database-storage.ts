@@ -229,8 +229,19 @@ export class DatabaseStorage implements IStorage {
 
   async createOrder(order: InsertOrder): Promise<Order> {
     const orderNumber = `ORD-${Date.now()}`;
+    
+    // Check if service exists, if not set serviceId to null
+    let validServiceId = null;
+    if (order.serviceId) {
+      const service = await this.getService(order.serviceId);
+      if (service) {
+        validServiceId = order.serviceId;
+      }
+    }
+    
     const result = await db.insert(schema.orders).values({
       ...order,
+      serviceId: validServiceId,
       orderNumber,
       status: "pending",
       paymentStatus: "pending",
