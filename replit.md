@@ -2,7 +2,18 @@
 
 Ma3k (معك) is a comprehensive Arabic digital services platform that provides website development, e-commerce solutions, educational programming courses, project management, and employee productivity tools. The platform serves three distinct user types: Students (for educational courses), Clients (for web development projects), and Employees (with administrative tools). It features an innovative website creation form, integrated payment processing (PayPal with USD conversion, Stripe, bank transfers, and Saudi payment methods), automated invoice generation, course management system, and a complete service marketplace with luxury design and Arabic RTL support.
 
-## Recent Changes (December 2, 2025)
+## Recent Changes (December 3, 2025)
+
+### Client Dashboard Improvements
+- **Invoice Download**: Added download invoice button for completed orders in client dashboard
+- **Responsive Layout**: Improved orders section with flex-wrap and gap for better mobile responsiveness
+- **UI Consistency**: Invoice button uses Ma3k teal color scheme matching the platform design
+
+### Code Quality
+- **TypeScript Safety**: Added Download and Eye icons to lucide-react imports
+- **Browserslist Update**: Updated caniuse-lite database for better browser compatibility
+
+## Previous Changes (December 2, 2025)
 
 ### Authentication Security Hardening
 - **Password Hashing**: All registration endpoints (students, clients, employees) now use scrypt password hashing
