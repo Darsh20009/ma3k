@@ -38,7 +38,9 @@ import {
   Star,
   Phone,
   User,
-  TrendingUp
+  TrendingUp,
+  Download,
+  Eye
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -688,7 +690,7 @@ export default function ClientDashboard() {
                       {orders.map((order) => (
                         <Card key={order.id} style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
                           <CardContent className="p-6">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between flex-wrap gap-4">
                               <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "var(--ma3k-darker)" }}>
                                   <FileText className="w-6 h-6" style={{ color: "var(--ma3k-teal)" }} />
@@ -700,18 +702,32 @@ export default function ClientDashboard() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="text-left">
-                                <p className="text-xl font-bold" style={{ color: "var(--ma3k-green)" }}>
-                                  {order.price.toLocaleString()} ر.س
-                                </p>
-                                <Badge 
-                                  style={{ 
-                                    background: order.paymentStatus === "completed" ? "rgba(76, 175, 80, 0.2)" : "rgba(234, 179, 8, 0.2)",
-                                    color: order.paymentStatus === "completed" ? "var(--ma3k-green)" : "#eab308"
-                                  }}
-                                >
-                                  {order.paymentStatus === "completed" ? "مدفوع" : "قيد الانتظار"}
-                                </Badge>
+                              <div className="flex items-center gap-4">
+                                <div className="text-left">
+                                  <p className="text-xl font-bold" style={{ color: "var(--ma3k-green)" }}>
+                                    {order.price.toLocaleString()} ر.س
+                                  </p>
+                                  <Badge 
+                                    style={{ 
+                                      background: order.paymentStatus === "completed" ? "rgba(76, 175, 80, 0.2)" : "rgba(234, 179, 8, 0.2)",
+                                      color: order.paymentStatus === "completed" ? "var(--ma3k-green)" : "#eab308"
+                                    }}
+                                  >
+                                    {order.paymentStatus === "completed" ? "مدفوع" : "قيد الانتظار"}
+                                  </Badge>
+                                </div>
+                                {order.paymentStatus === "completed" && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => window.open(`/api/invoices/${order.id}/pdf`, '_blank')}
+                                    style={{ borderColor: "var(--ma3k-teal)", color: "var(--ma3k-teal)" }}
+                                    data-testid={`button-download-invoice-${order.id}`}
+                                  >
+                                    <Download className="w-4 h-4 ml-2" />
+                                    تحميل الفاتورة
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           </CardContent>
