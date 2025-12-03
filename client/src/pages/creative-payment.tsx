@@ -29,22 +29,8 @@ import {
 import { SiPaypal } from "react-icons/si";
 import { apiRequest } from "@/lib/queryClient";
 
-type PaymentMethodType = "bank_transfer" | "paypal" | "etisalat_cash";
+type PaymentMethodType = "paypal" | "egypt_transfer";
 type PaymentMethod = PaymentMethodType | null;
-
-interface BankTransferConfig {
-  type: "bank_transfer";
-  id: "bank_transfer";
-  name: string;
-  icon: React.ComponentType<{ className?: string }>;
-  description: string;
-  accountNumber: string;
-  bankName: string;
-  accountName: string;
-  color: string;
-  borderColor: string;
-  bgColor: string;
-}
 
 interface PayPalConfig {
   type: "paypal";
@@ -52,68 +38,71 @@ interface PayPalConfig {
   name: string;
   icon: React.ComponentType<{ className?: string }>;
   description: string;
-  email: string;
+  paymentLink: string;
   color: string;
   borderColor: string;
   bgColor: string;
 }
 
-interface EtisalatCashConfig {
-  type: "etisalat_cash";
-  id: "etisalat_cash";
+interface EgyptTransferConfig {
+  type: "egypt_transfer";
+  id: "egypt_transfer";
   name: string;
   icon: React.ComponentType<{ className?: string }>;
   description: string;
-  phoneNumber: string;
+  methods: {
+    bankTransfer: {
+      accountNumber: string;
+      bankName: string;
+      accountName: string;
+    };
+    etisalatCash: {
+      phoneNumber: string;
+    };
+  };
   color: string;
   borderColor: string;
   bgColor: string;
 }
 
-type PaymentMethodConfig = BankTransferConfig | PayPalConfig | EtisalatCashConfig;
-
-const BANK_TRANSFER_CONFIG: BankTransferConfig = {
-  type: "bank_transfer",
-  id: "bank_transfer",
-  name: "تحويل بنكي",
-  icon: Building2,
-  description: "التحويل البنكي المباشر",
-  accountNumber: "EG420059003800000200013934156",
-  bankName: "البنك الأهلي المصري",
-  accountName: "شركة معك للخدمات الرقمية",
-  color: "from-blue-500 to-blue-700",
-  borderColor: "border-blue-500/30",
-  bgColor: "bg-blue-500/10"
-};
+type PaymentMethodConfig = PayPalConfig | EgyptTransferConfig;
 
 const PAYPAL_CONFIG: PayPalConfig = {
   type: "paypal",
   id: "paypal",
   name: "PayPal",
   icon: SiPaypal,
-  description: "الدفع عبر PayPal",
-  email: "payments@ma3k.com",
+  description: "الدفع الدولي عبر PayPal",
+  paymentLink: "https://www.paypal.com/ncp/payment/B7VV2ADFRJYDWاولا",
   color: "from-[#003087] to-[#009cde]",
   borderColor: "border-[#009cde]/30",
   bgColor: "bg-[#009cde]/10"
 };
 
-const ETISALAT_CASH_CONFIG: EtisalatCashConfig = {
-  type: "etisalat_cash",
-  id: "etisalat_cash",
-  name: "اتصالات كاش",
-  icon: Smartphone,
-  description: "الدفع عبر اتصالات كاش",
-  phoneNumber: "01155201921",
-  color: "from-orange-500 to-red-600",
-  borderColor: "border-orange-500/30",
-  bgColor: "bg-orange-500/10"
+const EGYPT_TRANSFER_CONFIG: EgyptTransferConfig = {
+  type: "egypt_transfer",
+  id: "egypt_transfer",
+  name: "تحويل لمصر",
+  icon: Building2,
+  description: "تحويل بنكي أو اتصالات كاش",
+  methods: {
+    bankTransfer: {
+      accountNumber: "EG420059003800000200013934156",
+      bankName: "بنك فيصل الإسلامي",
+      accountName: "محمود محمد احمد"
+    },
+    etisalatCash: {
+      phoneNumber: "01155201921"
+    }
+  },
+  color: "from-green-500 to-teal-600",
+  borderColor: "border-green-500/30",
+  bgColor: "bg-green-500/10"
 };
 
 const PAYMENT_METHODS: PaymentMethodConfig[] = [
-  BANK_TRANSFER_CONFIG,
   PAYPAL_CONFIG,
-  ETISALAT_CASH_CONFIG
+  EGYPT_TRANSFER_CONFIG
 ];
 
 export default function PaymentPage() {
@@ -138,7 +127,8 @@ export default function PaymentPage() {
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+  // تحويل الأسعار من ريال إلى دولار (1 ريال = 0.27 دولار تقريباً)
+  const subtotal = cart.reduce((sum, item) => sum + Math.round(item.price * 0.27), 0);
   const finalPrice = Math.max(0, subtotal - discountAmount);
 
   useEffect(() => {
@@ -416,71 +406,80 @@ export default function PaymentPage() {
                           animate={{ opacity: 1, height: "auto" }}
                           className="mt-4 p-4 rounded-lg bg-background/50"
                         >
-                          {method.type === "bank_transfer" && (
-                              <div className="space-y-3">
-                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                  <span className="text-sm text-muted-foreground">رقم الحساب:</span>
-                                  <div className="flex items-center gap-2">
-                                    <code className="text-sm font-mono" dir="ltr">{method.accountNumber}</code>
-                                    <Button 
-                                      size="icon" 
-                                      variant="ghost" 
-                                      onClick={() => copyToClipboard(method.accountNumber)}
-                                      data-testid="button-copy-account"
-                                    >
-                                      <Copy className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                  <span className="text-sm text-muted-foreground">البنك:</span>
-                                  <span className="font-medium">{method.bankName}</span>
-                                </div>
-                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                  <span className="text-sm text-muted-foreground">اسم الحساب:</span>
-                                  <span className="font-medium">{method.accountName}</span>
-                                </div>
-                              </div>
-                          )}
                           {method.type === "paypal" && (
-                              <div className="space-y-3">
-                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                  <span className="text-sm text-muted-foreground">البريد الإلكتروني:</span>
-                                  <div className="flex items-center gap-2">
-                                    <code className="text-sm font-mono">{method.email}</code>
-                                    <Button 
-                                      size="icon" 
-                                      variant="ghost" 
-                                      onClick={() => copyToClipboard(method.email)}
-                                      data-testid="button-copy-paypal"
-                                    >
-                                      <Copy className="w-4 h-4" />
-                                    </Button>
-                                  </div>
+                              <div className="space-y-4">
+                                <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                  <p className="text-sm text-muted-foreground mb-3">
+                                    اضغط على الزر أدناه للدفع عبر PayPal
+                                  </p>
+                                  <Button
+                                    className="w-full bg-[#0070ba] hover:bg-[#003087]"
+                                    onClick={() => window.open(method.paymentLink, '_blank')}
+                                  >
+                                    <SiPaypal className="w-5 h-5 ml-2" />
+                                    الدفع عبر PayPal
+                                  </Button>
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                  قم بإرسال المبلغ إلى هذا الحساب ثم أرفق إيصال التحويل أدناه
+                                <p className="text-xs text-muted-foreground text-center">
+                                  بعد إتمام الدفع، قم برفع إيصال الدفع أدناه
                                 </p>
                               </div>
                           )}
-                          {method.type === "etisalat_cash" && (
-                              <div className="space-y-3">
-                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                  <span className="text-sm text-muted-foreground">رقم الهاتف:</span>
-                                  <div className="flex items-center gap-2">
-                                    <code className="text-lg font-mono font-bold" dir="ltr">{method.phoneNumber}</code>
-                                    <Button 
-                                      size="icon" 
-                                      variant="ghost" 
-                                      onClick={() => copyToClipboard(method.phoneNumber)}
-                                      data-testid="button-copy-etisalat"
-                                    >
-                                      <Copy className="w-4 h-4" />
-                                    </Button>
+                          {method.type === "egypt_transfer" && (
+                              <div className="space-y-4">
+                                <div className="p-4 bg-card rounded-lg border border-border">
+                                  <h4 className="font-bold mb-3 flex items-center gap-2">
+                                    <Building2 className="w-4 h-4" />
+                                    تحويل بنكي
+                                  </h4>
+                                  <div className="space-y-2">
+                                    <div className="flex justify-between items-center p-2 bg-muted rounded">
+                                      <span className="text-sm text-muted-foreground">البنك:</span>
+                                      <span className="font-medium">{method.methods.bankTransfer.bankName}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-2 bg-muted rounded">
+                                      <span className="text-sm text-muted-foreground">اسم الحساب:</span>
+                                      <span className="font-medium">{method.methods.bankTransfer.accountName}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center p-2 bg-muted rounded">
+                                      <span className="text-sm text-muted-foreground">رقم الحساب:</span>
+                                      <div className="flex items-center gap-2">
+                                        <code className="text-xs font-mono" dir="ltr">{method.methods.bankTransfer.accountNumber}</code>
+                                        <Button 
+                                          size="icon" 
+                                          variant="ghost"
+                                          className="h-6 w-6"
+                                          onClick={() => copyToClipboard(method.methods.bankTransfer.accountNumber)}
+                                        >
+                                          <Copy className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                  قم بتحويل المبلغ عبر اتصالات كاش ثم أرفق إيصال التحويل أدناه
+                                
+                                <div className="p-4 bg-card rounded-lg border border-border">
+                                  <h4 className="font-bold mb-3 flex items-center gap-2">
+                                    <Smartphone className="w-4 h-4" />
+                                    اتصالات كاش
+                                  </h4>
+                                  <div className="flex justify-between items-center p-2 bg-muted rounded">
+                                    <span className="text-sm text-muted-foreground">رقم الهاتف:</span>
+                                    <div className="flex items-center gap-2">
+                                      <code className="text-lg font-mono font-bold" dir="ltr">{method.methods.etisalatCash.phoneNumber}</code>
+                                      <Button 
+                                        size="icon" 
+                                        variant="ghost"
+                                        onClick={() => copyToClipboard(method.methods.etisalatCash.phoneNumber)}
+                                      >
+                                        <Copy className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <p className="text-xs text-muted-foreground text-center">
+                                  قم بالتحويل ثم أرفق إيصال التحويل أدناه
                                 </p>
                               </div>
                           )}
@@ -587,7 +586,7 @@ export default function PaymentPage() {
                 {cart.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg" data-testid={`cart-item-${idx}`}>
                     <span className="text-sm font-medium">{item.name}</span>
-                    <span className="text-primary font-bold">{item.price} جنيه</span>
+                    <span className="text-primary font-bold">${Math.round(item.price * 0.27)}</span>
                   </div>
                 ))}
               </div>
@@ -597,18 +596,18 @@ export default function PaymentPage() {
               <div className="space-y-3">
                 <div className="flex justify-between text-muted-foreground">
                   <span>المجموع الفرعي</span>
-                  <span>{subtotal} جنيه</span>
+                  <span>${subtotal}</span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-green-500">
                     <span>الخصم ({discountPercentage}%)</span>
-                    <span>-{discountAmount} جنيه</span>
+                    <span>-${discountAmount}</span>
                   </div>
                 )}
                 <Separator />
                 <div className="flex justify-between text-xl font-bold">
                   <span>الإجمالي</span>
-                  <span className="text-primary">{finalPrice} جنيه</span>
+                  <span className="text-primary">${finalPrice}</span>
                 </div>
               </div>
 
