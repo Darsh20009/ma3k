@@ -29,79 +29,92 @@ import {
 import { SiPaypal } from "react-icons/si";
 import { apiRequest } from "@/lib/queryClient";
 
-type PaymentMethod = "bank_transfer" | "paypal" | "etisalat_cash" | null;
+type PaymentMethodType = "bank_transfer" | "paypal" | "etisalat_cash";
+type PaymentMethod = PaymentMethodType | null;
 
-interface BankTransferDetails {
-  accountNumber: string;
-  bankName: string;
-  accountName: string;
-}
-
-interface PayPalDetails {
-  email: string;
-}
-
-interface EtisalatCashDetails {
-  phoneNumber: string;
-}
-
-interface PaymentMethodConfig {
-  id: string;
+interface BankTransferConfig {
+  type: "bank_transfer";
+  id: "bank_transfer";
   name: string;
   icon: React.ComponentType<{ className?: string }>;
   description: string;
-  details: BankTransferDetails | PayPalDetails | EtisalatCashDetails;
+  accountNumber: string;
+  bankName: string;
+  accountName: string;
   color: string;
   borderColor: string;
   bgColor: string;
 }
 
-const BANK_TRANSFER_CONFIG: PaymentMethodConfig = {
+interface PayPalConfig {
+  type: "paypal";
+  id: "paypal";
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  email: string;
+  color: string;
+  borderColor: string;
+  bgColor: string;
+}
+
+interface EtisalatCashConfig {
+  type: "etisalat_cash";
+  id: "etisalat_cash";
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  phoneNumber: string;
+  color: string;
+  borderColor: string;
+  bgColor: string;
+}
+
+type PaymentMethodConfig = BankTransferConfig | PayPalConfig | EtisalatCashConfig;
+
+const BANK_TRANSFER_CONFIG: BankTransferConfig = {
+  type: "bank_transfer",
   id: "bank_transfer",
   name: "تحويل بنكي",
   icon: Building2,
   description: "التحويل البنكي المباشر",
-  details: {
-    accountNumber: "EG420059003800000200013934156",
-    bankName: "البنك الأهلي المصري",
-    accountName: "شركة معك للخدمات الرقمية"
-  } as BankTransferDetails,
+  accountNumber: "EG420059003800000200013934156",
+  bankName: "البنك الأهلي المصري",
+  accountName: "شركة معك للخدمات الرقمية",
   color: "from-blue-500 to-blue-700",
   borderColor: "border-blue-500/30",
   bgColor: "bg-blue-500/10"
 };
 
-const PAYPAL_CONFIG: PaymentMethodConfig = {
+const PAYPAL_CONFIG: PayPalConfig = {
+  type: "paypal",
   id: "paypal",
   name: "PayPal",
   icon: SiPaypal,
   description: "الدفع عبر PayPal",
-  details: {
-    email: "payments@ma3k.com"
-  } as PayPalDetails,
+  email: "payments@ma3k.com",
   color: "from-[#003087] to-[#009cde]",
   borderColor: "border-[#009cde]/30",
   bgColor: "bg-[#009cde]/10"
 };
 
-const ETISALAT_CASH_CONFIG: PaymentMethodConfig = {
+const ETISALAT_CASH_CONFIG: EtisalatCashConfig = {
+  type: "etisalat_cash",
   id: "etisalat_cash",
   name: "اتصالات كاش",
   icon: Smartphone,
   description: "الدفع عبر اتصالات كاش",
-  details: {
-    phoneNumber: "01155201921"
-  } as EtisalatCashDetails,
+  phoneNumber: "01155201921",
   color: "from-orange-500 to-red-600",
   borderColor: "border-orange-500/30",
   bgColor: "bg-orange-500/10"
 };
 
-const PAYMENT_METHODS: Record<string, PaymentMethodConfig> = {
-  bank_transfer: BANK_TRANSFER_CONFIG,
-  paypal: PAYPAL_CONFIG,
-  etisalat_cash: ETISALAT_CASH_CONFIG
-};
+const PAYMENT_METHODS: PaymentMethodConfig[] = [
+  BANK_TRANSFER_CONFIG,
+  PAYPAL_CONFIG,
+  ETISALAT_CASH_CONFIG
+];
 
 export default function PaymentPage() {
   const [, setLocation] = useLocation();
