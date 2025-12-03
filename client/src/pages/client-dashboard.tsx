@@ -152,7 +152,7 @@ export default function ClientDashboard() {
   });
 
   const { data: notifications = [] } = useQuery<Notification[]>({
-    queryKey: [`/api/notifications/${user?.id}`],
+    queryKey: [`/api/notifications/client/${user?.id}`],
     enabled: !!user?.id && isClient(),
   });
 

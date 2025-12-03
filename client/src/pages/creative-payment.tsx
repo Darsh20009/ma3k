@@ -416,18 +416,16 @@ export default function PaymentPage() {
                           animate={{ opacity: 1, height: "auto" }}
                           className="mt-4 p-4 rounded-lg bg-background/50"
                         >
-                          {method.id === "bank_transfer" && (() => {
-                            const details = method.details as BankTransferDetails;
-                            return (
+                          {method.type === "bank_transfer" && (
                               <div className="space-y-3">
                                 <div className="flex justify-between items-center p-3 bg-card rounded-lg">
                                   <span className="text-sm text-muted-foreground">رقم الحساب:</span>
                                   <div className="flex items-center gap-2">
-                                    <code className="text-sm font-mono" dir="ltr">{details.accountNumber}</code>
+                                    <code className="text-sm font-mono" dir="ltr">{method.accountNumber}</code>
                                     <Button 
                                       size="icon" 
                                       variant="ghost" 
-                                      onClick={() => copyToClipboard(details.accountNumber)}
+                                      onClick={() => copyToClipboard(method.accountNumber)}
                                       data-testid="button-copy-account"
                                     >
                                       <Copy className="w-4 h-4" />
@@ -436,27 +434,24 @@ export default function PaymentPage() {
                                 </div>
                                 <div className="flex justify-between items-center p-3 bg-card rounded-lg">
                                   <span className="text-sm text-muted-foreground">البنك:</span>
-                                  <span className="font-medium">{details.bankName}</span>
+                                  <span className="font-medium">{method.bankName}</span>
                                 </div>
                                 <div className="flex justify-between items-center p-3 bg-card rounded-lg">
                                   <span className="text-sm text-muted-foreground">اسم الحساب:</span>
-                                  <span className="font-medium">{details.accountName}</span>
+                                  <span className="font-medium">{method.accountName}</span>
                                 </div>
                               </div>
-                            );
-                          })()}
-                          {method.id === "paypal" && (() => {
-                            const details = method.details as PayPalDetails;
-                            return (
+                          )}
+                          {method.type === "paypal" && (
                               <div className="space-y-3">
                                 <div className="flex justify-between items-center p-3 bg-card rounded-lg">
                                   <span className="text-sm text-muted-foreground">البريد الإلكتروني:</span>
                                   <div className="flex items-center gap-2">
-                                    <code className="text-sm font-mono">{details.email}</code>
+                                    <code className="text-sm font-mono">{method.email}</code>
                                     <Button 
                                       size="icon" 
                                       variant="ghost" 
-                                      onClick={() => copyToClipboard(details.email)}
+                                      onClick={() => copyToClipboard(method.email)}
                                       data-testid="button-copy-paypal"
                                     >
                                       <Copy className="w-4 h-4" />
@@ -467,20 +462,17 @@ export default function PaymentPage() {
                                   قم بإرسال المبلغ إلى هذا الحساب ثم أرفق إيصال التحويل أدناه
                                 </p>
                               </div>
-                            );
-                          })()}
-                          {method.id === "etisalat_cash" && (() => {
-                            const details = method.details as EtisalatCashDetails;
-                            return (
+                          )}
+                          {method.type === "etisalat_cash" && (
                               <div className="space-y-3">
                                 <div className="flex justify-between items-center p-3 bg-card rounded-lg">
                                   <span className="text-sm text-muted-foreground">رقم الهاتف:</span>
                                   <div className="flex items-center gap-2">
-                                    <code className="text-lg font-mono font-bold" dir="ltr">{details.phoneNumber}</code>
+                                    <code className="text-lg font-mono font-bold" dir="ltr">{method.phoneNumber}</code>
                                     <Button 
                                       size="icon" 
                                       variant="ghost" 
-                                      onClick={() => copyToClipboard(details.phoneNumber)}
+                                      onClick={() => copyToClipboard(method.phoneNumber)}
                                       data-testid="button-copy-etisalat"
                                     >
                                       <Copy className="w-4 h-4" />
@@ -491,8 +483,7 @@ export default function PaymentPage() {
                                   قم بتحويل المبلغ عبر اتصالات كاش ثم أرفق إيصال التحويل أدناه
                                 </p>
                               </div>
-                            );
-                          })()}
+                          )}
                         </motion.div>
                       )}
                     </motion.div>
