@@ -28,6 +28,8 @@ import Login from "@/pages/login";
 import Register from "@/pages/register";
 import MyCoursesComplete from "@/pages/my-courses-complete";
 import MyProjectsComplete from "@/pages/my-projects-complete";
+import ClientDashboard from "@/pages/client-dashboard";
+import EmployeeDashboardNew from "@/pages/employee-dashboard-new";
 import CertSearch from "@/pages/cert-search";
 import EmployeeProfile from "@/pages/employee-profile";
 import WebsiteForm from "@/pages/website-form";
@@ -55,6 +57,8 @@ function Router() {
         <Route path="/register" component={Register} />
         <Route path="/my-courses" component={MyCoursesComplete} />
         <Route path="/my-projects" component={MyProjectsComplete} />
+        <Route path="/client-dashboard" component={ClientDashboard} />
+        <Route path="/employee-dashboard-new" component={EmployeeDashboardNew} />
         <Route path="/cert-search" component={CertSearch} />
         <Route path="/employee-profile" component={EmployeeProfile} />
         <Route path="/employee-login" component={EmployeeLogin} />

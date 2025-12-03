@@ -579,7 +579,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/clients/:id/orders", async (req, res) => {
+    try {
+      const orders = await storage.getClientOrders(req.params.id);
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch client orders" });
+    }
+  });
+
+  app.get("/api/clients", async (req, res) => {
+    try {
+      const clients = await storage.getClients();
+      res.json(clients);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch clients" });
+    }
+  });
+
   // Employees routes
+  app.get("/api/employees", async (req, res) => {
+    try {
+      const employees = await storage.getEmployees();
+      res.json(employees);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch employees" });
+    }
+  });
+
   app.get("/api/employees/:id", async (req, res) => {
     try {
       const employee = await storage.getEmployee(req.params.id);
@@ -615,6 +642,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(employee);
     } catch (error) {
       res.status(500).json({ error: "Failed to update employee photo" });
+    }
+  });
+
+  // Tasks routes
+  app.patch("/api/tasks/:id", async (req, res) => {
+    try {
+      const { isCompleted, hoursRemaining } = req.body;
+      const task = await storage.updateEmployeeTask(req.params.id, isCompleted, hoursRemaining);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+      res.json(task);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update task" });
     }
   });
 

@@ -53,9 +53,11 @@ export interface IStorage {
   updateStudentFreeCourses(id: string, count: number): Promise<Student | undefined>;
 
   // Clients
+  getClients(): Promise<Client[]>;
   getClient(id: string): Promise<Client | undefined>;
   getClientByEmail(email: string): Promise<Client | undefined>;
   createClient(client: InsertClient): Promise<Client>;
+  getClientOrders(clientId: string): Promise<Order[]>;
 
   // Employees
   getEmployees(): Promise<Employee[]>;
@@ -1069,8 +1071,20 @@ export class JsonStorage implements IStorage {
     return undefined;
   }
 
+  async getClients(): Promise<Client[]> {
+    return Array.from(this.clients.values());
+  }
+
   async getClient(id: string): Promise<Client | undefined> {
     return this.clients.get(id);
+  }
+
+  async getClientOrders(clientId: string): Promise<Order[]> {
+    const client = await this.getClient(clientId);
+    if (!client) return [];
+    return Array.from(this.orders.values()).filter(
+      (order) => order.customerEmail === client.email
+    );
   }
 
   async getClientByEmail(email: string): Promise<Client | undefined> {
