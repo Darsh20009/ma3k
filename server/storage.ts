@@ -8,7 +8,10 @@ import {
   type Project, type InsertProject, type DiscountCode, type InsertDiscountCode,
   type EmployeeTask, type InsertEmployeeTask,
   type Lesson, type LessonProgress, type Quiz, type QuizAttempt, type InsertQuizAttempt,
-  type Review, type InsertReview, type Notification, type InsertNotification
+  type Review, type InsertReview, type Notification, type InsertNotification,
+  type ChatConversation, type InsertChatConversation, type ChatMessage, type InsertChatMessage,
+  type ModificationRequest, type InsertModificationRequest, type FeatureRequest, type InsertFeatureRequest,
+  type ProjectFile, type InsertProjectFile, type ProjectQuestion, type InsertProjectQuestion
 } from "@shared/schema";
 import session from "express-session";
 import { randomUUID } from "crypto";
@@ -143,6 +146,48 @@ export interface IStorage {
     activeProjects: number;
     completedCourses: number;
   }>;
+
+  // Chat Conversations
+  createChatConversation(data: InsertChatConversation): Promise<ChatConversation>;
+  getChatConversation(id: string): Promise<ChatConversation | undefined>;
+  getClientConversations(clientId: string): Promise<ChatConversation[]>;
+  getEmployeeConversations(employeeId: string): Promise<ChatConversation[]>;
+  getProjectConversation(projectId: string): Promise<ChatConversation | undefined>;
+  updateConversationLastMessage(id: string): Promise<void>;
+
+  // Chat Messages
+  createChatMessage(data: InsertChatMessage): Promise<ChatMessage>;
+  getChatMessages(conversationId: string): Promise<ChatMessage[]>;
+  markMessagesAsRead(conversationId: string, recipientId: string): Promise<void>;
+  getUnreadMessagesCount(userId: string, userType: string): Promise<number>;
+
+  // Modification Requests
+  createModificationRequest(data: InsertModificationRequest): Promise<ModificationRequest>;
+  getModificationRequest(id: string): Promise<ModificationRequest | undefined>;
+  getProjectModificationRequests(projectId: string): Promise<ModificationRequest[]>;
+  getClientModificationRequests(clientId: string): Promise<ModificationRequest[]>;
+  updateModificationRequestStatus(id: string, status: string, assignedTo?: string): Promise<ModificationRequest | undefined>;
+
+  // Feature Requests
+  createFeatureRequest(data: InsertFeatureRequest): Promise<FeatureRequest>;
+  getFeatureRequest(id: string): Promise<FeatureRequest | undefined>;
+  getProjectFeatureRequests(projectId: string): Promise<FeatureRequest[]>;
+  getClientFeatureRequests(clientId: string): Promise<FeatureRequest[]>;
+  updateFeatureRequestStatus(id: string, status: string, adminNotes?: string, estimatedCost?: number, estimatedDays?: number): Promise<FeatureRequest | undefined>;
+
+  // Project Files
+  createProjectFile(data: InsertProjectFile): Promise<ProjectFile>;
+  getProjectFiles(projectId: string): Promise<ProjectFile[]>;
+  deleteProjectFile(id: string): Promise<void>;
+
+  // Project Questions
+  createProjectQuestion(data: InsertProjectQuestion): Promise<ProjectQuestion>;
+  getProjectQuestions(projectId: string): Promise<ProjectQuestion[]>;
+  answerProjectQuestion(id: string, answer: string): Promise<ProjectQuestion | undefined>;
+  initializeProjectQuestions(projectId: string): Promise<void>;
+
+  // Admin
+  getAllPendingRequests(): Promise<{ modifications: ModificationRequest[], features: FeatureRequest[] }>;
 
   // Session Store
   sessionStore?: session.Store;

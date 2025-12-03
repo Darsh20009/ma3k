@@ -424,6 +424,94 @@ export const insertQuizAttemptSchema = createInsertSchema(quizAttempts).pick({
   attemptNumber: true,
 });
 
+// Chat Conversations table
+export const chatConversations = pgTable("chat_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").references(() => projects.id),
+  clientId: varchar("client_id").references(() => clients.id),
+  employeeId: varchar("employee_id").references(() => employees.id),
+  type: text("type").notNull(), // 'project', 'support', 'general'
+  status: text("status").default("active"), // 'active', 'closed', 'archived'
+  lastMessageAt: timestamp("last_message_at").default(sql`CURRENT_TIMESTAMP`),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Chat Messages table
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id").references(() => chatConversations.id).notNull(),
+  senderId: varchar("sender_id").notNull(),
+  senderType: text("sender_type").notNull(), // 'client', 'employee', 'admin'
+  senderName: text("sender_name").notNull(),
+  content: text("content").notNull(),
+  messageType: text("message_type").default("text"), // 'text', 'file', 'image', 'audio'
+  fileUrl: text("file_url"),
+  fileName: text("file_name"),
+  isRead: boolean("is_read").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Modification Requests table
+export const modificationRequests = pgTable("modification_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").references(() => projects.id).notNull(),
+  clientId: varchar("client_id").references(() => clients.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  priority: text("priority").default("medium"), // 'low', 'medium', 'high', 'urgent'
+  status: text("status").default("pending"), // 'pending', 'in_progress', 'completed', 'rejected'
+  assignedTo: varchar("assigned_to").references(() => employees.id),
+  attachments: text("attachments").array(),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Feature Requests table
+export const featureRequests = pgTable("feature_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").references(() => projects.id).notNull(),
+  clientId: varchar("client_id").references(() => clients.id).notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  category: text("category"), // 'ui', 'functionality', 'integration', 'other'
+  priority: text("priority").default("medium"),
+  status: text("status").default("pending"), // 'pending', 'approved', 'in_progress', 'completed', 'rejected'
+  estimatedCost: integer("estimated_cost"),
+  estimatedDays: integer("estimated_days"),
+  adminNotes: text("admin_notes"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Project Files table
+export const projectFiles = pgTable("project_files", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").references(() => projects.id).notNull(),
+  uploadedBy: varchar("uploaded_by").notNull(),
+  uploaderType: text("uploader_type").notNull(), // 'client', 'employee'
+  uploaderName: text("uploader_name").notNull(),
+  fileName: text("file_name").notNull(),
+  fileUrl: text("file_url").notNull(),
+  fileType: text("file_type"), // 'image', 'document', 'logo', 'design', 'other'
+  fileSize: integer("file_size"),
+  description: text("description"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Project Questions/Answers table (for project requirements)
+export const projectQuestions = pgTable("project_questions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").references(() => projects.id).notNull(),
+  question: text("question").notNull(),
+  answer: text("answer"),
+  category: text("category"), // 'general', 'design', 'features', 'content', 'technical'
+  isRequired: boolean("is_required").default(false),
+  order: integer("order").default(0),
+  answeredAt: timestamp("answered_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
 // Reviews and Ratings table
 export const reviews = pgTable("reviews", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -513,3 +601,76 @@ export type Quiz = typeof quizzes.$inferSelect;
 export type InsertQuiz = z.infer<typeof insertQuizSchema>;
 export type QuizAttempt = typeof quizAttempts.$inferSelect;
 export type InsertQuizAttempt = z.infer<typeof insertQuizAttemptSchema>;
+
+// Insert schemas for chat and new tables
+export const insertChatConversationSchema = createInsertSchema(chatConversations).pick({
+  projectId: true,
+  clientId: true,
+  employeeId: true,
+  type: true,
+  status: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).pick({
+  conversationId: true,
+  senderId: true,
+  senderType: true,
+  senderName: true,
+  content: true,
+  messageType: true,
+  fileUrl: true,
+  fileName: true,
+});
+
+export const insertModificationRequestSchema = createInsertSchema(modificationRequests).pick({
+  projectId: true,
+  clientId: true,
+  title: true,
+  description: true,
+  priority: true,
+  attachments: true,
+});
+
+export const insertFeatureRequestSchema = createInsertSchema(featureRequests).pick({
+  projectId: true,
+  clientId: true,
+  title: true,
+  description: true,
+  category: true,
+  priority: true,
+});
+
+export const insertProjectFileSchema = createInsertSchema(projectFiles).pick({
+  projectId: true,
+  uploadedBy: true,
+  uploaderType: true,
+  uploaderName: true,
+  fileName: true,
+  fileUrl: true,
+  fileType: true,
+  fileSize: true,
+  description: true,
+});
+
+export const insertProjectQuestionSchema = createInsertSchema(projectQuestions).pick({
+  projectId: true,
+  question: true,
+  answer: true,
+  category: true,
+  isRequired: true,
+  order: true,
+});
+
+// Types for new tables
+export type ChatConversation = typeof chatConversations.$inferSelect;
+export type InsertChatConversation = z.infer<typeof insertChatConversationSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ModificationRequest = typeof modificationRequests.$inferSelect;
+export type InsertModificationRequest = z.infer<typeof insertModificationRequestSchema>;
+export type FeatureRequest = typeof featureRequests.$inferSelect;
+export type InsertFeatureRequest = z.infer<typeof insertFeatureRequestSchema>;
+export type ProjectFile = typeof projectFiles.$inferSelect;
+export type InsertProjectFile = z.infer<typeof insertProjectFileSchema>;
+export type ProjectQuestion = typeof projectQuestions.$inferSelect;
+export type InsertProjectQuestion = z.infer<typeof insertProjectQuestionSchema>;

@@ -1193,6 +1193,445 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== Chat System Routes ====================
+  
+  // Create or get conversation for a project
+  app.post("/api/chat/conversations", async (req, res) => {
+    try {
+      const { projectId, clientId, employeeId, type } = req.body;
+      
+      // Validation: At least one participant required
+      if (!clientId && !employeeId) {
+        return res.status(400).json({ error: "At least one participant is required" });
+      }
+      
+      // Verify client exists if provided
+      if (clientId) {
+        const client = await storage.getClient(clientId);
+        if (!client) {
+          return res.status(400).json({ error: "Client not found" });
+        }
+      }
+      
+      // Verify project exists if provided
+      if (projectId) {
+        const project = await storage.getProject(projectId);
+        if (!project) {
+          return res.status(400).json({ error: "Project not found" });
+        }
+        
+        // Check if conversation already exists for this project
+        const existing = await storage.getProjectConversation(projectId);
+        if (existing) {
+          return res.json(existing);
+        }
+        
+        // Verify client is project owner
+        if (clientId && project.clientId !== clientId) {
+          return res.status(403).json({ error: "Client is not the project owner" });
+        }
+      }
+      
+      const conversation = await storage.createChatConversation({
+        projectId,
+        clientId,
+        employeeId,
+        type: type || 'project',
+        status: 'active'
+      });
+      res.status(201).json(conversation);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      res.status(500).json({ error: "Failed to create conversation" });
+    }
+  });
+
+  // Get client's conversations
+  app.get("/api/chat/conversations/client/:clientId", async (req, res) => {
+    try {
+      const conversations = await storage.getClientConversations(req.params.clientId);
+      res.json(conversations);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch conversations" });
+    }
+  });
+
+  // Get employee's conversations
+  app.get("/api/chat/conversations/employee/:employeeId", async (req, res) => {
+    try {
+      const conversations = await storage.getEmployeeConversations(req.params.employeeId);
+      res.json(conversations);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch conversations" });
+    }
+  });
+
+  // Get messages for a conversation
+  app.get("/api/chat/conversations/:id/messages", async (req, res) => {
+    try {
+      const messages = await storage.getChatMessages(req.params.id);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
+  // Send a message
+  app.post("/api/chat/messages", async (req, res) => {
+    try {
+      const { conversationId, senderId, senderType, senderName, content, messageType, fileUrl, fileName } = req.body;
+      
+      // Validation
+      if (!conversationId || !senderId || !senderType || !content) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      if (!['client', 'employee', 'admin'].includes(senderType)) {
+        return res.status(400).json({ error: "Invalid sender type" });
+      }
+      
+      // Verify conversation exists
+      const conversation = await storage.getChatConversation(conversationId);
+      if (!conversation) {
+        return res.status(404).json({ error: "Conversation not found" });
+      }
+      
+      // Verify sender is participant in conversation
+      const isParticipant = 
+        (senderType === 'client' && conversation.clientId === senderId) ||
+        (senderType === 'employee' && conversation.employeeId === senderId) ||
+        senderType === 'admin';
+      
+      if (!isParticipant) {
+        return res.status(403).json({ error: "You are not a participant in this conversation" });
+      }
+      
+      const message = await storage.createChatMessage({
+        conversationId,
+        senderId,
+        senderType,
+        senderName: senderName || 'مستخدم',
+        content,
+        messageType: messageType || 'text',
+        fileUrl,
+        fileName
+      });
+
+      // Broadcast message via WebSocket
+      const recipientId = senderType === 'client' ? conversation.employeeId : conversation.clientId;
+      const recipientType = senderType === 'client' ? 'employee' : 'client';
+      if (recipientId) {
+        broadcastNotification(recipientId, recipientType, {
+          type: 'chat_message',
+          conversationId,
+          message
+        });
+      }
+
+      res.status(201).json(message);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  // Mark messages as read
+  app.put("/api/chat/conversations/:id/read", async (req, res) => {
+    try {
+      const { recipientId } = req.body;
+      await storage.markMessagesAsRead(req.params.id, recipientId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to mark messages as read" });
+    }
+  });
+
+  // Get unread messages count
+  app.get("/api/chat/unread/:userType/:userId", async (req, res) => {
+    try {
+      const { userType, userId } = req.params;
+      const count = await storage.getUnreadMessagesCount(userId, userType);
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get unread count" });
+    }
+  });
+
+  // ==================== Modification Requests Routes ====================
+
+  // Create modification request
+  app.post("/api/modification-requests", async (req, res) => {
+    try {
+      const { projectId, clientId, title, description, priority, attachments } = req.body;
+      
+      // Validation
+      if (!projectId || !clientId || !title || !description) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      // Verify project exists
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      // Verify client is project owner
+      if (project.clientId !== clientId) {
+        return res.status(403).json({ error: "You are not authorized to submit modification requests for this project" });
+      }
+      
+      // Validate priority if provided
+      if (priority && !['low', 'medium', 'high', 'urgent'].includes(priority)) {
+        return res.status(400).json({ error: "Invalid priority" });
+      }
+      
+      const request = await storage.createModificationRequest({
+        projectId,
+        clientId,
+        title,
+        description,
+        priority: priority || 'medium',
+        attachments
+      });
+      
+      // Create notification for assigned employee/admin
+      await storage.createNotification({
+        userId: 'admin',
+        userType: 'employee',
+        title: 'طلب تعديل جديد',
+        message: `تم استلام طلب تعديل جديد: ${title}`,
+        type: 'project',
+        link: `/employee-dashboard?tab=requests`
+      });
+      
+      res.status(201).json(request);
+    } catch (error) {
+      console.error('Error creating modification request:', error);
+      res.status(500).json({ error: "Failed to create modification request" });
+    }
+  });
+
+  // Get modification requests for a project
+  app.get("/api/modification-requests/project/:projectId", async (req, res) => {
+    try {
+      const requests = await storage.getProjectModificationRequests(req.params.projectId);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch modification requests" });
+    }
+  });
+
+  // Get modification requests for a client
+  app.get("/api/modification-requests/client/:clientId", async (req, res) => {
+    try {
+      const requests = await storage.getClientModificationRequests(req.params.clientId);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch modification requests" });
+    }
+  });
+
+  // Update modification request status
+  app.put("/api/modification-requests/:id/status", async (req, res) => {
+    try {
+      const { status, assignedTo } = req.body;
+      const request = await storage.updateModificationRequestStatus(req.params.id, status, assignedTo);
+      res.json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update modification request" });
+    }
+  });
+
+  // ==================== Feature Requests Routes ====================
+
+  // Create feature request
+  app.post("/api/feature-requests", async (req, res) => {
+    try {
+      const { projectId, clientId, title, description, category, priority } = req.body;
+      
+      // Validation
+      if (!projectId || !clientId || !title || !description) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      // Verify project exists
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      // Verify client is project owner
+      if (project.clientId !== clientId) {
+        return res.status(403).json({ error: "You are not authorized to submit feature requests for this project" });
+      }
+      
+      // Validate priority if provided
+      if (priority && !['low', 'medium', 'high'].includes(priority)) {
+        return res.status(400).json({ error: "Invalid priority" });
+      }
+      
+      const request = await storage.createFeatureRequest({
+        projectId,
+        clientId,
+        title,
+        description,
+        category: category || 'general',
+        priority: priority || 'medium'
+      });
+      
+      // Create notification
+      await storage.createNotification({
+        userId: 'admin',
+        userType: 'employee',
+        title: 'طلب ميزة جديدة',
+        message: `تم استلام طلب ميزة جديدة: ${title}`,
+        type: 'project',
+        link: `/employee-dashboard?tab=features`
+      });
+      
+      res.status(201).json(request);
+    } catch (error) {
+      console.error('Error creating feature request:', error);
+      res.status(500).json({ error: "Failed to create feature request" });
+    }
+  });
+
+  // Get feature requests for a project
+  app.get("/api/feature-requests/project/:projectId", async (req, res) => {
+    try {
+      const requests = await storage.getProjectFeatureRequests(req.params.projectId);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch feature requests" });
+    }
+  });
+
+  // Get feature requests for a client
+  app.get("/api/feature-requests/client/:clientId", async (req, res) => {
+    try {
+      const requests = await storage.getClientFeatureRequests(req.params.clientId);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch feature requests" });
+    }
+  });
+
+  // Update feature request status
+  app.put("/api/feature-requests/:id/status", async (req, res) => {
+    try {
+      const { status, adminNotes, estimatedCost, estimatedDays } = req.body;
+      const request = await storage.updateFeatureRequestStatus(req.params.id, status, adminNotes, estimatedCost, estimatedDays);
+      res.json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update feature request" });
+    }
+  });
+
+  // ==================== Project Files Routes ====================
+
+  // Upload project file
+  app.post("/api/project-files", async (req, res) => {
+    try {
+      const { projectId, uploadedBy, uploaderType, uploaderName, fileName, fileUrl, fileType, fileSize, description } = req.body;
+      
+      // Validation
+      if (!projectId || !uploadedBy || !uploaderType || !fileName || !fileUrl) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      if (!['client', 'employee', 'admin'].includes(uploaderType)) {
+        return res.status(400).json({ error: "Invalid uploader type" });
+      }
+      
+      // Verify project exists
+      const project = await storage.getProject(projectId);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      
+      // Verify uploader is authorized
+      if (uploaderType === 'client' && project.clientId !== uploadedBy) {
+        return res.status(403).json({ error: "You are not authorized to upload files for this project" });
+      }
+      
+      const file = await storage.createProjectFile({
+        projectId,
+        uploadedBy,
+        uploaderType,
+        uploaderName: uploaderName || 'مستخدم',
+        fileName,
+        fileUrl,
+        fileType: fileType || 'other',
+        fileSize: fileSize || 0,
+        description
+      });
+      res.status(201).json(file);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      res.status(500).json({ error: "Failed to upload file" });
+    }
+  });
+
+  // Get project files
+  app.get("/api/project-files/:projectId", async (req, res) => {
+    try {
+      const files = await storage.getProjectFiles(req.params.projectId);
+      res.json(files);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch project files" });
+    }
+  });
+
+  // Delete project file
+  app.delete("/api/project-files/:id", async (req, res) => {
+    try {
+      await storage.deleteProjectFile(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete file" });
+    }
+  });
+
+  // ==================== Project Questions Routes ====================
+
+  // Get project questions
+  app.get("/api/project-questions/:projectId", async (req, res) => {
+    try {
+      let questions = await storage.getProjectQuestions(req.params.projectId);
+      
+      // Initialize questions if empty
+      if (questions.length === 0) {
+        await storage.initializeProjectQuestions(req.params.projectId);
+        questions = await storage.getProjectQuestions(req.params.projectId);
+      }
+      
+      res.json(questions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch project questions" });
+    }
+  });
+
+  // Answer a project question
+  app.put("/api/project-questions/:id/answer", async (req, res) => {
+    try {
+      const { answer } = req.body;
+      const question = await storage.answerProjectQuestion(req.params.id, answer);
+      res.json(question);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to answer question" });
+    }
+  });
+
+  // Get all pending requests (admin)
+  app.get("/api/admin/pending-requests", async (req, res) => {
+    try {
+      const requests = await storage.getAllPendingRequests();
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch pending requests" });
+    }
+  });
+
   // Invoice PDF Route
   app.get("/api/invoices/:id/pdf", async (req, res) => {
     try {

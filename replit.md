@@ -4,6 +4,40 @@ Ma3k (معك) is a comprehensive Arabic digital services platform that provides 
 
 ## Recent Changes (December 3, 2025)
 
+### New Chat System
+- **Chat Conversations**: Real-time messaging between clients and employees for project communication
+- **WebSocket Integration**: Instant message delivery using WebSocket notifications
+- **Message Types**: Support for text messages and file attachments
+- **Read Receipts**: Track unread messages with mark-as-read functionality
+- **Security**: Participant verification and authorization checks
+
+### Modification Requests System
+- **Project Modifications**: Clients can request changes to their projects
+- **Priority Levels**: Support for low, medium, high, and urgent priorities
+- **Status Tracking**: Track request status from pending to completed
+- **Admin Notifications**: Automatic notifications for employees/admins
+
+### Feature Requests System
+- **New Features**: Clients can request new features for their projects
+- **Cost Estimation**: Admin can provide estimated cost and timeline
+- **Category Classification**: Organize requests by category
+- **Approval Workflow**: Status tracking from pending to approved/rejected
+
+### Project Files Management
+- **File Upload**: Upload and manage project-related files
+- **Access Control**: Only project owners can upload files
+- **File Types**: Support for various file types with metadata
+
+### Project Questions System
+- **Default Questions**: Auto-generated questions for new projects
+- **Categories**: Questions organized by category (general, design, features, etc.)
+- **Client Answers**: Clients can answer project-related questions
+
+### API Validation & Security
+- **Input Validation**: All new endpoints validate required fields
+- **Authorization Checks**: Verify user permissions before operations
+- **Error Handling**: Proper 404/403/400 responses for edge cases
+
 ### MongoDB Integration
 - **Primary Database**: MongoDB Atlas now serves as the primary database via Mongoose ODM
 - **Three-Tier Storage**: Priority system: MongoDB (primary) → PostgreSQL (fallback) → JSON (last resort)

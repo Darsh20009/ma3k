@@ -11,7 +11,10 @@ import {
   type Project, type InsertProject, type DiscountCode, type InsertDiscountCode,
   type EmployeeTask, type InsertEmployeeTask,
   type Lesson, type LessonProgress, type Quiz, type QuizAttempt, type InsertQuizAttempt,
-  type Review, type InsertReview, type Notification, type InsertNotification
+  type Review, type InsertReview, type Notification, type InsertNotification,
+  type ChatConversation, type InsertChatConversation, type ChatMessage, type InsertChatMessage,
+  type ModificationRequest, type InsertModificationRequest, type FeatureRequest, type InsertFeatureRequest,
+  type ProjectFile, type InsertProjectFile, type ProjectQuestion, type InsertProjectQuestion
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 import session from "express-session";
@@ -738,5 +741,222 @@ export class DatabaseStorage implements IStorage {
       activeProjects: activeProjectsResult?.count || 0,
       completedCourses: completedCoursesResult?.count || 0,
     };
+  }
+
+  // Chat Conversations
+  async createChatConversation(data: InsertChatConversation): Promise<ChatConversation> {
+    const result = await db.insert(schema.chatConversations).values(data).returning();
+    return result[0];
+  }
+
+  async getChatConversation(id: string): Promise<ChatConversation | undefined> {
+    const result = await db.select().from(schema.chatConversations).where(eq(schema.chatConversations.id, id));
+    return result[0];
+  }
+
+  async getClientConversations(clientId: string): Promise<ChatConversation[]> {
+    return await db.select().from(schema.chatConversations)
+      .where(eq(schema.chatConversations.clientId, clientId))
+      .orderBy(desc(schema.chatConversations.lastMessageAt));
+  }
+
+  async getEmployeeConversations(employeeId: string): Promise<ChatConversation[]> {
+    return await db.select().from(schema.chatConversations)
+      .where(eq(schema.chatConversations.employeeId, employeeId))
+      .orderBy(desc(schema.chatConversations.lastMessageAt));
+  }
+
+  async getProjectConversation(projectId: string): Promise<ChatConversation | undefined> {
+    const result = await db.select().from(schema.chatConversations)
+      .where(eq(schema.chatConversations.projectId, projectId));
+    return result[0];
+  }
+
+  async updateConversationLastMessage(id: string): Promise<void> {
+    await db.update(schema.chatConversations)
+      .set({ lastMessageAt: sql`CURRENT_TIMESTAMP` })
+      .where(eq(schema.chatConversations.id, id));
+  }
+
+  // Chat Messages
+  async createChatMessage(data: InsertChatMessage): Promise<ChatMessage> {
+    const result = await db.insert(schema.chatMessages).values(data).returning();
+    await this.updateConversationLastMessage(data.conversationId);
+    return result[0];
+  }
+
+  async getChatMessages(conversationId: string): Promise<ChatMessage[]> {
+    return await db.select().from(schema.chatMessages)
+      .where(eq(schema.chatMessages.conversationId, conversationId))
+      .orderBy(schema.chatMessages.createdAt);
+  }
+
+  async markMessagesAsRead(conversationId: string, recipientId: string): Promise<void> {
+    await db.update(schema.chatMessages)
+      .set({ isRead: true })
+      .where(and(
+        eq(schema.chatMessages.conversationId, conversationId),
+        sql`${schema.chatMessages.senderId} != ${recipientId}`
+      ));
+  }
+
+  async getUnreadMessagesCount(userId: string, userType: string): Promise<number> {
+    let conversations: ChatConversation[] = [];
+    if (userType === 'client') {
+      conversations = await this.getClientConversations(userId);
+    } else if (userType === 'employee') {
+      conversations = await this.getEmployeeConversations(userId);
+    }
+    
+    let totalUnread = 0;
+    for (const conv of conversations) {
+      const result = await db.select({ count: count() }).from(schema.chatMessages)
+        .where(and(
+          eq(schema.chatMessages.conversationId, conv.id),
+          eq(schema.chatMessages.isRead, false),
+          sql`${schema.chatMessages.senderId} != ${userId}`
+        ));
+      totalUnread += result[0]?.count || 0;
+    }
+    return totalUnread;
+  }
+
+  // Modification Requests
+  async createModificationRequest(data: InsertModificationRequest): Promise<ModificationRequest> {
+    const result = await db.insert(schema.modificationRequests).values(data).returning();
+    return result[0];
+  }
+
+  async getModificationRequest(id: string): Promise<ModificationRequest | undefined> {
+    const result = await db.select().from(schema.modificationRequests)
+      .where(eq(schema.modificationRequests.id, id));
+    return result[0];
+  }
+
+  async getProjectModificationRequests(projectId: string): Promise<ModificationRequest[]> {
+    return await db.select().from(schema.modificationRequests)
+      .where(eq(schema.modificationRequests.projectId, projectId))
+      .orderBy(desc(schema.modificationRequests.createdAt));
+  }
+
+  async getClientModificationRequests(clientId: string): Promise<ModificationRequest[]> {
+    return await db.select().from(schema.modificationRequests)
+      .where(eq(schema.modificationRequests.clientId, clientId))
+      .orderBy(desc(schema.modificationRequests.createdAt));
+  }
+
+  async updateModificationRequestStatus(id: string, status: string, assignedTo?: string): Promise<ModificationRequest | undefined> {
+    const updateData: any = { status, updatedAt: sql`CURRENT_TIMESTAMP` };
+    if (assignedTo) updateData.assignedTo = assignedTo;
+    if (status === 'completed') updateData.completedAt = sql`CURRENT_TIMESTAMP`;
+    
+    const result = await db.update(schema.modificationRequests)
+      .set(updateData)
+      .where(eq(schema.modificationRequests.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Feature Requests
+  async createFeatureRequest(data: InsertFeatureRequest): Promise<FeatureRequest> {
+    const result = await db.insert(schema.featureRequests).values(data).returning();
+    return result[0];
+  }
+
+  async getFeatureRequest(id: string): Promise<FeatureRequest | undefined> {
+    const result = await db.select().from(schema.featureRequests)
+      .where(eq(schema.featureRequests.id, id));
+    return result[0];
+  }
+
+  async getProjectFeatureRequests(projectId: string): Promise<FeatureRequest[]> {
+    return await db.select().from(schema.featureRequests)
+      .where(eq(schema.featureRequests.projectId, projectId))
+      .orderBy(desc(schema.featureRequests.createdAt));
+  }
+
+  async getClientFeatureRequests(clientId: string): Promise<FeatureRequest[]> {
+    return await db.select().from(schema.featureRequests)
+      .where(eq(schema.featureRequests.clientId, clientId))
+      .orderBy(desc(schema.featureRequests.createdAt));
+  }
+
+  async updateFeatureRequestStatus(id: string, status: string, adminNotes?: string, estimatedCost?: number, estimatedDays?: number): Promise<FeatureRequest | undefined> {
+    const updateData: any = { status, updatedAt: sql`CURRENT_TIMESTAMP` };
+    if (adminNotes) updateData.adminNotes = adminNotes;
+    if (estimatedCost !== undefined) updateData.estimatedCost = estimatedCost;
+    if (estimatedDays !== undefined) updateData.estimatedDays = estimatedDays;
+    
+    const result = await db.update(schema.featureRequests)
+      .set(updateData)
+      .where(eq(schema.featureRequests.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Project Files
+  async createProjectFile(data: InsertProjectFile): Promise<ProjectFile> {
+    const result = await db.insert(schema.projectFiles).values(data).returning();
+    return result[0];
+  }
+
+  async getProjectFiles(projectId: string): Promise<ProjectFile[]> {
+    return await db.select().from(schema.projectFiles)
+      .where(eq(schema.projectFiles.projectId, projectId))
+      .orderBy(desc(schema.projectFiles.createdAt));
+  }
+
+  async deleteProjectFile(id: string): Promise<void> {
+    await db.delete(schema.projectFiles).where(eq(schema.projectFiles.id, id));
+  }
+
+  // Project Questions
+  async createProjectQuestion(data: InsertProjectQuestion): Promise<ProjectQuestion> {
+    const result = await db.insert(schema.projectQuestions).values(data).returning();
+    return result[0];
+  }
+
+  async getProjectQuestions(projectId: string): Promise<ProjectQuestion[]> {
+    return await db.select().from(schema.projectQuestions)
+      .where(eq(schema.projectQuestions.projectId, projectId))
+      .orderBy(schema.projectQuestions.order);
+  }
+
+  async answerProjectQuestion(id: string, answer: string): Promise<ProjectQuestion | undefined> {
+    const result = await db.update(schema.projectQuestions)
+      .set({ answer, answeredAt: sql`CURRENT_TIMESTAMP` })
+      .where(eq(schema.projectQuestions.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async initializeProjectQuestions(projectId: string): Promise<void> {
+    const defaultQuestions = [
+      { question: "ما هو اسم الموقع أو المشروع؟", category: "general", isRequired: true, order: 1 },
+      { question: "ما هي فكرة الموقع بالتفصيل؟", category: "general", isRequired: true, order: 2 },
+      { question: "ما هي الألوان المفضلة للتصميم؟", category: "design", isRequired: false, order: 3 },
+      { question: "هل لديك أمثلة لمواقع تعجبك؟", category: "design", isRequired: false, order: 4 },
+      { question: "ما هي المميزات الأساسية المطلوبة؟", category: "features", isRequired: true, order: 5 },
+      { question: "هل تحتاج لوحة تحكم؟", category: "features", isRequired: false, order: 6 },
+      { question: "هل لديك محتوى جاهز (نصوص، صور)؟", category: "content", isRequired: false, order: 7 },
+      { question: "هل تحتاج ربط مع خدمات خارجية؟", category: "technical", isRequired: false, order: 8 },
+    ];
+
+    for (const q of defaultQuestions) {
+      await this.createProjectQuestion({ ...q, projectId });
+    }
+  }
+
+  // Get all pending modification/feature requests for admin
+  async getAllPendingRequests(): Promise<{ modifications: ModificationRequest[], features: FeatureRequest[] }> {
+    const modifications = await db.select().from(schema.modificationRequests)
+      .where(eq(schema.modificationRequests.status, 'pending'))
+      .orderBy(desc(schema.modificationRequests.createdAt));
+    
+    const features = await db.select().from(schema.featureRequests)
+      .where(eq(schema.featureRequests.status, 'pending'))
+      .orderBy(desc(schema.featureRequests.createdAt));
+    
+    return { modifications, features };
   }
 }
