@@ -31,45 +31,76 @@ import { apiRequest } from "@/lib/queryClient";
 
 type PaymentMethod = "bank_transfer" | "paypal" | "etisalat_cash" | null;
 
-const PAYMENT_METHODS = {
-  bank_transfer: {
-    id: "bank_transfer",
-    name: "تحويل بنكي",
-    icon: Building2,
-    description: "التحويل البنكي المباشر",
-    details: {
-      accountNumber: "EG420059003800000200013934156",
-      bankName: "البنك الأهلي المصري",
-      accountName: "شركة معك للخدمات الرقمية"
-    },
-    color: "from-blue-500 to-blue-700",
-    borderColor: "border-blue-500/30",
-    bgColor: "bg-blue-500/10"
-  },
-  paypal: {
-    id: "paypal",
-    name: "PayPal",
-    icon: SiPaypal,
-    description: "الدفع عبر PayPal",
-    details: {
-      email: "payments@ma3k.com"
-    },
-    color: "from-[#003087] to-[#009cde]",
-    borderColor: "border-[#009cde]/30",
-    bgColor: "bg-[#009cde]/10"
-  },
-  etisalat_cash: {
-    id: "etisalat_cash",
-    name: "اتصالات كاش",
-    icon: Smartphone,
-    description: "الدفع عبر اتصالات كاش",
-    details: {
-      phoneNumber: "01155201921"
-    },
-    color: "from-orange-500 to-red-600",
-    borderColor: "border-orange-500/30",
-    bgColor: "bg-orange-500/10"
-  }
+interface BankTransferDetails {
+  accountNumber: string;
+  bankName: string;
+  accountName: string;
+}
+
+interface PayPalDetails {
+  email: string;
+}
+
+interface EtisalatCashDetails {
+  phoneNumber: string;
+}
+
+interface PaymentMethodConfig {
+  id: string;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  details: BankTransferDetails | PayPalDetails | EtisalatCashDetails;
+  color: string;
+  borderColor: string;
+  bgColor: string;
+}
+
+const BANK_TRANSFER_CONFIG: PaymentMethodConfig = {
+  id: "bank_transfer",
+  name: "تحويل بنكي",
+  icon: Building2,
+  description: "التحويل البنكي المباشر",
+  details: {
+    accountNumber: "EG420059003800000200013934156",
+    bankName: "البنك الأهلي المصري",
+    accountName: "شركة معك للخدمات الرقمية"
+  } as BankTransferDetails,
+  color: "from-blue-500 to-blue-700",
+  borderColor: "border-blue-500/30",
+  bgColor: "bg-blue-500/10"
+};
+
+const PAYPAL_CONFIG: PaymentMethodConfig = {
+  id: "paypal",
+  name: "PayPal",
+  icon: SiPaypal,
+  description: "الدفع عبر PayPal",
+  details: {
+    email: "payments@ma3k.com"
+  } as PayPalDetails,
+  color: "from-[#003087] to-[#009cde]",
+  borderColor: "border-[#009cde]/30",
+  bgColor: "bg-[#009cde]/10"
+};
+
+const ETISALAT_CASH_CONFIG: PaymentMethodConfig = {
+  id: "etisalat_cash",
+  name: "اتصالات كاش",
+  icon: Smartphone,
+  description: "الدفع عبر اتصالات كاش",
+  details: {
+    phoneNumber: "01155201921"
+  } as EtisalatCashDetails,
+  color: "from-orange-500 to-red-600",
+  borderColor: "border-orange-500/30",
+  bgColor: "bg-orange-500/10"
+};
+
+const PAYMENT_METHODS: Record<string, PaymentMethodConfig> = {
+  bank_transfer: BANK_TRANSFER_CONFIG,
+  paypal: PAYPAL_CONFIG,
+  etisalat_cash: ETISALAT_CASH_CONFIG
 };
 
 export default function PaymentPage() {
@@ -372,74 +403,83 @@ export default function PaymentPage() {
                           animate={{ opacity: 1, height: "auto" }}
                           className="mt-4 p-4 rounded-lg bg-background/50"
                         >
-                          {method.id === "bank_transfer" && (
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                <span className="text-sm text-muted-foreground">رقم الحساب:</span>
-                                <div className="flex items-center gap-2">
-                                  <code className="text-sm font-mono" dir="ltr">{method.details.accountNumber}</code>
-                                  <Button 
-                                    size="icon" 
-                                    variant="ghost" 
-                                    onClick={() => copyToClipboard(method.details.accountNumber!)}
-                                    data-testid="button-copy-account"
-                                  >
-                                    <Copy className="w-4 h-4" />
-                                  </Button>
+                          {method.id === "bank_transfer" && (() => {
+                            const details = method.details as BankTransferDetails;
+                            return (
+                              <div className="space-y-3">
+                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
+                                  <span className="text-sm text-muted-foreground">رقم الحساب:</span>
+                                  <div className="flex items-center gap-2">
+                                    <code className="text-sm font-mono" dir="ltr">{details.accountNumber}</code>
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      onClick={() => copyToClipboard(details.accountNumber)}
+                                      data-testid="button-copy-account"
+                                    >
+                                      <Copy className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
+                                  <span className="text-sm text-muted-foreground">البنك:</span>
+                                  <span className="font-medium">{details.bankName}</span>
+                                </div>
+                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
+                                  <span className="text-sm text-muted-foreground">اسم الحساب:</span>
+                                  <span className="font-medium">{details.accountName}</span>
                                 </div>
                               </div>
-                              <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                <span className="text-sm text-muted-foreground">البنك:</span>
-                                <span className="font-medium">{method.details.bankName}</span>
-                              </div>
-                              <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                <span className="text-sm text-muted-foreground">اسم الحساب:</span>
-                                <span className="font-medium">{method.details.accountName}</span>
-                              </div>
-                            </div>
-                          )}
-                          {method.id === "paypal" && (
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                <span className="text-sm text-muted-foreground">البريد الإلكتروني:</span>
-                                <div className="flex items-center gap-2">
-                                  <code className="text-sm font-mono">{method.details.email}</code>
-                                  <Button 
-                                    size="icon" 
-                                    variant="ghost" 
-                                    onClick={() => copyToClipboard(method.details.email!)}
-                                    data-testid="button-copy-paypal"
-                                  >
-                                    <Copy className="w-4 h-4" />
-                                  </Button>
+                            );
+                          })()}
+                          {method.id === "paypal" && (() => {
+                            const details = method.details as PayPalDetails;
+                            return (
+                              <div className="space-y-3">
+                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
+                                  <span className="text-sm text-muted-foreground">البريد الإلكتروني:</span>
+                                  <div className="flex items-center gap-2">
+                                    <code className="text-sm font-mono">{details.email}</code>
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      onClick={() => copyToClipboard(details.email)}
+                                      data-testid="button-copy-paypal"
+                                    >
+                                      <Copy className="w-4 h-4" />
+                                    </Button>
+                                  </div>
                                 </div>
+                                <p className="text-sm text-muted-foreground">
+                                  قم بإرسال المبلغ إلى هذا الحساب ثم أرفق إيصال التحويل أدناه
+                                </p>
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                قم بإرسال المبلغ إلى هذا الحساب ثم أرفق إيصال التحويل أدناه
-                              </p>
-                            </div>
-                          )}
-                          {method.id === "etisalat_cash" && (
-                            <div className="space-y-3">
-                              <div className="flex justify-between items-center p-3 bg-card rounded-lg">
-                                <span className="text-sm text-muted-foreground">رقم الهاتف:</span>
-                                <div className="flex items-center gap-2">
-                                  <code className="text-lg font-mono font-bold" dir="ltr">{method.details.phoneNumber}</code>
-                                  <Button 
-                                    size="icon" 
-                                    variant="ghost" 
-                                    onClick={() => copyToClipboard(method.details.phoneNumber!)}
-                                    data-testid="button-copy-etisalat"
-                                  >
-                                    <Copy className="w-4 h-4" />
-                                  </Button>
+                            );
+                          })()}
+                          {method.id === "etisalat_cash" && (() => {
+                            const details = method.details as EtisalatCashDetails;
+                            return (
+                              <div className="space-y-3">
+                                <div className="flex justify-between items-center p-3 bg-card rounded-lg">
+                                  <span className="text-sm text-muted-foreground">رقم الهاتف:</span>
+                                  <div className="flex items-center gap-2">
+                                    <code className="text-lg font-mono font-bold" dir="ltr">{details.phoneNumber}</code>
+                                    <Button 
+                                      size="icon" 
+                                      variant="ghost" 
+                                      onClick={() => copyToClipboard(details.phoneNumber)}
+                                      data-testid="button-copy-etisalat"
+                                    >
+                                      <Copy className="w-4 h-4" />
+                                    </Button>
+                                  </div>
                                 </div>
+                                <p className="text-sm text-muted-foreground">
+                                  قم بتحويل المبلغ عبر اتصالات كاش ثم أرفق إيصال التحويل أدناه
+                                </p>
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                قم بتحويل المبلغ عبر اتصالات كاش ثم أرفق إيصال التحويل أدناه
-                              </p>
-                            </div>
-                          )}
+                            );
+                          })()}
                         </motion.div>
                       )}
                     </motion.div>
