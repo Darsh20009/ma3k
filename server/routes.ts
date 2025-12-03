@@ -139,21 +139,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const orderData = insertOrderSchema.parse(req.body);
       const order = await storage.createOrder(orderData);
       
-      // Send email notification to ma3k.2025@gmail.com
+      // Try to send email notification (non-blocking)
       if (orderData.customerEmail && orderData.customerName) {
         const websiteSpecs = req.body.websiteSpecs || null;
         
-        await sendOrderNotificationEmail({
-          orderNumber: order.id,
-          customerName: orderData.customerName,
-          customerEmail: orderData.customerEmail,
-          customerPhone: orderData.customerPhone || 'غير متوفر',
-          serviceName: orderData.serviceName,
-          price: orderData.price,
-          paymentStatus: 'pending',
-          paymentMethod: orderData.paymentMethod || 'غير محدد',
-          websiteSpecs: websiteSpecs
-        });
+        try {
+          await sendOrderNotificationEmail({
+            orderNumber: order.id,
+            customerName: orderData.customerName,
+            customerEmail: orderData.customerEmail,
+            customerPhone: orderData.customerPhone || 'غير متوفر',
+            serviceName: orderData.serviceName,
+            price: orderData.price,
+            paymentStatus: 'pending',
+            paymentMethod: orderData.paymentMethod || 'غير محدد',
+            websiteSpecs: websiteSpecs
+          });
+        } catch (emailError) {
+          console.log('Email notification skipped (SendGrid not configured)');
+        }
       }
       
       res.status(201).json(order);
