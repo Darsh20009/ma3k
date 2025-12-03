@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { 
   CreditCard, 
@@ -126,6 +127,26 @@ export default function PaymentPage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showPayPalDialog, setShowPayPalDialog] = useState(false);
+
+  const openPayPalPopup = (paymentLink: string) => {
+    const width = Math.min(600, window.innerWidth * 0.9);
+    const height = Math.min(700, window.innerHeight * 0.9);
+    const left = (window.innerWidth - width) / 2 + window.screenX;
+    const top = (window.innerHeight - height) / 2 + window.screenY;
+    
+    const popup = window.open(
+      paymentLink,
+      'PayPalPayment',
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+    );
+    
+    if (popup) {
+      setShowPayPalDialog(true);
+    } else {
+      window.open(paymentLink, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   // تحويل الأسعار من ريال إلى دولار (1 ريال = 0.27 دولار تقريباً)
   const subtotal = cart.reduce((sum, item) => sum + Math.round(item.price * 0.27), 0);
@@ -410,11 +431,12 @@ export default function PaymentPage() {
                               <div className="space-y-4">
                                 <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                                   <p className="text-sm text-muted-foreground mb-3">
-                                    اضغط على الزر أدناه للدفع عبر PayPal (سيتم فتح صفحة PayPal في نافذة جديدة)
+                                    اضغط على الزر أدناه للدفع عبر PayPal
                                   </p>
                                   <Button
                                     className="w-full bg-[#0070ba] hover:bg-[#003087]"
-                                    onClick={() => window.open(method.paymentLink, '_blank', 'noopener,noreferrer')}
+                                    onClick={() => openPayPalPopup(method.paymentLink)}
+                                    data-testid="button-paypal-pay"
                                   >
                                     <SiPaypal className="w-5 h-5 ml-2" />
                                     الدفع عبر PayPal
@@ -669,6 +691,37 @@ export default function PaymentPage() {
         </div>
       </div>
 
+      <Dialog open={showPayPalDialog} onOpenChange={setShowPayPalDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <SiPaypal className="w-6 h-6 text-[#0070ba]" />
+              تم فتح صفحة PayPal
+            </DialogTitle>
+            <DialogDescription className="text-right">
+              يرجى إتمام عملية الدفع في النافذة المفتوحة
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <h4 className="font-bold mb-2 text-sm">خطوات إتمام الدفع:</h4>
+              <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                <li>أكمل عملية الدفع في نافذة PayPal</li>
+                <li>احفظ إيصال الدفع أو لقطة شاشة</li>
+                <li>عد إلى هذه الصفحة وارفع الإيصال</li>
+                <li>اضغط على "تأكيد الطلب"</li>
+              </ol>
+            </div>
+            <Button 
+              onClick={() => setShowPayPalDialog(false)} 
+              className="w-full"
+              variant="outline"
+            >
+              فهمت، سأرفع الإيصال بعد الدفع
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
