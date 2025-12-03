@@ -336,9 +336,20 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getClients(): Promise<Client[]> {
+    return await db.select().from(schema.clients);
+  }
+
   async getClient(id: string): Promise<Client | undefined> {
     const result = await db.select().from(schema.clients).where(eq(schema.clients.id, id));
     return result[0];
+  }
+
+  async getClientOrders(clientId: string): Promise<Order[]> {
+    const client = await this.getClient(clientId);
+    if (!client) return [];
+    return await db.select().from(schema.orders)
+      .where(eq(schema.orders.customerEmail, client.email));
   }
 
   async getClientByEmail(email: string): Promise<Client | undefined> {

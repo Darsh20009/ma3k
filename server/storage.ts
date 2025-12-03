@@ -1588,10 +1588,57 @@ export class JsonStorage implements IStorage {
 
 import { db } from "./db";
 import { DatabaseStorage } from "./database-storage";
+import { connectMongoDB } from "./mongodb";
+import { MongoStorage } from "./mongo-storage";
 
 let storage: IStorage;
 
-if (db) {
+async function initializeStorage(): Promise<IStorage> {
+  // Try MongoDB first if MONGODB_URI is provided
+  if (process.env.MONGODB_URI) {
+    const connected = await connectMongoDB();
+    if (connected) {
+      console.log('✅ Using MongoDB database storage');
+      return new MongoStorage();
+    }
+  }
+  
+  // Fall back to PostgreSQL if available
+  if (db) {
+    console.log('✅ Using PostgreSQL database storage');
+    return new DatabaseStorage();
+  }
+  
+  // Fall back to JSON file storage
+  console.log('📁 Using JSON file storage (fallback)');
+  return new JsonStorage();
+}
+
+// Initialize storage synchronously for backward compatibility
+if (process.env.MONGODB_URI) {
+  connectMongoDB().then(connected => {
+    if (connected) {
+      storage = new MongoStorage();
+      console.log('✅ Using MongoDB database storage');
+    } else if (db) {
+      storage = new DatabaseStorage();
+      console.log('✅ Using PostgreSQL database storage');
+    } else {
+      storage = new JsonStorage();
+      console.log('📁 Using JSON file storage (fallback)');
+    }
+  }).catch(() => {
+    if (db) {
+      storage = new DatabaseStorage();
+      console.log('✅ Using PostgreSQL database storage');
+    } else {
+      storage = new JsonStorage();
+      console.log('📁 Using JSON file storage (fallback)');
+    }
+  });
+  // Set initial storage for sync access
+  storage = new JsonStorage();
+} else if (db) {
   storage = new DatabaseStorage();
   console.log('✅ Using PostgreSQL database storage');
 } else {
