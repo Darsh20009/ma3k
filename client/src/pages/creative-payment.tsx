@@ -10,7 +10,6 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import { 
   CreditCard, 
@@ -74,7 +73,7 @@ const PAYPAL_CONFIG: PayPalConfig = {
   name: "PayPal",
   icon: SiPaypal,
   description: "الدفع الدولي عبر PayPal",
-  paymentLink: "https://www.paypal.com/ncp/payment/B7VV2ADFRJYDWاولا",
+  paymentLink: "https://www.paypal.com/ncp/payment/B7VV2ADFRJYDW",
   color: "from-[#003087] to-[#009cde]",
   borderColor: "border-[#009cde]/30",
   bgColor: "bg-[#009cde]/10"
@@ -127,7 +126,6 @@ export default function PaymentPage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showPayPalIframe, setShowPayPalIframe] = useState(false);
 
   // تحويل الأسعار من ريال إلى دولار (1 ريال = 0.27 دولار تقريباً)
   const subtotal = cart.reduce((sum, item) => sum + Math.round(item.price * 0.27), 0);
@@ -412,11 +410,11 @@ export default function PaymentPage() {
                               <div className="space-y-4">
                                 <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                                   <p className="text-sm text-muted-foreground mb-3">
-                                    اضغط على الزر أدناه للدفع عبر PayPal
+                                    اضغط على الزر أدناه للدفع عبر PayPal (سيتم فتح صفحة PayPal في نافذة جديدة)
                                   </p>
                                   <Button
                                     className="w-full bg-[#0070ba] hover:bg-[#003087]"
-                                    onClick={() => setShowPayPalIframe(true)}
+                                    onClick={() => window.open(method.paymentLink, '_blank', 'noopener,noreferrer')}
                                   >
                                     <SiPaypal className="w-5 h-5 ml-2" />
                                     الدفع عبر PayPal
@@ -671,26 +669,6 @@ export default function PaymentPage() {
         </div>
       </div>
 
-      {/* PayPal iframe Dialog */}
-      <Dialog open={showPayPalIframe} onOpenChange={setShowPayPalIframe}>
-        <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 gap-0">
-          <div className="relative w-full h-full">
-            <Button
-              onClick={() => setShowPayPalIframe(false)}
-              className="absolute top-2 right-2 z-50 bg-red-500 hover:bg-red-600"
-              size="icon"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-            <iframe
-              src="https://www.paypal.com/ncp/payment/B7VV2ADFRJYDW"
-              className="w-full h-full border-0 rounded-lg"
-              title="PayPal Payment"
-              allow="payment"
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
