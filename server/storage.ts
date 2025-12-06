@@ -40,6 +40,7 @@ export interface IStorage {
   // Invoices
   createInvoice(orderId: string): Promise<Invoice>;
   getInvoice(id: string): Promise<Invoice | undefined>;
+  getInvoicesByClientId(clientId: string): Promise<Invoice[]>;
 
   // Consultations
   createConsultation(consultation: InsertConsultation): Promise<Consultation>;
@@ -1039,10 +1040,18 @@ export class JsonStorage implements IStorage {
       id,
       invoiceNumber,
       orderId,
+      clientId: order.clientId || null,
       customerName: order.customerName,
       customerEmail: order.customerEmail,
+      customerPhone: order.customerPhone || null,
       serviceName: order.serviceName,
+      serviceDescription: null,
+      subtotal: order.price,
+      discountAmount: 0,
       amount: order.price,
+      taxAmount: 0,
+      paymentMethod: order.paymentMethod || null,
+      paymentStatus: order.paymentStatus || "paid",
       createdAt: new Date(),
     };
     this.invoices.set(id, invoice);
@@ -1052,6 +1061,12 @@ export class JsonStorage implements IStorage {
 
   async getInvoice(id: string): Promise<Invoice | undefined> {
     return this.invoices.get(id);
+  }
+
+  async getInvoicesByClientId(clientId: string): Promise<Invoice[]> {
+    return Array.from(this.invoices.values()).filter(
+      (invoice) => invoice.clientId === clientId
+    );
   }
 
   async createConsultation(insertConsultation: InsertConsultation): Promise<Consultation> {

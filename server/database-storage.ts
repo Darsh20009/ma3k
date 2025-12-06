@@ -276,10 +276,17 @@ export class DatabaseStorage implements IStorage {
     const result = await db.insert(schema.invoices).values({
       invoiceNumber,
       orderId,
+      clientId: order.clientId || null,
       customerName: order.customerName,
       customerEmail: order.customerEmail,
+      customerPhone: order.customerPhone || null,
       serviceName: order.serviceName,
+      subtotal: order.price,
+      discountAmount: 0,
       amount: order.price,
+      taxAmount: 0,
+      paymentMethod: order.paymentMethod || null,
+      paymentStatus: order.paymentStatus || "paid",
     }).returning();
     return result[0];
   }
@@ -287,6 +294,11 @@ export class DatabaseStorage implements IStorage {
   async getInvoice(id: string): Promise<Invoice | undefined> {
     const result = await db.select().from(schema.invoices).where(eq(schema.invoices.id, id));
     return result[0];
+  }
+
+  async getInvoicesByClientId(clientId: string): Promise<Invoice[]> {
+    const result = await db.select().from(schema.invoices).where(eq(schema.invoices.clientId, clientId));
+    return result;
   }
 
   async createConsultation(consultation: InsertConsultation): Promise<Consultation> {

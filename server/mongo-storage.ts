@@ -307,11 +307,17 @@ export class MongoStorage implements IStorage {
     const newInvoice = new Models.Invoice({
       invoiceNumber,
       orderId,
+      clientId: order.clientId || null,
       customerName: order.customerName,
       customerEmail: order.customerEmail,
+      customerPhone: order.customerPhone || null,
       serviceName: order.serviceName,
       subtotal: order.price,
+      discountAmount: 0,
       amount: order.price,
+      taxAmount: 0,
+      paymentMethod: order.paymentMethod || null,
+      paymentStatus: order.paymentStatus || "paid",
     });
     await newInvoice.save();
     return toPlainObject<Invoice>(newInvoice);
@@ -321,6 +327,12 @@ export class MongoStorage implements IStorage {
     await this.ensureInitialized();
     const invoice = await Models.Invoice.findById(id);
     return invoice ? toPlainObject<Invoice>(invoice) : undefined;
+  }
+
+  async getInvoicesByClientId(clientId: string): Promise<Invoice[]> {
+    await this.ensureInitialized();
+    const invoices = await Models.Invoice.find({ clientId }).sort({ createdAt: -1 });
+    return toPlainArray<Invoice>(invoices);
   }
 
   async createConsultation(consultation: InsertConsultation): Promise<Consultation> {

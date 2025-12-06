@@ -54,7 +54,11 @@ import {
   Copy,
   ExternalLink,
   Eye,
-  EyeOff
+  EyeOff,
+  RefreshCw,
+  Receipt,
+  CalendarCheck,
+  Wallet
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -79,6 +83,28 @@ type Order = {
   price: number;
   status: string;
   paymentStatus: string;
+  paymentMethod?: string;
+  discountAmount?: number;
+  finalAmount?: number;
+  createdAt: string;
+  updatedAt?: string;
+};
+
+type Invoice = {
+  id: string;
+  invoiceNumber: string;
+  orderId: string;
+  clientId: string;
+  customerName: string;
+  customerEmail: string;
+  serviceName: string;
+  subtotal: number;
+  discountAmount: number;
+  amount: number;
+  paymentStatus: string;
+  paymentMethod?: string;
+  paidAt?: string;
+  dueDate?: string;
   createdAt: string;
 };
 
@@ -254,6 +280,11 @@ export default function ClientDashboard() {
 
   const { data: orders = [] } = useQuery<Order[]>({
     queryKey: [`/api/clients/${user?.id}/orders`],
+    enabled: !!user?.id && isClient(),
+  });
+
+  const { data: invoices = [] } = useQuery<Invoice[]>({
+    queryKey: [`/api/clients/${user?.id}/invoices`],
     enabled: !!user?.id && isClient(),
   });
 
@@ -487,6 +518,7 @@ export default function ClientDashboard() {
                     { id: "features", label: "طلب ميزات", icon: Lightbulb },
                     { id: "files", label: "ملفات المشروع", icon: File },
                     { id: "orders", label: "طلباتي", icon: CreditCard },
+                    { id: "subscriptions", label: "الاشتراكات والفواتير", icon: Receipt },
                     { id: "myinfo", label: "بياناتي", icon: Database },
                     { id: "notifications", label: "الإشعارات", icon: Bell, badge: unreadNotifications },
                     { id: "settings", label: "الإعدادات", icon: Settings },
@@ -1333,6 +1365,319 @@ export default function ClientDashboard() {
                       ))}
                     </div>
                   )}
+                </motion.div>
+              )}
+
+              {activeTab === "subscriptions" && (
+                <motion.div
+                  key="subscriptions"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>الاشتراكات والفواتير</h1>
+                    <p style={{ color: "var(--ma3k-beige-dark)" }}>إدارة اشتراكاتك ومراجعة الفواتير</p>
+                  </div>
+
+                  <div className="grid md:grid-cols-4 gap-4">
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(0, 128, 128, 0.2)" }}>
+                            <Receipt className="w-6 h-6" style={{ color: "var(--ma3k-teal)" }} />
+                          </div>
+                          <div>
+                            <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>إجمالي الفواتير</p>
+                            <p className="text-2xl font-bold" style={{ color: "var(--ma3k-teal)" }}>
+                              {invoices.length}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(76, 175, 80, 0.2)" }}>
+                            <Wallet className="w-6 h-6" style={{ color: "var(--ma3k-green)" }} />
+                          </div>
+                          <div>
+                            <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>المدفوعات المكتملة</p>
+                            <p className="text-2xl font-bold" style={{ color: "var(--ma3k-green)" }}>
+                              {invoices.filter(i => i.paymentStatus === "paid").length}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(234, 179, 8, 0.2)" }}>
+                            <Clock className="w-6 h-6" style={{ color: "#eab308" }} />
+                          </div>
+                          <div>
+                            <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>قيد الانتظار</p>
+                            <p className="text-2xl font-bold" style={{ color: "#eab308" }}>
+                              {invoices.filter(i => i.paymentStatus === "pending").length}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(168, 85, 247, 0.2)" }}>
+                            <CalendarCheck className="w-6 h-6" style={{ color: "#a855f7" }} />
+                          </div>
+                          <div>
+                            <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>مشاريع نشطة</p>
+                            <p className="text-2xl font-bold" style={{ color: "#a855f7" }}>
+                              {activeProjects}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: "var(--ma3k-beige)" }}>اشتراكات المشاريع وتواريخ التجديد</CardTitle>
+                      <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>
+                        تتبع مواعيد تجديد اشتراكات مشاريعك
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {projects.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Briefcase className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                          <p style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد مشاريع مسجلة</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {projects.map((project) => {
+                            const createdDate = project.createdAt ? new Date(project.createdAt) : new Date();
+                            const renewalDate = new Date(createdDate);
+                            renewalDate.setFullYear(renewalDate.getFullYear() + 1);
+                            const daysUntilRenewal = Math.ceil((renewalDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                            const isNearRenewal = daysUntilRenewal <= 30;
+                            const isExpired = daysUntilRenewal < 0;
+
+                            return (
+                              <div
+                                key={project.id}
+                                className="p-4 rounded-xl"
+                                style={{ 
+                                  background: "var(--ma3k-darker)",
+                                  border: isExpired ? "2px solid #ef4444" : isNearRenewal ? "2px solid #eab308" : "1px solid var(--ma3k-border)"
+                                }}
+                              >
+                                <div className="flex items-center justify-between flex-wrap gap-4">
+                                  <div className="flex items-center gap-4">
+                                    <div 
+                                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                                      style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
+                                    >
+                                      <Globe className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div>
+                                      <h4 className="font-bold" style={{ color: "var(--ma3k-beige)" }}>{project.projectName}</h4>
+                                      <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                        {project.domain || "قيد الإعداد"}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-4 flex-wrap">
+                                    <div className="text-left">
+                                      <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>تاريخ البدء</p>
+                                      <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                        {createdDate.toLocaleDateString('ar-SA')}
+                                      </p>
+                                    </div>
+                                    <div className="text-left">
+                                      <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>تاريخ التجديد</p>
+                                      <p className="font-medium" style={{ color: isExpired ? "#ef4444" : isNearRenewal ? "#eab308" : "var(--ma3k-green)" }}>
+                                        {renewalDate.toLocaleDateString('ar-SA')}
+                                      </p>
+                                    </div>
+                                    <Badge 
+                                      style={{ 
+                                        background: isExpired ? "rgba(239, 68, 68, 0.2)" : isNearRenewal ? "rgba(234, 179, 8, 0.2)" : "rgba(76, 175, 80, 0.2)",
+                                        color: isExpired ? "#ef4444" : isNearRenewal ? "#eab308" : "var(--ma3k-green)"
+                                      }}
+                                    >
+                                      {isExpired ? "منتهي" : isNearRenewal ? `${daysUntilRenewal} يوم للتجديد` : "نشط"}
+                                    </Badge>
+                                    {(isNearRenewal || isExpired) && (
+                                      <Button
+                                        size="sm"
+                                        style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))", color: "white" }}
+                                        data-testid={`button-renew-${project.id}`}
+                                      >
+                                        <RefreshCw className="w-4 h-4 ml-2" />
+                                        تجديد الاشتراك
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: "var(--ma3k-beige)" }}>سجل الفواتير</CardTitle>
+                      <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>
+                        عرض وتحميل جميع الفواتير
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {invoices.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Receipt className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                          <p style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد فواتير حتى الآن</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {invoices.map((invoice) => (
+                            <div
+                              key={invoice.id}
+                              className="flex items-center justify-between p-4 rounded-xl flex-wrap gap-4"
+                              style={{ background: "var(--ma3k-darker)" }}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(0, 128, 128, 0.2)" }}>
+                                  <FileText className="w-5 h-5" style={{ color: "var(--ma3k-teal)" }} />
+                                </div>
+                                <div>
+                                  <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                    فاتورة #{invoice.invoiceNumber}
+                                  </p>
+                                  <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                    {invoice.serviceName} - {new Date(invoice.createdAt).toLocaleDateString('ar-SA')}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4 flex-wrap">
+                                <div className="text-left">
+                                  <p className="text-lg font-bold" style={{ color: "var(--ma3k-green)" }}>
+                                    {invoice.amount.toLocaleString()} ر.س
+                                  </p>
+                                  {invoice.discountAmount > 0 && (
+                                    <p className="text-xs" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                      خصم: {invoice.discountAmount.toLocaleString()} ر.س
+                                    </p>
+                                  )}
+                                </div>
+                                <Badge 
+                                  style={{ 
+                                    background: invoice.paymentStatus === "paid" ? "rgba(76, 175, 80, 0.2)" : "rgba(234, 179, 8, 0.2)",
+                                    color: invoice.paymentStatus === "paid" ? "var(--ma3k-green)" : "#eab308"
+                                  }}
+                                >
+                                  {invoice.paymentStatus === "paid" ? "مدفوع" : "قيد الانتظار"}
+                                </Badge>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="icon"
+                                    variant="outline"
+                                    onClick={() => window.open(`/api/invoices/${invoice.id}/pdf`, '_blank')}
+                                    style={{ borderColor: "var(--ma3k-teal)", color: "var(--ma3k-teal)" }}
+                                    data-testid={`button-view-invoice-${invoice.id}`}
+                                  >
+                                    <Eye className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="outline"
+                                    onClick={() => {
+                                      const link = document.createElement('a');
+                                      link.href = `/api/invoices/${invoice.id}/download`;
+                                      link.download = `invoice-${invoice.invoiceNumber}.html`;
+                                      link.click();
+                                    }}
+                                    style={{ borderColor: "var(--ma3k-green)", color: "var(--ma3k-green)" }}
+                                    data-testid={`button-download-invoice-${invoice.id}`}
+                                  >
+                                    <Download className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: "var(--ma3k-beige)" }}>سجل المدفوعات</CardTitle>
+                      <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>
+                        تاريخ جميع عمليات الدفع
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {orders.filter(o => o.paymentStatus === "completed").length === 0 ? (
+                        <div className="text-center py-8">
+                          <CreditCard className="w-12 h-12 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                          <p style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد مدفوعات مكتملة</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {orders.filter(o => o.paymentStatus === "completed").map((order) => (
+                            <div
+                              key={order.id}
+                              className="flex items-center justify-between p-4 rounded-xl flex-wrap gap-4"
+                              style={{ background: "var(--ma3k-darker)" }}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(76, 175, 80, 0.2)" }}>
+                                  <CheckCircle className="w-5 h-5" style={{ color: "var(--ma3k-green)" }} />
+                                </div>
+                                <div>
+                                  <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                    {order.serviceName}
+                                  </p>
+                                  <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                    طلب #{order.orderNumber}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4 flex-wrap">
+                                <div className="text-left">
+                                  <p className="text-lg font-bold" style={{ color: "var(--ma3k-green)" }}>
+                                    {order.price.toLocaleString()} ر.س
+                                  </p>
+                                  <p className="text-xs" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                    {new Date(order.createdAt).toLocaleDateString('ar-SA')}
+                                  </p>
+                                </div>
+                                {order.paymentMethod && (
+                                  <Badge style={{ background: "rgba(0, 128, 128, 0.2)", color: "var(--ma3k-teal)" }}>
+                                    {order.paymentMethod === "paypal" ? "PayPal" : 
+                                     order.paymentMethod === "bank_transfer" ? "تحويل بنكي" : 
+                                     order.paymentMethod === "stripe" ? "Stripe" : order.paymentMethod}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
                 </motion.div>
               )}
 

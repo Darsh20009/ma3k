@@ -615,6 +615,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/clients/:id/invoices", async (req, res) => {
+    try {
+      const invoices = await storage.getInvoicesByClientId(req.params.id);
+      res.json(invoices);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch client invoices" });
+    }
+  });
+
   app.get("/api/clients", async (req, res) => {
     try {
       const clients = await storage.getClients();
