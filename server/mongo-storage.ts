@@ -840,6 +840,10 @@ export class MongoStorage implements IStorage {
     return [];
   }
 
+  async getAllConversations(): Promise<any[]> {
+    return [];
+  }
+
   async getProjectConversation(projectId: string): Promise<any | undefined> {
     return undefined;
   }
