@@ -372,13 +372,14 @@ export default function ClientDashboard() {
     
     if (!conv) {
       try {
-        const result = await apiRequest("POST", "/api/chat/conversations", {
+        const response = await apiRequest("POST", "/api/chat/conversations", {
           projectId: selectedProject.id,
           clientId: user?.id,
           type: "project"
         });
+        const newConv = await response.json() as ChatConversation;
         queryClient.invalidateQueries({ queryKey: ['/api/chat/conversations/client', user?.id] });
-        conv = result;
+        conv = newConv;
       } catch (error) {
         toast({ title: "خطأ في إنشاء المحادثة", variant: "destructive" });
         return;
