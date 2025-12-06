@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
@@ -23,6 +23,7 @@ import {
   AlertTriangle,
   CheckCircle,
   TrendingUp,
+  TrendingDown,
   DollarSign,
   GraduationCap,
   ShoppingCart,
@@ -30,8 +31,30 @@ import {
   PieChart,
   Activity,
   BookOpen,
-  Star
+  Star,
+  ArrowUpRight,
+  ArrowDownRight,
+  Target,
+  Percent,
+  RefreshCw
 } from "lucide-react";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+  Legend,
+  AreaChart,
+  Area
+} from "recharts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -147,6 +170,10 @@ const priorityConfig: Record<string, { label: string; color: string; bgColor: st
   urgent: { label: "عاجلة", color: "#ef4444", bgColor: "rgba(239, 68, 68, 0.2)" }
 };
 
+const CHART_COLORS = ["#ef4444", "#3b82f6", "#22c55e", "#a855f7", "#f59e0b", "#06b6d4"];
+
+const arabicMonths = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+
 export default function AdminDashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, isEmployee, isAdmin, logout } = useAuth();
@@ -241,6 +268,170 @@ export default function AdminDashboard() {
   const pendingOrders = orders.filter(o => o.paymentStatus === "pending");
   const completedOrders = orders.filter(o => o.paymentStatus === "completed");
   const totalRevenue = completedOrders.reduce((sum, o) => sum + o.price, 0);
+
+  // Advanced Statistics Calculations
+  const revenueByMonth = useMemo(() => {
+    const monthlyData: Record<string, number> = {};
+    const now = new Date();
+    // Initialize last 6 months
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      monthlyData[key] = 0;
+    }
+    // Calculate revenue per month
+    completedOrders.forEach(order => {
+      const date = new Date(order.createdAt);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (monthlyData[key] !== undefined) {
+        monthlyData[key] += order.price;
+      }
+    });
+    // Convert to chart format
+    return Object.entries(monthlyData).map(([key, value]) => {
+      const [year, month] = key.split('-').map(Number);
+      return {
+        name: arabicMonths[month],
+        revenue: value,
+        month: month
+      };
+    });
+  }, [completedOrders]);
+
+  const projectsByStatus = useMemo(() => {
+    return Object.entries(statusConfig).map(([key, info]) => ({
+      name: info.label,
+      value: projects.filter(p => p.status === key).length,
+      color: info.color
+    })).filter(item => item.value > 0);
+  }, [projects]);
+
+  const ordersByMonth = useMemo(() => {
+    const monthlyData: Record<string, { total: number; completed: number; pending: number }> = {};
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      monthlyData[key] = { total: 0, completed: 0, pending: 0 };
+    }
+    orders.forEach(order => {
+      const date = new Date(order.createdAt);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (monthlyData[key]) {
+        monthlyData[key].total += 1;
+        if (order.paymentStatus === "completed") {
+          monthlyData[key].completed += 1;
+        } else {
+          monthlyData[key].pending += 1;
+        }
+      }
+    });
+    return Object.entries(monthlyData).map(([key, value]) => {
+      const [year, month] = key.split('-').map(Number);
+      return {
+        name: arabicMonths[month],
+        total: value.total,
+        completed: value.completed,
+        pending: value.pending
+      };
+    });
+  }, [orders]);
+
+  const clientGrowth = useMemo(() => {
+    const monthlyData: Record<string, number> = {};
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      monthlyData[key] = 0;
+    }
+    clients.forEach(client => {
+      const date = new Date(client.createdAt);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (monthlyData[key] !== undefined) {
+        monthlyData[key] += 1;
+      }
+    });
+    let cumulative = 0;
+    return Object.entries(monthlyData).map(([key, value]) => {
+      cumulative += value;
+      const [year, month] = key.split('-').map(Number);
+      return {
+        name: arabicMonths[month],
+        newClients: value,
+        totalClients: cumulative
+      };
+    });
+  }, [clients]);
+
+  const performanceMetrics = useMemo(() => {
+    const avgOrderValue = completedOrders.length > 0 
+      ? Math.round(totalRevenue / completedOrders.length) 
+      : 0;
+    const completionRate = orders.length > 0 
+      ? Math.round((completedOrders.length / orders.length) * 100) 
+      : 0;
+    const projectCompletionRate = projects.length > 0 
+      ? Math.round((completedProjects.length / projects.length) * 100) 
+      : 0;
+    const activeCoursesCount = courses.filter(c => c.isActive).length;
+    const enrollmentRate = courses.length > 0 && students.length > 0
+      ? Math.round((students.length / courses.length))
+      : 0;
+    
+    // Calculate trend (compare last 30 days to previous 30 days)
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+    
+    const recentRevenue = completedOrders
+      .filter(o => new Date(o.createdAt) >= thirtyDaysAgo)
+      .reduce((sum, o) => sum + o.price, 0);
+    const previousRevenue = completedOrders
+      .filter(o => new Date(o.createdAt) >= sixtyDaysAgo && new Date(o.createdAt) < thirtyDaysAgo)
+      .reduce((sum, o) => sum + o.price, 0);
+    
+    // Handle trend calculation - avoid division by zero and NaN
+    let revenueTrend = 0;
+    if (previousRevenue > 0) {
+      revenueTrend = Math.round(((recentRevenue - previousRevenue) / previousRevenue) * 100);
+    } else if (recentRevenue > 0) {
+      // If no previous revenue but current revenue exists, show 100% growth
+      revenueTrend = 100;
+    }
+    // Ensure finite value
+    if (!isFinite(revenueTrend)) {
+      revenueTrend = 0;
+    }
+
+    return {
+      avgOrderValue,
+      completionRate,
+      projectCompletionRate,
+      activeCoursesCount,
+      enrollmentRate,
+      revenueTrend,
+      recentRevenue,
+      previousRevenue
+    };
+  }, [completedOrders, orders, projects, completedProjects, courses, students, totalRevenue]);
+
+  const topServices = useMemo(() => {
+    const serviceCount: Record<string, { count: number; revenue: number }> = {};
+    orders.forEach(order => {
+      if (!serviceCount[order.serviceName]) {
+        serviceCount[order.serviceName] = { count: 0, revenue: 0 };
+      }
+      serviceCount[order.serviceName].count += 1;
+      if (order.paymentStatus === "completed") {
+        serviceCount[order.serviceName].revenue += order.price;
+      }
+    });
+    return Object.entries(serviceCount)
+      .map(([name, data]) => ({ name, ...data }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+  }, [orders]);
 
   if (isLoading) {
     return (
@@ -915,57 +1106,344 @@ export default function AdminDashboard() {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div>
-                    <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>التقارير والإحصائيات</h1>
-                    <p style={{ color: "var(--ma3k-beige-dark)" }}>ملخص أداء الشركة</p>
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div>
+                      <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>التقارير والإحصائيات</h1>
+                      <p style={{ color: "var(--ma3k-beige-dark)" }}>تحليل شامل لأداء الشركة</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.print()}
+                      style={{ borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                      data-testid="button-print-report"
+                    >
+                      <Download className="w-4 h-4 ml-2" />
+                      تصدير التقرير
+                    </Button>
+                  </div>
+
+                  {/* KPI Cards */}
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Card style={{ background: "linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.05))", border: "1px solid rgba(239, 68, 68, 0.3)" }}>
+                      <CardContent className="p-5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-xs mb-1" style={{ color: "var(--ma3k-beige-dark)" }}>إجمالي الإيرادات</p>
+                            <p className="text-2xl font-bold" style={{ color: "#ef4444" }}>{totalRevenue.toLocaleString()} ر.س</p>
+                            <div className="flex items-center gap-1 mt-1">
+                              {performanceMetrics.revenueTrend >= 0 ? (
+                                <ArrowUpRight className="w-3 h-3" style={{ color: "#22c55e" }} />
+                              ) : (
+                                <ArrowDownRight className="w-3 h-3" style={{ color: "#ef4444" }} />
+                              )}
+                              <span className="text-xs" style={{ color: performanceMetrics.revenueTrend >= 0 ? "#22c55e" : "#ef4444" }}>
+                                {Math.abs(performanceMetrics.revenueTrend)}% عن الشهر السابق
+                              </span>
+                            </div>
+                          </div>
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(239, 68, 68, 0.2)" }}>
+                            <DollarSign className="w-6 h-6" style={{ color: "#ef4444" }} />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card style={{ background: "linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.05))", border: "1px solid rgba(59, 130, 246, 0.3)" }}>
+                      <CardContent className="p-5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-xs mb-1" style={{ color: "var(--ma3k-beige-dark)" }}>متوسط قيمة الطلب</p>
+                            <p className="text-2xl font-bold" style={{ color: "#3b82f6" }}>{performanceMetrics.avgOrderValue.toLocaleString()} ر.س</p>
+                            <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>
+                              من {completedOrders.length} طلب مكتمل
+                            </p>
+                          </div>
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(59, 130, 246, 0.2)" }}>
+                            <Target className="w-6 h-6" style={{ color: "#3b82f6" }} />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card style={{ background: "linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(22, 163, 74, 0.05))", border: "1px solid rgba(34, 197, 94, 0.3)" }}>
+                      <CardContent className="p-5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-xs mb-1" style={{ color: "var(--ma3k-beige-dark)" }}>نسبة إكمال الطلبات</p>
+                            <p className="text-2xl font-bold" style={{ color: "#22c55e" }}>{performanceMetrics.completionRate}%</p>
+                            <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>
+                              {completedOrders.length} من {orders.length}
+                            </p>
+                          </div>
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(34, 197, 94, 0.2)" }}>
+                            <Percent className="w-6 h-6" style={{ color: "#22c55e" }} />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card style={{ background: "linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(147, 51, 234, 0.05))", border: "1px solid rgba(168, 85, 247, 0.3)" }}>
+                      <CardContent className="p-5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div>
+                            <p className="text-xs mb-1" style={{ color: "var(--ma3k-beige-dark)" }}>نسبة إكمال المشاريع</p>
+                            <p className="text-2xl font-bold" style={{ color: "#a855f7" }}>{performanceMetrics.projectCompletionRate}%</p>
+                            <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>
+                              {completedProjects.length} من {projects.length}
+                            </p>
+                          </div>
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(168, 85, 247, 0.2)" }}>
+                            <Briefcase className="w-6 h-6" style={{ color: "#a855f7" }} />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Revenue Chart */}
+                  <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5" style={{ color: "#ef4444" }} />
+                        <CardTitle style={{ color: "var(--ma3k-beige)" }}>تطور الإيرادات الشهرية</CardTitle>
+                      </div>
+                      <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>آخر 6 أشهر</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-72">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={revenueByMonth} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4}/>
+                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                            <XAxis dataKey="name" stroke="var(--ma3k-beige-dark)" fontSize={12} />
+                            <YAxis stroke="var(--ma3k-beige-dark)" fontSize={12} tickFormatter={(value) => `${(value/1000).toFixed(0)}k`} />
+                            <Tooltip 
+                              contentStyle={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", borderRadius: "8px" }}
+                              labelStyle={{ color: "var(--ma3k-beige)" }}
+                              formatter={(value: number) => [`${value.toLocaleString()} ر.س`, "الإيرادات"]}
+                            />
+                            <Area type="monotone" dataKey="revenue" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Orders Chart */}
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardHeader>
+                        <div className="flex items-center gap-2">
+                          <ShoppingCart className="w-5 h-5" style={{ color: "#3b82f6" }} />
+                          <CardTitle style={{ color: "var(--ma3k-beige)" }}>إحصائيات الطلبات</CardTitle>
+                        </div>
+                        <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>مقارنة الطلبات المكتملة والمعلقة</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-64">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={ordersByMonth} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                              <XAxis dataKey="name" stroke="var(--ma3k-beige-dark)" fontSize={11} />
+                              <YAxis stroke="var(--ma3k-beige-dark)" fontSize={11} />
+                              <Tooltip 
+                                contentStyle={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", borderRadius: "8px" }}
+                                labelStyle={{ color: "var(--ma3k-beige)" }}
+                              />
+                              <Bar dataKey="completed" name="مكتملة" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                              <Bar dataKey="pending" name="معلقة" fill="#eab308" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Projects by Status */}
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardHeader>
+                        <div className="flex items-center gap-2">
+                          <PieChart className="w-5 h-5" style={{ color: "#a855f7" }} />
+                          <CardTitle style={{ color: "var(--ma3k-beige)" }}>توزيع المشاريع</CardTitle>
+                        </div>
+                        <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>حسب الحالة</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {projectsByStatus.length > 0 ? (
+                          <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <RePieChart>
+                                <Pie
+                                  data={projectsByStatus}
+                                  cx="50%"
+                                  cy="50%"
+                                  innerRadius={50}
+                                  outerRadius={80}
+                                  paddingAngle={5}
+                                  dataKey="value"
+                                >
+                                  {projectsByStatus.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                  ))}
+                                </Pie>
+                                <Tooltip 
+                                  contentStyle={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", borderRadius: "8px" }}
+                                  formatter={(value: number, name: string) => [value, name]}
+                                />
+                                <Legend 
+                                  formatter={(value) => <span style={{ color: "var(--ma3k-beige)" }}>{value}</span>}
+                                />
+                              </RePieChart>
+                            </ResponsiveContainer>
+                          </div>
+                        ) : (
+                          <div className="h-64 flex items-center justify-center">
+                            <p style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد بيانات</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
+                    {/* Client Growth */}
                     <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
                       <CardHeader>
-                        <CardTitle style={{ color: "var(--ma3k-beige)" }}>توزيع المشاريع حسب الحالة</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <Users className="w-5 h-5" style={{ color: "#22c55e" }} />
+                          <CardTitle style={{ color: "var(--ma3k-beige)" }}>نمو العملاء</CardTitle>
+                        </div>
+                        <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>العملاء الجدد شهرياً</CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardContent>
+                        <div className="h-64">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={clientGrowth} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                              <XAxis dataKey="name" stroke="var(--ma3k-beige-dark)" fontSize={11} />
+                              <YAxis stroke="var(--ma3k-beige-dark)" fontSize={11} />
+                              <Tooltip 
+                                contentStyle={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", borderRadius: "8px" }}
+                                labelStyle={{ color: "var(--ma3k-beige)" }}
+                              />
+                              <Line type="monotone" dataKey="newClients" name="عملاء جدد" stroke="#22c55e" strokeWidth={2} dot={{ fill: "#22c55e" }} />
+                              <Line type="monotone" dataKey="totalClients" name="الإجمالي" stroke="#3b82f6" strokeWidth={2} dot={{ fill: "#3b82f6" }} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Top Services */}
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardHeader>
+                        <div className="flex items-center gap-2">
+                          <Star className="w-5 h-5" style={{ color: "#f59e0b" }} />
+                          <CardTitle style={{ color: "var(--ma3k-beige)" }}>أفضل الخدمات</CardTitle>
+                        </div>
+                        <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>حسب الإيرادات</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {topServices.length > 0 ? topServices.map((service, index) => (
+                          <div
+                            key={service.name}
+                            className="flex items-center justify-between p-3 rounded-xl"
+                            style={{ background: "var(--ma3k-darker)" }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
+                                style={{ background: `${CHART_COLORS[index]}30`, color: CHART_COLORS[index] }}
+                              >
+                                {index + 1}
+                              </div>
+                              <div>
+                                <p className="font-medium text-sm" style={{ color: "var(--ma3k-beige)" }}>{service.name}</p>
+                                <p className="text-xs" style={{ color: "var(--ma3k-beige-dark)" }}>{service.count} طلب</p>
+                              </div>
+                            </div>
+                            <div className="text-left">
+                              <p className="font-bold" style={{ color: CHART_COLORS[index] }}>{service.revenue.toLocaleString()} ر.س</p>
+                            </div>
+                          </div>
+                        )) : (
+                          <p className="text-center py-4" style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد بيانات</p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Summary Statistics */}
+                  <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Activity className="w-5 h-5" style={{ color: "#06b6d4" }} />
+                        <CardTitle style={{ color: "var(--ma3k-beige)" }}>ملخص الأداء</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Users className="w-4 h-4" style={{ color: "#22c55e" }} />
+                            <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>إجمالي العملاء</p>
+                          </div>
+                          <p className="text-2xl font-bold" style={{ color: "#22c55e" }}>{clients.length}</p>
+                        </div>
+                        <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <GraduationCap className="w-4 h-4" style={{ color: "#a855f7" }} />
+                            <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>إجمالي الطلاب</p>
+                          </div>
+                          <p className="text-2xl font-bold" style={{ color: "#a855f7" }}>{students.length}</p>
+                        </div>
+                        <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <BookOpen className="w-4 h-4" style={{ color: "#3b82f6" }} />
+                            <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>الدورات النشطة</p>
+                          </div>
+                          <p className="text-2xl font-bold" style={{ color: "#3b82f6" }}>{performanceMetrics.activeCoursesCount}</p>
+                        </div>
+                        <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Award className="w-4 h-4" style={{ color: "#f59e0b" }} />
+                            <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>الموظفين</p>
+                          </div>
+                          <p className="text-2xl font-bold" style={{ color: "#f59e0b" }}>{employees.length}</p>
+                        </div>
+                      </div>
+
+                      {/* Progress Bars for Status */}
+                      <div className="mt-6 space-y-4">
+                        <h4 className="font-medium" style={{ color: "var(--ma3k-beige)" }}>توزيع حالات المشاريع</h4>
                         {Object.entries(statusConfig).map(([key, info]) => {
                           const count = projects.filter(p => p.status === key).length;
                           const percentage = projects.length > 0 ? (count / projects.length) * 100 : 0;
                           return (
                             <div key={key}>
                               <div className="flex items-center justify-between mb-1">
-                                <span style={{ color: "var(--ma3k-beige)" }}>{info.label}</span>
-                                <span style={{ color: info.color }}>{count}</span>
+                                <span className="text-sm" style={{ color: "var(--ma3k-beige)" }}>{info.label}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium" style={{ color: info.color }}>{count}</span>
+                                  <span className="text-xs" style={{ color: "var(--ma3k-beige-dark)" }}>({percentage.toFixed(0)}%)</span>
+                                </div>
                               </div>
-                              <Progress value={percentage} className="h-2" />
+                              <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--ma3k-darker)" }}>
+                                <div 
+                                  className="h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${percentage}%`, background: info.color }}
+                                />
+                              </div>
                             </div>
                           );
                         })}
-                      </CardContent>
-                    </Card>
-
-                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
-                      <CardHeader>
-                        <CardTitle style={{ color: "var(--ma3k-beige)" }}>ملخص مالي</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
-                          <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>إجمالي الإيرادات</p>
-                          <p className="text-2xl font-bold" style={{ color: "var(--ma3k-green)" }}>{totalRevenue.toLocaleString()} ر.س</p>
-                        </div>
-                        <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
-                          <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>متوسط قيمة الطلب</p>
-                          <p className="text-2xl font-bold" style={{ color: "#3b82f6" }}>
-                            {completedOrders.length > 0 ? Math.round(totalRevenue / completedOrders.length).toLocaleString() : 0} ر.س
-                          </p>
-                        </div>
-                        <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
-                          <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>نسبة إكمال الطلبات</p>
-                          <p className="text-2xl font-bold" style={{ color: "#a855f7" }}>
-                            {orders.length > 0 ? Math.round((completedOrders.length / orders.length) * 100) : 0}%
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </motion.div>
               )}
 
