@@ -533,10 +533,28 @@ export const notifications = pgTable("notifications", {
   userType: text("user_type").notNull(), // 'student', 'client', 'employee'
   title: text("title").notNull(),
   message: text("message").notNull(),
-  type: text("type").notNull(), // 'order', 'course', 'project', 'certificate', 'payment', 'general'
+  type: text("type").notNull(), // 'order', 'course', 'project', 'certificate', 'payment', 'general', 'meeting'
   isRead: boolean("is_read").default(false),
   link: text("link"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Meetings table for admin meeting management
+export const meetings = pgTable("meetings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description"),
+  createdBy: varchar("created_by").references(() => employees.id).notNull(),
+  creatorName: text("creator_name").notNull(),
+  scheduledAt: timestamp("scheduled_at").notNull(),
+  duration: integer("duration").default(60), // Duration in minutes
+  meetingType: text("meeting_type").default("video"), // 'video', 'chat', 'urgent'
+  status: text("status").default("scheduled"), // 'scheduled', 'in_progress', 'completed', 'cancelled'
+  meetingLink: text("meeting_link"),
+  attendees: text("attendees").array(), // Employee IDs
+  notes: text("notes"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // Insert schemas for new tables
@@ -559,11 +577,26 @@ export const insertNotificationSchema = createInsertSchema(notifications).pick({
   link: true,
 });
 
+export const insertMeetingSchema = createInsertSchema(meetings).pick({
+  title: true,
+  description: true,
+  createdBy: true,
+  creatorName: true,
+  scheduledAt: true,
+  duration: true,
+  meetingType: true,
+  meetingLink: true,
+  attendees: true,
+  notes: true,
+});
+
 // Types
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type Meeting = typeof meetings.$inferSelect;
+export type InsertMeeting = z.infer<typeof insertMeetingSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Service = typeof services.$inferSelect;

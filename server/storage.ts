@@ -11,7 +11,8 @@ import {
   type Review, type InsertReview, type Notification, type InsertNotification,
   type ChatConversation, type InsertChatConversation, type ChatMessage, type InsertChatMessage,
   type ModificationRequest, type InsertModificationRequest, type FeatureRequest, type InsertFeatureRequest,
-  type ProjectFile, type InsertProjectFile, type ProjectQuestion, type InsertProjectQuestion
+  type ProjectFile, type InsertProjectFile, type ProjectQuestion, type InsertProjectQuestion,
+  type Meeting, type InsertMeeting
 } from "@shared/schema";
 import session from "express-session";
 import { randomUUID } from "crypto";
@@ -192,6 +193,51 @@ export interface IStorage {
 
   // Admin
   getAllPendingRequests(): Promise<{ modifications: ModificationRequest[], features: FeatureRequest[] }>;
+
+  // Meetings
+  createMeeting(data: InsertMeeting): Promise<Meeting>;
+  getMeeting(id: string): Promise<Meeting | undefined>;
+  getMeetings(): Promise<Meeting[]>;
+  updateMeeting(id: string, data: Partial<InsertMeeting>): Promise<Meeting | undefined>;
+  deleteMeeting(id: string): Promise<void>;
+  getUpcomingMeetings(): Promise<Meeting[]>;
+
+  // Enhanced Dashboard Stats
+  getEnhancedDashboardStats(): Promise<{
+    totalOrders: number;
+    totalStudents: number;
+    totalClients: number;
+    totalProjects: number;
+    totalRevenue: number;
+    pendingOrders: number;
+    activeProjects: number;
+    completedProjects: number;
+    openTickets: number;
+    monthlyRevenue: number;
+    totalEmployees: number;
+  }>;
+
+  // Reports
+  getEmployeeProductivityReport(): Promise<Array<{
+    employeeId: string;
+    employeeName: string;
+    completedTasks: number;
+    pendingTasks: number;
+    assignedProjects: number;
+  }>>;
+  
+  getProjectsReport(): Promise<Array<{
+    status: string;
+    count: number;
+  }>>;
+  
+  getFinancialReport(): Promise<{
+    totalRevenue: number;
+    monthlyRevenue: number;
+    paidOrders: number;
+    pendingPayments: number;
+    averageOrderValue: number;
+  }>;
 
   // Session Store
   sessionStore?: session.Store;
@@ -1777,6 +1823,113 @@ export class JsonStorage implements IStorage {
   // Admin - Stub implementations
   async getAllPendingRequests(): Promise<{ modifications: ModificationRequest[], features: FeatureRequest[] }> {
     return { modifications: [], features: [] };
+  }
+
+  // Meetings - Stub implementations
+  async createMeeting(data: InsertMeeting): Promise<Meeting> {
+    throw new Error("Meetings not supported in JSON storage. Use PostgreSQL database.");
+  }
+
+  async getMeeting(id: string): Promise<Meeting | undefined> {
+    return undefined;
+  }
+
+  async getMeetings(): Promise<Meeting[]> {
+    return [];
+  }
+
+  async updateMeeting(id: string, data: Partial<InsertMeeting>): Promise<Meeting | undefined> {
+    return undefined;
+  }
+
+  async deleteMeeting(id: string): Promise<void> {
+    // No-op in JSON storage
+  }
+
+  async getUpcomingMeetings(): Promise<Meeting[]> {
+    return [];
+  }
+
+  // Enhanced Dashboard Stats
+  async getEnhancedDashboardStats(): Promise<{
+    totalOrders: number;
+    totalStudents: number;
+    totalClients: number;
+    totalProjects: number;
+    totalRevenue: number;
+    pendingOrders: number;
+    activeProjects: number;
+    completedProjects: number;
+    openTickets: number;
+    monthlyRevenue: number;
+    totalEmployees: number;
+  }> {
+    const orders = Array.from(this.orders.values());
+    const students = Array.from(this.students.values());
+    const clients = Array.from(this.clients.values());
+    const projects = Array.from(this.projects.values());
+    const employees = Array.from(this.employees.values());
+    
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    return {
+      totalOrders: orders.length,
+      totalStudents: students.length,
+      totalClients: clients.length,
+      totalProjects: projects.length,
+      totalRevenue: orders.filter(o => o.paymentStatus === 'completed').reduce((sum, o) => sum + (o.finalAmount || o.price), 0),
+      pendingOrders: orders.filter(o => o.status === 'pending').length,
+      activeProjects: projects.filter(p => p.status !== 'completed').length,
+      completedProjects: projects.filter(p => p.status === 'completed').length,
+      openTickets: 0,
+      monthlyRevenue: orders.filter(o => o.paymentStatus === 'completed' && o.createdAt && new Date(o.createdAt) >= monthStart).reduce((sum, o) => sum + (o.finalAmount || o.price), 0),
+      totalEmployees: employees.length,
+    };
+  }
+
+  // Reports - Stub implementations
+  async getEmployeeProductivityReport(): Promise<Array<{
+    employeeId: string;
+    employeeName: string;
+    completedTasks: number;
+    pendingTasks: number;
+    assignedProjects: number;
+  }>> {
+    return [];
+  }
+
+  async getProjectsReport(): Promise<Array<{
+    status: string;
+    count: number;
+  }>> {
+    const projects = Array.from(this.projects.values());
+    const statusCounts = new Map<string, number>();
+    projects.forEach(p => {
+      statusCounts.set(p.status || 'unknown', (statusCounts.get(p.status || 'unknown') || 0) + 1);
+    });
+    return Array.from(statusCounts.entries()).map(([status, count]) => ({ status, count }));
+  }
+
+  async getFinancialReport(): Promise<{
+    totalRevenue: number;
+    monthlyRevenue: number;
+    paidOrders: number;
+    pendingPayments: number;
+    averageOrderValue: number;
+  }> {
+    const orders = Array.from(this.orders.values());
+    const paidOrders = orders.filter(o => o.paymentStatus === 'completed');
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    return {
+      totalRevenue: paidOrders.reduce((sum, o) => sum + (o.finalAmount || o.price), 0),
+      monthlyRevenue: paidOrders.filter(o => o.createdAt && new Date(o.createdAt) >= monthStart).reduce((sum, o) => sum + (o.finalAmount || o.price), 0),
+      paidOrders: paidOrders.length,
+      pendingPayments: orders.filter(o => o.paymentStatus === 'pending').length,
+      averageOrderValue: paidOrders.length > 0 ? paidOrders.reduce((sum, o) => sum + (o.finalAmount || o.price), 0) / paidOrders.length : 0,
+    };
   }
 }
 

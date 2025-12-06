@@ -14,7 +14,8 @@ import {
   type Review, type InsertReview, type Notification, type InsertNotification,
   type ChatConversation, type InsertChatConversation, type ChatMessage, type InsertChatMessage,
   type ModificationRequest, type InsertModificationRequest, type FeatureRequest, type InsertFeatureRequest,
-  type ProjectFile, type InsertProjectFile, type ProjectQuestion, type InsertProjectQuestion
+  type ProjectFile, type InsertProjectFile, type ProjectQuestion, type InsertProjectQuestion,
+  type Meeting, type InsertMeeting
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 import session from "express-session";
@@ -985,5 +986,247 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(schema.featureRequests.createdAt));
     
     return { modifications, features };
+  }
+
+  // Meetings
+  async createMeeting(data: InsertMeeting): Promise<Meeting> {
+    const result = await db.insert(schema.meetings).values({
+      ...data,
+      status: data.status || 'scheduled'
+    }).returning();
+    return result[0];
+  }
+
+  async getMeeting(id: string): Promise<Meeting | undefined> {
+    const result = await db.select().from(schema.meetings).where(eq(schema.meetings.id, id));
+    return result[0];
+  }
+
+  async getMeetings(): Promise<Meeting[]> {
+    return await db.select().from(schema.meetings).orderBy(desc(schema.meetings.scheduledAt));
+  }
+
+  async updateMeeting(id: string, data: Partial<InsertMeeting>): Promise<Meeting | undefined> {
+    const result = await db.update(schema.meetings)
+      .set({ ...data, updatedAt: sql`CURRENT_TIMESTAMP` })
+      .where(eq(schema.meetings.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteMeeting(id: string): Promise<void> {
+    await db.delete(schema.meetings).where(eq(schema.meetings.id, id));
+  }
+
+  async getUpcomingMeetings(): Promise<Meeting[]> {
+    return await db.select().from(schema.meetings)
+      .where(and(
+        sql`${schema.meetings.scheduledAt} >= CURRENT_TIMESTAMP`,
+        eq(schema.meetings.status, 'scheduled')
+      ))
+      .orderBy(schema.meetings.scheduledAt);
+  }
+
+  // Enhanced Dashboard Stats
+  async getEnhancedDashboardStats(): Promise<{
+    totalOrders: number;
+    pendingOrders: number;
+    completedOrders: number;
+    totalRevenue: number;
+    monthlyRevenue: number;
+    totalStudents: number;
+    activeStudents: number;
+    totalClients: number;
+    totalEmployees: number;
+    totalProjects: number;
+    activeProjects: number;
+    completedProjects: number;
+    totalCourses: number;
+    totalEnrollments: number;
+    completedEnrollments: number;
+    averageProjectDuration: number;
+    upcomingMeetings: number;
+  }> {
+    const [ordersResult] = await db.select({
+      total: count(),
+      pending: sql<number>`COUNT(CASE WHEN status = 'pending' THEN 1 END)`,
+      completed: sql<number>`COUNT(CASE WHEN status = 'completed' THEN 1 END)`,
+      totalRevenue: sql<number>`COALESCE(SUM(price), 0)`,
+      monthlyRevenue: sql<number>`COALESCE(SUM(CASE WHEN created_at >= DATE_TRUNC('month', CURRENT_DATE) THEN price ELSE 0 END), 0)`
+    }).from(schema.orders);
+
+    const [studentsResult] = await db.select({
+      total: count(),
+      active: sql<number>`COUNT(CASE WHEN free_courses_taken > 0 THEN 1 END)`
+    }).from(schema.students);
+
+    const [clientsResult] = await db.select({ total: count() }).from(schema.clients);
+    const [employeesResult] = await db.select({ total: count() }).from(schema.employees);
+
+    const [projectsResult] = await db.select({
+      total: count(),
+      active: sql<number>`COUNT(CASE WHEN status != 'completed' THEN 1 END)`,
+      completed: sql<number>`COUNT(CASE WHEN status = 'completed' THEN 1 END)`
+    }).from(schema.projects);
+
+    const [coursesResult] = await db.select({ total: count() }).from(schema.courses);
+
+    const [enrollmentsResult] = await db.select({
+      total: count(),
+      completed: sql<number>`COUNT(CASE WHEN status = 'completed' THEN 1 END)`
+    }).from(schema.enrollments);
+
+    const [meetingsResult] = await db.select({
+      upcoming: sql<number>`COUNT(CASE WHEN scheduled_at >= CURRENT_TIMESTAMP AND status = 'scheduled' THEN 1 END)`
+    }).from(schema.meetings);
+
+    return {
+      totalOrders: ordersResult?.total || 0,
+      pendingOrders: Number(ordersResult?.pending) || 0,
+      completedOrders: Number(ordersResult?.completed) || 0,
+      totalRevenue: Number(ordersResult?.totalRevenue) || 0,
+      monthlyRevenue: Number(ordersResult?.monthlyRevenue) || 0,
+      totalStudents: studentsResult?.total || 0,
+      activeStudents: Number(studentsResult?.active) || 0,
+      totalClients: clientsResult?.total || 0,
+      totalEmployees: employeesResult?.total || 0,
+      totalProjects: projectsResult?.total || 0,
+      activeProjects: Number(projectsResult?.active) || 0,
+      completedProjects: Number(projectsResult?.completed) || 0,
+      totalCourses: coursesResult?.total || 0,
+      totalEnrollments: enrollmentsResult?.total || 0,
+      completedEnrollments: Number(enrollmentsResult?.completed) || 0,
+      averageProjectDuration: 14,
+      upcomingMeetings: Number(meetingsResult?.upcoming) || 0
+    };
+  }
+
+  // Reports
+  async getEmployeeProductivityReport(): Promise<Array<{
+    employeeId: string;
+    employeeName: string;
+    totalTasks: number;
+    completedTasks: number;
+    pendingTasks: number;
+    completionRate: number;
+    totalHoursWorked: number;
+  }>> {
+    const employees = await this.getEmployees();
+    const reports = [];
+
+    for (const emp of employees) {
+      const tasks = await this.getEmployeeTasks(emp.id);
+      const completedTasks = tasks.filter(t => t.isCompleted).length;
+      const pendingTasks = tasks.filter(t => !t.isCompleted).length;
+      const totalHours = tasks.reduce((sum, t) => sum + (t.hoursRemaining || 0), 0);
+
+      reports.push({
+        employeeId: emp.id,
+        employeeName: emp.fullName,
+        totalTasks: tasks.length,
+        completedTasks,
+        pendingTasks,
+        completionRate: tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0,
+        totalHoursWorked: totalHours
+      });
+    }
+
+    return reports;
+  }
+
+  async getProjectsReport(): Promise<Array<{
+    projectId: string;
+    projectName: string;
+    clientName: string;
+    status: string;
+    daysRemaining: number;
+    totalTasks: number;
+    completedTasks: number;
+    progress: number;
+  }>> {
+    const projects = await this.getAllProjects();
+    const clients = await this.getClients();
+    const reports = [];
+
+    for (const project of projects) {
+      const client = clients.find(c => c.id === project.clientId);
+      const tasks = await db.select().from(schema.employeeTasks)
+        .where(eq(schema.employeeTasks.projectId, project.id));
+      const completedTasks = tasks.filter(t => t.isCompleted).length;
+
+      reports.push({
+        projectId: project.id,
+        projectName: project.projectName,
+        clientName: client?.fullName || 'غير معروف',
+        status: project.status,
+        daysRemaining: project.daysRemaining || 0,
+        totalTasks: tasks.length,
+        completedTasks,
+        progress: tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0
+      });
+    }
+
+    return reports;
+  }
+
+  async getFinancialReport(): Promise<{
+    totalRevenue: number;
+    monthlyRevenue: number;
+    weeklyRevenue: number;
+    averageOrderValue: number;
+    topServices: Array<{ serviceName: string; count: number; revenue: number }>;
+    revenueByMonth: Array<{ month: string; revenue: number }>;
+  }> {
+    const orders = await this.getOrders();
+    const completedOrders = orders.filter(o => o.paymentStatus === 'completed');
+    
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+
+    const monthlyOrders = completedOrders.filter(o => new Date(o.createdAt) >= startOfMonth);
+    const weeklyOrders = completedOrders.filter(o => new Date(o.createdAt) >= startOfWeek);
+
+    const totalRevenue = completedOrders.reduce((sum, o) => sum + o.price, 0);
+    const monthlyRevenue = monthlyOrders.reduce((sum, o) => sum + o.price, 0);
+    const weeklyRevenue = weeklyOrders.reduce((sum, o) => sum + o.price, 0);
+    const averageOrderValue = completedOrders.length > 0 ? Math.round(totalRevenue / completedOrders.length) : 0;
+
+    const serviceMap = new Map<string, { count: number; revenue: number }>();
+    for (const order of completedOrders) {
+      const existing = serviceMap.get(order.serviceName) || { count: 0, revenue: 0 };
+      serviceMap.set(order.serviceName, {
+        count: existing.count + 1,
+        revenue: existing.revenue + order.price
+      });
+    }
+
+    const topServices = Array.from(serviceMap.entries())
+      .map(([serviceName, data]) => ({ serviceName, ...data }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+
+    const revenueByMonth: Array<{ month: string; revenue: number }> = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthOrders = completedOrders.filter(o => {
+        const orderDate = new Date(o.createdAt);
+        return orderDate.getMonth() === date.getMonth() && orderDate.getFullYear() === date.getFullYear();
+      });
+      revenueByMonth.push({
+        month: date.toLocaleDateString('ar-SA', { month: 'short', year: 'numeric' }),
+        revenue: monthOrders.reduce((sum, o) => sum + o.price, 0)
+      });
+    }
+
+    return {
+      totalRevenue,
+      monthlyRevenue,
+      weeklyRevenue,
+      averageOrderValue,
+      topServices,
+      revenueByMonth
+    };
   }
 }
