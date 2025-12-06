@@ -45,8 +45,14 @@ import {
   Zap,
   Award,
   FileText,
-  Bell
+  Bell,
+  Send,
+  MessagesSquare,
+  ClipboardList,
+  Wrench,
+  Sparkles
 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Project = {
   id: string;
@@ -92,6 +98,56 @@ type Client = {
   phone?: string;
 };
 
+type ChatConversation = {
+  id: string;
+  projectId?: string;
+  clientId?: string;
+  employeeId?: string;
+  type: string;
+  status: string;
+  lastMessageAt?: string;
+  createdAt?: string;
+};
+
+type ChatMessage = {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  senderType: string;
+  senderName: string;
+  content: string;
+  messageType: string;
+  isRead: boolean;
+  createdAt?: string;
+};
+
+type ModificationRequest = {
+  id: string;
+  projectId: string;
+  clientId: string;
+  title: string;
+  description: string;
+  priority: string;
+  status: string;
+  assignedTo?: string;
+  createdAt?: string;
+};
+
+type FeatureRequest = {
+  id: string;
+  projectId: string;
+  clientId: string;
+  title: string;
+  description: string;
+  category?: string;
+  priority: string;
+  status: string;
+  estimatedCost?: number;
+  estimatedDays?: number;
+  adminNotes?: string;
+  createdAt?: string;
+};
+
 const statusConfig = {
   analysis: { 
     label: "التحليل", 
@@ -135,6 +191,9 @@ export default function EmployeeDashboardNew() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedConversation, setSelectedConversation] = useState<ChatConversation | null>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const [requestsTab, setRequestsTab] = useState<"modifications" | "features">("modifications");
   const { user, isAuthenticated, isLoading, isEmployee, logout } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -172,6 +231,26 @@ export default function EmployeeDashboardNew() {
     enabled: !!user?.id && isEmployee(),
   });
 
+  const { data: conversations = [] } = useQuery<ChatConversation[]>({
+    queryKey: ["/api/chat/conversations/employee", user?.id],
+    enabled: !!user?.id && isEmployee(),
+  });
+
+  const { data: messages = [], refetch: refetchMessages } = useQuery<ChatMessage[]>({
+    queryKey: ["/api/chat/conversations", selectedConversation?.id, "messages"],
+    enabled: !!selectedConversation?.id,
+  });
+
+  const { data: modificationRequests = [] } = useQuery<ModificationRequest[]>({
+    queryKey: ["/api/modification-requests"],
+    enabled: !!user?.id && isEmployee(),
+  });
+
+  const { data: featureRequests = [] } = useQuery<FeatureRequest[]>({
+    queryKey: ["/api/feature-requests"],
+    enabled: !!user?.id && isEmployee(),
+  });
+
   const updateProjectMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       return await apiRequest("PATCH", `/api/projects/${id}`, { status });
@@ -194,6 +273,53 @@ export default function EmployeeDashboardNew() {
       toast({
         title: "تم التحديث",
         description: "تم تحديث حالة المهمة",
+      });
+    }
+  });
+
+  const sendMessageMutation = useMutation({
+    mutationFn: async (data: { conversationId: string; content: string }) => {
+      return await apiRequest("POST", "/api/chat/messages", {
+        conversationId: data.conversationId,
+        senderId: user?.id,
+        senderType: "employee",
+        senderName: user?.fullName || "موظف",
+        content: data.content,
+        messageType: "text"
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chat/conversations", selectedConversation?.id, "messages"] });
+      setNewMessage("");
+      toast({
+        title: "تم الإرسال",
+        description: "تم إرسال الرسالة بنجاح",
+      });
+    }
+  });
+
+  const updateModificationRequestMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      return await apiRequest("PUT", `/api/modification-requests/${id}/status`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/modification-requests"] });
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث حالة طلب التعديل",
+      });
+    }
+  });
+
+  const updateFeatureRequestMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      return await apiRequest("PUT", `/api/feature-requests/${id}/status`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/feature-requests"] });
+      toast({
+        title: "تم التحديث",
+        description: "تم تحديث حالة طلب الميزة",
       });
     }
   });
@@ -293,6 +419,8 @@ export default function EmployeeDashboardNew() {
               { id: "dashboard", label: "الرئيسية", icon: LayoutDashboard },
               { id: "projects", label: "المشاريع", icon: Briefcase, badge: activeProjects.length },
               { id: "tasks", label: "مهامي", icon: Target, badge: pendingTasks.length },
+              { id: "chat", label: "المحادثات", icon: MessagesSquare, badge: conversations.length },
+              { id: "requests", label: "طلبات العملاء", icon: ClipboardList, badge: modificationRequests.length + featureRequests.length },
               { id: "team", label: "فريق العمل", icon: Users },
               { id: "clients", label: "العملاء", icon: Users },
               { id: "reports", label: "التقارير", icon: FileText },
@@ -989,6 +1117,405 @@ export default function EmployeeDashboardNew() {
                     </div>
                   </CardContent>
                 </Card>
+              </motion.div>
+            )}
+
+            {activeTab === "chat" && (
+              <motion.div
+                key="chat"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="h-[calc(100vh-140px)]"
+              >
+                <div className="flex h-full gap-4">
+                  <Card className="w-80 flex flex-col" style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2" style={{ color: "var(--ma3k-beige)" }}>
+                        <MessagesSquare className="w-5 h-5" style={{ color: "var(--ma3k-teal)" }} />
+                        المحادثات
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1 overflow-hidden p-0">
+                      <ScrollArea className="h-full">
+                        {conversations.length === 0 ? (
+                          <div className="text-center py-8 px-4">
+                            <MessagesSquare className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--ma3k-beige-dark)" }} />
+                            <p style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد محادثات</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-1 p-2">
+                            {conversations.map((conv) => {
+                              const client = clients.find(c => c.id === conv.clientId);
+                              const project = projects.find(p => p.id === conv.projectId);
+                              return (
+                                <button
+                                  key={conv.id}
+                                  onClick={() => setSelectedConversation(conv)}
+                                  className="w-full p-3 rounded-xl text-right transition-all hover-elevate"
+                                  style={{
+                                    background: selectedConversation?.id === conv.id 
+                                      ? "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" 
+                                      : "var(--ma3k-darker)",
+                                    color: selectedConversation?.id === conv.id ? "white" : "var(--ma3k-beige)"
+                                  }}
+                                  data-testid={`chat-conversation-${conv.id}`}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Avatar className="w-10 h-10">
+                                      <AvatarFallback style={{ 
+                                        background: selectedConversation?.id === conv.id 
+                                          ? "rgba(255,255,255,0.2)" 
+                                          : "linear-gradient(135deg, #a855f7, #ec4899)", 
+                                        color: "white" 
+                                      }}>
+                                        {client?.fullName?.charAt(0) || "W"}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="font-bold truncate">{client?.fullName || "عميل"}</p>
+                                      <p className="text-xs truncate" style={{ 
+                                        color: selectedConversation?.id === conv.id ? "rgba(255,255,255,0.7)" : "var(--ma3k-beige-dark)" 
+                                      }}>
+                                        {project?.projectName || "محادثة"}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </ScrollArea>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="flex-1 flex flex-col" style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                    {selectedConversation ? (
+                      <>
+                        <CardHeader className="pb-3 border-b" style={{ borderColor: "var(--ma3k-border)" }}>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback style={{ background: "linear-gradient(135deg, #a855f7, #ec4899)", color: "white" }}>
+                                {clients.find(c => c.id === selectedConversation.clientId)?.fullName?.charAt(0) || "W"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <CardTitle style={{ color: "var(--ma3k-beige)" }}>
+                                {clients.find(c => c.id === selectedConversation.clientId)?.fullName || "عميل"}
+                              </CardTitle>
+                              <p className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                {projects.find(p => p.id === selectedConversation.projectId)?.projectName || "محادثة"}
+                              </p>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="flex-1 overflow-hidden p-0">
+                          <ScrollArea className="h-full p-4">
+                            {messages.length === 0 ? (
+                              <div className="text-center py-8">
+                                <MessageCircle className="w-12 h-12 mx-auto mb-3" style={{ color: "var(--ma3k-beige-dark)" }} />
+                                <p style={{ color: "var(--ma3k-beige-dark)" }}>لا توجد رسائل بعد</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                {messages.map((msg) => (
+                                  <div
+                                    key={msg.id}
+                                    className={`flex ${msg.senderType === "employee" ? "justify-start" : "justify-end"}`}
+                                  >
+                                    <div
+                                      className="max-w-[70%] p-3 rounded-xl"
+                                      style={{
+                                        background: msg.senderType === "employee"
+                                          ? "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))"
+                                          : "var(--ma3k-darker)",
+                                        color: msg.senderType === "employee" ? "white" : "var(--ma3k-beige)"
+                                      }}
+                                    >
+                                      <p className="text-sm mb-1 font-bold" style={{ 
+                                        color: msg.senderType === "employee" ? "rgba(255,255,255,0.8)" : "var(--ma3k-beige-dark)" 
+                                      }}>
+                                        {msg.senderName}
+                                      </p>
+                                      <p>{msg.content}</p>
+                                      <p className="text-xs mt-1" style={{ 
+                                        color: msg.senderType === "employee" ? "rgba(255,255,255,0.6)" : "var(--ma3k-beige-dark)" 
+                                      }}>
+                                        {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : ""}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </ScrollArea>
+                        </CardContent>
+                        <div className="p-4 border-t" style={{ borderColor: "var(--ma3k-border)" }}>
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="اكتب رسالتك..."
+                              value={newMessage}
+                              onChange={(e) => setNewMessage(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && newMessage.trim()) {
+                                  sendMessageMutation.mutate({
+                                    conversationId: selectedConversation.id,
+                                    content: newMessage.trim()
+                                  });
+                                }
+                              }}
+                              style={{ 
+                                background: "var(--ma3k-darker)", 
+                                borderColor: "var(--ma3k-border)",
+                                color: "var(--ma3k-beige)"
+                              }}
+                              data-testid="input-chat-message"
+                            />
+                            <Button
+                              onClick={() => {
+                                if (newMessage.trim()) {
+                                  sendMessageMutation.mutate({
+                                    conversationId: selectedConversation.id,
+                                    content: newMessage.trim()
+                                  });
+                                }
+                              }}
+                              disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                              style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
+                              data-testid="button-send-message"
+                            >
+                              <Send className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex-1 flex items-center justify-center">
+                        <div className="text-center">
+                          <MessagesSquare className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                          <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
+                            اختر محادثة
+                          </h3>
+                          <p style={{ color: "var(--ma3k-beige-dark)" }}>
+                            اختر محادثة من القائمة لبدء المراسلة
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === "requests" && (
+              <motion.div
+                key="requests"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>طلبات العملاء</h1>
+                    <p style={{ color: "var(--ma3k-beige-dark)" }}>إدارة طلبات التعديل والميزات الجديدة</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    variant={requestsTab === "modifications" ? "default" : "outline"}
+                    onClick={() => setRequestsTab("modifications")}
+                    style={requestsTab === "modifications" 
+                      ? { background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }
+                      : { borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }
+                    }
+                    data-testid="tab-modifications"
+                  >
+                    <Wrench className="w-4 h-4 ml-2" />
+                    طلبات التعديل ({modificationRequests.length})
+                  </Button>
+                  <Button
+                    variant={requestsTab === "features" ? "default" : "outline"}
+                    onClick={() => setRequestsTab("features")}
+                    style={requestsTab === "features" 
+                      ? { background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }
+                      : { borderColor: "var(--ma3k-border)", color: "var(--ma3k-beige)" }
+                    }
+                    data-testid="tab-features"
+                  >
+                    <Sparkles className="w-4 h-4 ml-2" />
+                    طلبات الميزات ({featureRequests.length})
+                  </Button>
+                </div>
+
+                {requestsTab === "modifications" && (
+                  <>
+                    {modificationRequests.length === 0 ? (
+                      <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                        <CardContent className="text-center py-16">
+                          <Wrench className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                          <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
+                            لا توجد طلبات تعديل
+                          </h3>
+                          <p style={{ color: "var(--ma3k-beige-dark)" }}>
+                            لم يتم تقديم أي طلبات تعديل حتى الآن
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <div className="space-y-4">
+                        {modificationRequests.map((req) => {
+                          const client = clients.find(c => c.id === req.clientId);
+                          const project = projects.find(p => p.id === req.projectId);
+                          const priorityColors = {
+                            low: { bg: "rgba(76, 175, 80, 0.2)", color: "var(--ma3k-green)" },
+                            medium: { bg: "rgba(234, 179, 8, 0.2)", color: "#eab308" },
+                            high: { bg: "rgba(249, 115, 22, 0.2)", color: "#f97316" },
+                            urgent: { bg: "rgba(239, 68, 68, 0.2)", color: "#ef4444" }
+                          };
+                          const statusColors = {
+                            pending: { bg: "rgba(234, 179, 8, 0.2)", color: "#eab308", label: "قيد الانتظار" },
+                            in_progress: { bg: "rgba(0, 128, 128, 0.2)", color: "var(--ma3k-teal)", label: "قيد التنفيذ" },
+                            completed: { bg: "rgba(76, 175, 80, 0.2)", color: "var(--ma3k-green)", label: "مكتمل" },
+                            rejected: { bg: "rgba(239, 68, 68, 0.2)", color: "#ef4444", label: "مرفوض" }
+                          };
+                          const priority = priorityColors[req.priority as keyof typeof priorityColors] || priorityColors.medium;
+                          const status = statusColors[req.status as keyof typeof statusColors] || statusColors.pending;
+
+                          return (
+                            <Card key={req.id} style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <h4 className="font-bold" style={{ color: "var(--ma3k-beige)" }}>{req.title}</h4>
+                                      <Badge style={{ background: priority.bg, color: priority.color }}>
+                                        {req.priority === "urgent" ? "عاجل" : req.priority === "high" ? "عالي" : req.priority === "medium" ? "متوسط" : "منخفض"}
+                                      </Badge>
+                                      <Badge style={{ background: status.bg, color: status.color }}>
+                                        {status.label}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm mb-2" style={{ color: "var(--ma3k-beige-dark)" }}>{req.description}</p>
+                                    <div className="flex items-center gap-4 text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                      <span>العميل: {client?.fullName || "غير معروف"}</span>
+                                      <span>المشروع: {project?.projectName || "غير محدد"}</span>
+                                    </div>
+                                  </div>
+                                  <Select 
+                                    value={req.status}
+                                    onValueChange={(value) => updateModificationRequestMutation.mutate({ id: req.id, status: value })}
+                                  >
+                                    <SelectTrigger className="w-36" style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)" }}>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent style={{ background: "var(--ma3k-dark)", borderColor: "var(--ma3k-border)" }}>
+                                      <SelectItem value="pending">قيد الانتظار</SelectItem>
+                                      <SelectItem value="in_progress">قيد التنفيذ</SelectItem>
+                                      <SelectItem value="completed">مكتمل</SelectItem>
+                                      <SelectItem value="rejected">مرفوض</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {requestsTab === "features" && (
+                  <>
+                    {featureRequests.length === 0 ? (
+                      <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                        <CardContent className="text-center py-16">
+                          <Sparkles className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                          <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
+                            لا توجد طلبات ميزات
+                          </h3>
+                          <p style={{ color: "var(--ma3k-beige-dark)" }}>
+                            لم يتم تقديم أي طلبات ميزات جديدة حتى الآن
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <div className="space-y-4">
+                        {featureRequests.map((req) => {
+                          const client = clients.find(c => c.id === req.clientId);
+                          const project = projects.find(p => p.id === req.projectId);
+                          const priorityColors = {
+                            low: { bg: "rgba(76, 175, 80, 0.2)", color: "var(--ma3k-green)" },
+                            medium: { bg: "rgba(234, 179, 8, 0.2)", color: "#eab308" },
+                            high: { bg: "rgba(249, 115, 22, 0.2)", color: "#f97316" },
+                            urgent: { bg: "rgba(239, 68, 68, 0.2)", color: "#ef4444" }
+                          };
+                          const statusColors = {
+                            pending: { bg: "rgba(234, 179, 8, 0.2)", color: "#eab308", label: "قيد الانتظار" },
+                            under_review: { bg: "rgba(168, 85, 247, 0.2)", color: "#a855f7", label: "قيد المراجعة" },
+                            approved: { bg: "rgba(0, 128, 128, 0.2)", color: "var(--ma3k-teal)", label: "موافق عليه" },
+                            in_progress: { bg: "rgba(249, 115, 22, 0.2)", color: "#f97316", label: "قيد التنفيذ" },
+                            completed: { bg: "rgba(76, 175, 80, 0.2)", color: "var(--ma3k-green)", label: "مكتمل" },
+                            rejected: { bg: "rgba(239, 68, 68, 0.2)", color: "#ef4444", label: "مرفوض" }
+                          };
+                          const priority = priorityColors[req.priority as keyof typeof priorityColors] || priorityColors.medium;
+                          const status = statusColors[req.status as keyof typeof statusColors] || statusColors.pending;
+
+                          return (
+                            <Card key={req.id} style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                              <CardContent className="p-4">
+                                <div className="flex items-start justify-between gap-4">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                      <h4 className="font-bold" style={{ color: "var(--ma3k-beige)" }}>{req.title}</h4>
+                                      {req.category && (
+                                        <Badge style={{ background: "rgba(168, 85, 247, 0.2)", color: "#a855f7" }}>
+                                          {req.category}
+                                        </Badge>
+                                      )}
+                                      <Badge style={{ background: priority.bg, color: priority.color }}>
+                                        {req.priority === "urgent" ? "عاجل" : req.priority === "high" ? "عالي" : req.priority === "medium" ? "متوسط" : "منخفض"}
+                                      </Badge>
+                                      <Badge style={{ background: status.bg, color: status.color }}>
+                                        {status.label}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm mb-2" style={{ color: "var(--ma3k-beige-dark)" }}>{req.description}</p>
+                                    <div className="flex items-center gap-4 text-sm flex-wrap" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                      <span>العميل: {client?.fullName || "غير معروف"}</span>
+                                      <span>المشروع: {project?.projectName || "غير محدد"}</span>
+                                      {req.estimatedCost && <span>التكلفة: {req.estimatedCost} ر.س</span>}
+                                      {req.estimatedDays && <span>المدة: {req.estimatedDays} يوم</span>}
+                                    </div>
+                                  </div>
+                                  <Select 
+                                    value={req.status}
+                                    onValueChange={(value) => updateFeatureRequestMutation.mutate({ id: req.id, status: value })}
+                                  >
+                                    <SelectTrigger className="w-36" style={{ background: "var(--ma3k-darker)", borderColor: "var(--ma3k-border)" }}>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent style={{ background: "var(--ma3k-dark)", borderColor: "var(--ma3k-border)" }}>
+                                      <SelectItem value="pending">قيد الانتظار</SelectItem>
+                                      <SelectItem value="under_review">قيد المراجعة</SelectItem>
+                                      <SelectItem value="approved">موافق عليه</SelectItem>
+                                      <SelectItem value="in_progress">قيد التنفيذ</SelectItem>
+                                      <SelectItem value="completed">مكتمل</SelectItem>
+                                      <SelectItem value="rejected">مرفوض</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

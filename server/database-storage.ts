@@ -845,6 +845,11 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(schema.modificationRequests.createdAt));
   }
 
+  async getAllModificationRequests(): Promise<ModificationRequest[]> {
+    return await db.select().from(schema.modificationRequests)
+      .orderBy(desc(schema.modificationRequests.createdAt));
+  }
+
   async updateModificationRequestStatus(id: string, status: string, assignedTo?: string): Promise<ModificationRequest | undefined> {
     const updateData: any = { status, updatedAt: sql`CURRENT_TIMESTAMP` };
     if (assignedTo) updateData.assignedTo = assignedTo;
@@ -878,6 +883,11 @@ export class DatabaseStorage implements IStorage {
   async getClientFeatureRequests(clientId: string): Promise<FeatureRequest[]> {
     return await db.select().from(schema.featureRequests)
       .where(eq(schema.featureRequests.clientId, clientId))
+      .orderBy(desc(schema.featureRequests.createdAt));
+  }
+
+  async getAllFeatureRequests(): Promise<FeatureRequest[]> {
+    return await db.select().from(schema.featureRequests)
       .orderBy(desc(schema.featureRequests.createdAt));
   }
 

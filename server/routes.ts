@@ -1431,6 +1431,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all modification requests (for employees/admin)
+  app.get("/api/modification-requests", async (req, res) => {
+    try {
+      const requests = await storage.getAllModificationRequests();
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch modification requests" });
+    }
+  });
+
   // Update modification request status
   app.put("/api/modification-requests/:id/status", async (req, res) => {
     try {
@@ -1510,6 +1520,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/feature-requests/client/:clientId", async (req, res) => {
     try {
       const requests = await storage.getClientFeatureRequests(req.params.clientId);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch feature requests" });
+    }
+  });
+
+  // Get all feature requests (for employees/admin)
+  app.get("/api/feature-requests", async (req, res) => {
+    try {
+      const requests = await storage.getAllFeatureRequests();
       res.json(requests);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch feature requests" });

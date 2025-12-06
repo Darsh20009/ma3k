@@ -166,6 +166,7 @@ export interface IStorage {
   getModificationRequest(id: string): Promise<ModificationRequest | undefined>;
   getProjectModificationRequests(projectId: string): Promise<ModificationRequest[]>;
   getClientModificationRequests(clientId: string): Promise<ModificationRequest[]>;
+  getAllModificationRequests(): Promise<ModificationRequest[]>;
   updateModificationRequestStatus(id: string, status: string, assignedTo?: string): Promise<ModificationRequest | undefined>;
 
   // Feature Requests
@@ -173,6 +174,7 @@ export interface IStorage {
   getFeatureRequest(id: string): Promise<FeatureRequest | undefined>;
   getProjectFeatureRequests(projectId: string): Promise<FeatureRequest[]>;
   getClientFeatureRequests(clientId: string): Promise<FeatureRequest[]>;
+  getAllFeatureRequests(): Promise<FeatureRequest[]>;
   updateFeatureRequestStatus(id: string, status: string, adminNotes?: string, estimatedCost?: number, estimatedDays?: number): Promise<FeatureRequest | undefined>;
 
   // Project Files
@@ -1628,6 +1630,133 @@ export class JsonStorage implements IStorage {
       activeProjects: projects.filter(p => p.status !== 'completed').length,
       completedCourses: enrollments.filter(e => e.status === 'completed').length,
     };
+  }
+
+  // Chat Conversations - Stub implementations for JsonStorage
+  async createChatConversation(data: InsertChatConversation): Promise<ChatConversation> {
+    throw new Error("Chat not supported in JSON storage. Use PostgreSQL database.");
+  }
+
+  async getChatConversation(id: string): Promise<ChatConversation | undefined> {
+    return undefined;
+  }
+
+  async getClientConversations(clientId: string): Promise<ChatConversation[]> {
+    return [];
+  }
+
+  async getEmployeeConversations(employeeId: string): Promise<ChatConversation[]> {
+    return [];
+  }
+
+  async getProjectConversation(projectId: string): Promise<ChatConversation | undefined> {
+    return undefined;
+  }
+
+  async updateConversationLastMessage(id: string): Promise<void> {
+    // No-op in JSON storage
+  }
+
+  // Chat Messages - Stub implementations
+  async createChatMessage(data: InsertChatMessage): Promise<ChatMessage> {
+    throw new Error("Chat not supported in JSON storage. Use PostgreSQL database.");
+  }
+
+  async getChatMessages(conversationId: string): Promise<ChatMessage[]> {
+    return [];
+  }
+
+  async markMessagesAsRead(conversationId: string, recipientId: string): Promise<void> {
+    // No-op in JSON storage
+  }
+
+  async getUnreadMessagesCount(userId: string, userType: string): Promise<number> {
+    return 0;
+  }
+
+  // Modification Requests - Stub implementations
+  async createModificationRequest(data: InsertModificationRequest): Promise<ModificationRequest> {
+    throw new Error("Modification requests not supported in JSON storage. Use PostgreSQL database.");
+  }
+
+  async getModificationRequest(id: string): Promise<ModificationRequest | undefined> {
+    return undefined;
+  }
+
+  async getProjectModificationRequests(projectId: string): Promise<ModificationRequest[]> {
+    return [];
+  }
+
+  async getClientModificationRequests(clientId: string): Promise<ModificationRequest[]> {
+    return [];
+  }
+
+  async getAllModificationRequests(): Promise<ModificationRequest[]> {
+    return [];
+  }
+
+  async updateModificationRequestStatus(id: string, status: string, assignedTo?: string): Promise<ModificationRequest | undefined> {
+    return undefined;
+  }
+
+  // Feature Requests - Stub implementations
+  async createFeatureRequest(data: InsertFeatureRequest): Promise<FeatureRequest> {
+    throw new Error("Feature requests not supported in JSON storage. Use PostgreSQL database.");
+  }
+
+  async getFeatureRequest(id: string): Promise<FeatureRequest | undefined> {
+    return undefined;
+  }
+
+  async getProjectFeatureRequests(projectId: string): Promise<FeatureRequest[]> {
+    return [];
+  }
+
+  async getClientFeatureRequests(clientId: string): Promise<FeatureRequest[]> {
+    return [];
+  }
+
+  async getAllFeatureRequests(): Promise<FeatureRequest[]> {
+    return [];
+  }
+
+  async updateFeatureRequestStatus(id: string, status: string, adminNotes?: string, estimatedCost?: number, estimatedDays?: number): Promise<FeatureRequest | undefined> {
+    return undefined;
+  }
+
+  // Project Files - Stub implementations
+  async createProjectFile(data: InsertProjectFile): Promise<ProjectFile> {
+    throw new Error("Project files not supported in JSON storage. Use PostgreSQL database.");
+  }
+
+  async getProjectFiles(projectId: string): Promise<ProjectFile[]> {
+    return [];
+  }
+
+  async deleteProjectFile(id: string): Promise<void> {
+    // No-op in JSON storage
+  }
+
+  // Project Questions - Stub implementations
+  async createProjectQuestion(data: InsertProjectQuestion): Promise<ProjectQuestion> {
+    throw new Error("Project questions not supported in JSON storage. Use PostgreSQL database.");
+  }
+
+  async getProjectQuestions(projectId: string): Promise<ProjectQuestion[]> {
+    return [];
+  }
+
+  async answerProjectQuestion(id: string, answer: string): Promise<ProjectQuestion | undefined> {
+    return undefined;
+  }
+
+  async initializeProjectQuestions(projectId: string): Promise<void> {
+    // No-op in JSON storage
+  }
+
+  // Admin - Stub implementations
+  async getAllPendingRequests(): Promise<{ modifications: ModificationRequest[], features: FeatureRequest[] }> {
+    return { modifications: [], features: [] };
   }
 }
 

@@ -822,4 +822,123 @@ export class MongoStorage implements IStorage {
       completedCourses,
     };
   }
+
+  // Chat Conversations - Stub implementations for MongoDB
+  async createChatConversation(data: any): Promise<any> {
+    throw new Error("Chat not supported in MongoDB storage. Use PostgreSQL database.");
+  }
+
+  async getChatConversation(id: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async getClientConversations(clientId: string): Promise<any[]> {
+    return [];
+  }
+
+  async getEmployeeConversations(employeeId: string): Promise<any[]> {
+    return [];
+  }
+
+  async getProjectConversation(projectId: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async updateConversationLastMessage(id: string): Promise<void> {}
+
+  // Chat Messages
+  async createChatMessage(data: any): Promise<any> {
+    throw new Error("Chat not supported in MongoDB storage. Use PostgreSQL database.");
+  }
+
+  async getChatMessages(conversationId: string): Promise<any[]> {
+    return [];
+  }
+
+  async markMessagesAsRead(conversationId: string, recipientId: string): Promise<void> {}
+
+  async getUnreadMessagesCount(userId: string, userType: string): Promise<number> {
+    return 0;
+  }
+
+  // Modification Requests
+  async createModificationRequest(data: any): Promise<any> {
+    throw new Error("Modification requests not supported in MongoDB storage. Use PostgreSQL database.");
+  }
+
+  async getModificationRequest(id: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async getProjectModificationRequests(projectId: string): Promise<any[]> {
+    return [];
+  }
+
+  async getClientModificationRequests(clientId: string): Promise<any[]> {
+    return [];
+  }
+
+  async getAllModificationRequests(): Promise<any[]> {
+    return [];
+  }
+
+  async updateModificationRequestStatus(id: string, status: string, assignedTo?: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  // Feature Requests
+  async createFeatureRequest(data: any): Promise<any> {
+    throw new Error("Feature requests not supported in MongoDB storage. Use PostgreSQL database.");
+  }
+
+  async getFeatureRequest(id: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async getProjectFeatureRequests(projectId: string): Promise<any[]> {
+    return [];
+  }
+
+  async getClientFeatureRequests(clientId: string): Promise<any[]> {
+    return [];
+  }
+
+  async getAllFeatureRequests(): Promise<any[]> {
+    return [];
+  }
+
+  async updateFeatureRequestStatus(id: string, status: string, adminNotes?: string, estimatedCost?: number, estimatedDays?: number): Promise<any | undefined> {
+    return undefined;
+  }
+
+  // Project Files
+  async createProjectFile(data: any): Promise<any> {
+    throw new Error("Project files not supported in MongoDB storage. Use PostgreSQL database.");
+  }
+
+  async getProjectFiles(projectId: string): Promise<any[]> {
+    return [];
+  }
+
+  async deleteProjectFile(id: string): Promise<void> {}
+
+  // Project Questions
+  async createProjectQuestion(data: any): Promise<any> {
+    throw new Error("Project questions not supported in MongoDB storage. Use PostgreSQL database.");
+  }
+
+  async getProjectQuestions(projectId: string): Promise<any[]> {
+    return [];
+  }
+
+  async answerProjectQuestion(id: string, answer: string): Promise<any | undefined> {
+    return undefined;
+  }
+
+  async initializeProjectQuestions(projectId: string): Promise<void> {}
+
+  // Admin
+  async getAllPendingRequests(): Promise<{ modifications: any[], features: any[] }> {
+    return { modifications: [], features: [] };
+  }
 }
