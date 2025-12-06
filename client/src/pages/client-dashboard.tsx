@@ -46,7 +46,15 @@ import {
   Lightbulb,
   File,
   Image,
-  Trash2
+  Trash2,
+  Database,
+  Key,
+  HardDrive,
+  Link2,
+  Copy,
+  ExternalLink,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -218,6 +226,7 @@ export default function ClientDashboard() {
   const [newMessage, setNewMessage] = useState("");
   const [showModificationDialog, setShowModificationDialog] = useState(false);
   const [showFeatureDialog, setShowFeatureDialog] = useState(false);
+  const [showPasswords, setShowPasswords] = useState<{ [key: string]: boolean }>({});
   const [modificationForm, setModificationForm] = useState({ title: "", description: "", priority: "medium" });
   const [featureForm, setFeatureForm] = useState({ title: "", description: "", category: "functionality", priority: "medium" });
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -478,6 +487,7 @@ export default function ClientDashboard() {
                     { id: "features", label: "طلب ميزات", icon: Lightbulb },
                     { id: "files", label: "ملفات المشروع", icon: File },
                     { id: "orders", label: "طلباتي", icon: CreditCard },
+                    { id: "myinfo", label: "بياناتي", icon: Database },
                     { id: "notifications", label: "الإشعارات", icon: Bell, badge: unreadNotifications },
                     { id: "settings", label: "الإعدادات", icon: Settings },
                   ].map((item) => (
@@ -1383,6 +1393,216 @@ export default function ClientDashboard() {
                               {!notification.isRead && (
                                 <div className="w-2 h-2 rounded-full" style={{ background: "var(--ma3k-teal)" }} />
                               )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {activeTab === "myinfo" && (
+                <motion.div
+                  key="myinfo"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>بياناتي</h1>
+                    <p style={{ color: "var(--ma3k-beige-dark)" }}>معلومات مشاريعك والخدمات التقنية</p>
+                  </div>
+
+                  {projects.length === 0 ? (
+                    <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                      <CardContent className="text-center py-16">
+                        <Database className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                        <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>
+                          لا توجد مشاريع
+                        </h3>
+                        <p style={{ color: "var(--ma3k-beige-dark)" }}>
+                          ابدأ مشروعك الأول لعرض بياناتك هنا
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="space-y-6">
+                      {projects.map((project) => (
+                        <Card 
+                          key={project.id} 
+                          style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}
+                        >
+                          <CardHeader className="pb-4">
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                                style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
+                              >
+                                <Globe className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <CardTitle style={{ color: "var(--ma3k-beige)" }}>
+                                  {project.projectName}
+                                </CardTitle>
+                                <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>
+                                  {project.websiteIdea?.slice(0, 60)}...
+                                </CardDescription>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Link2 className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                  <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>الدومين</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-2">
+                                  <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                    {project.domain || "قيد الإعداد"}
+                                  </p>
+                                  {project.domain && (
+                                    <div className="flex gap-1">
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() => navigator.clipboard.writeText(project.domain || "")}
+                                        data-testid={`copy-domain-${project.id}`}
+                                      >
+                                        <Copy className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                      </Button>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() => window.open(`https://${project.domain}`, "_blank")}
+                                        data-testid={`open-domain-${project.id}`}
+                                      >
+                                        <ExternalLink className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                      </Button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Mail className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                  <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>البريد الإلكتروني للموقع</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-2">
+                                  <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                    {project.email || "غير مُعدّ بعد"}
+                                  </p>
+                                  {project.email && (
+                                    <Button
+                                      size="icon"
+                                      variant="ghost"
+                                      onClick={() => navigator.clipboard.writeText(project.email || "")}
+                                      data-testid={`copy-email-${project.id}`}
+                                    >
+                                      <Copy className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <HardDrive className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                  <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>قاعدة البيانات</span>
+                                </div>
+                                <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                  PostgreSQL / MongoDB
+                                </p>
+                                <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                  تُدار بالكامل من فريق معك
+                                </p>
+                              </div>
+
+                              <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Server className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                  <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>الاستضافة</span>
+                                </div>
+                                <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                  Ma3k Cloud Hosting
+                                </p>
+                                <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>
+                                  سيرفرات عالية الأداء
+                                </p>
+                              </div>
+
+                              <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Calendar className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                  <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>تاريخ الإنشاء</span>
+                                </div>
+                                <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                  {project.createdAt ? new Date(project.createdAt).toLocaleDateString('ar-SA') : "غير محدد"}
+                                </p>
+                              </div>
+
+                              <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Clock className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                  <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>تاريخ التسليم المتوقع</span>
+                                </div>
+                                <p className="font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                                  {project.targetDate ? new Date(project.targetDate).toLocaleDateString('ar-SA') : "قيد التحديد"}
+                                </p>
+                              </div>
+                            </div>
+
+                            {project.toolsUsed && project.toolsUsed.length > 0 && (
+                              <div className="p-4 rounded-xl" style={{ background: "var(--ma3k-darker)" }}>
+                                <div className="flex items-center gap-2 mb-3">
+                                  <Code2 className="w-4 h-4" style={{ color: "var(--ma3k-teal)" }} />
+                                  <span className="text-sm" style={{ color: "var(--ma3k-beige-dark)" }}>التقنيات المستخدمة</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {project.toolsUsed.map((tool, idx) => (
+                                    <Badge 
+                                      key={idx}
+                                      style={{ 
+                                        background: "rgba(0, 128, 128, 0.2)", 
+                                        color: "var(--ma3k-teal)",
+                                        border: "1px solid var(--ma3k-teal)"
+                                      }}
+                                    >
+                                      {tool}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex justify-end gap-2 pt-4 border-t flex-wrap" style={{ borderColor: "var(--ma3k-border)" }}>
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedProject(project);
+                                  setActiveTab("files");
+                                }}
+                                style={{ borderColor: "var(--ma3k-teal)", color: "var(--ma3k-teal)" }}
+                                data-testid={`myinfo-files-${project.id}`}
+                              >
+                                <File className="w-4 h-4 ml-2" />
+                                ملفات المشروع
+                              </Button>
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedProject(project);
+                                  setActiveTab("chat");
+                                }}
+                                style={{ borderColor: "var(--ma3k-green)", color: "var(--ma3k-green)" }}
+                                data-testid={`myinfo-chat-${project.id}`}
+                              >
+                                <MessageCircle className="w-4 h-4 ml-2" />
+                                التواصل مع الفريق
+                              </Button>
                             </div>
                           </CardContent>
                         </Card>
