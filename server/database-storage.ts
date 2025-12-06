@@ -766,6 +766,11 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(schema.chatConversations.lastMessageAt));
   }
 
+  async getAllConversations(): Promise<ChatConversation[]> {
+    return await db.select().from(schema.chatConversations)
+      .orderBy(desc(schema.chatConversations.lastMessageAt));
+  }
+
   async getProjectConversation(projectId: string): Promise<ChatConversation | undefined> {
     const result = await db.select().from(schema.chatConversations)
       .where(eq(schema.chatConversations.projectId, projectId));

@@ -152,6 +152,7 @@ export interface IStorage {
   getChatConversation(id: string): Promise<ChatConversation | undefined>;
   getClientConversations(clientId: string): Promise<ChatConversation[]>;
   getEmployeeConversations(employeeId: string): Promise<ChatConversation[]>;
+  getAllConversations(): Promise<ChatConversation[]>;
   getProjectConversation(projectId: string): Promise<ChatConversation | undefined>;
   updateConversationLastMessage(id: string): Promise<void>;
 
@@ -1646,6 +1647,10 @@ export class JsonStorage implements IStorage {
   }
 
   async getEmployeeConversations(employeeId: string): Promise<ChatConversation[]> {
+    return [];
+  }
+
+  async getAllConversations(): Promise<ChatConversation[]> {
     return [];
   }
 
