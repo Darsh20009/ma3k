@@ -26,12 +26,24 @@ import {
   Target,
   Lightbulb,
   BookOpen,
-  Trophy
+  Trophy,
+  Brain,
+  HelpCircle,
+  Phone,
+  Mail,
+  UserPlus,
+  BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import type { Service } from "@shared/schema";
 
 export default function HomeNew() {
@@ -688,10 +700,466 @@ export default function HomeNew() {
         </div>
       </section>
 
+      {/* Open Life AI Section */}
+      <section className="py-24" style={{ background: "var(--ma3k-darker)" }}>
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <motion.div
+              animate={{ rotateY: [0, 360] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              className="inline-block mb-8"
+            >
+              <div 
+                className="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto"
+                style={{ 
+                  background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                  boxShadow: "0 10px 40px var(--glow-green)"
+                }}
+              >
+                <Brain className="w-12 h-12 text-white" />
+              </div>
+            </motion.div>
+            
+            <Badge 
+              className="mb-6 px-4 py-1"
+              style={{ background: "var(--glass-bg)", border: "1px solid var(--ma3k-green)", color: "var(--ma3k-green)" }}
+            >
+              <Sparkles className="w-4 h-4 ml-2" />
+              ذكاء اصطناعي متطور
+            </Badge>
+            
+            <h2 
+              className="text-4xl md:text-5xl font-black mb-6"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              أوبن لايف - <span style={{ color: "var(--ma3k-green)" }}>Open Life AI</span>
+            </h2>
+            
+            <p 
+              className="text-xl max-w-3xl mx-auto mb-8 leading-relaxed"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
+              صمّم تطبيقك أو موقعك الخاص بسهولة واحترافية مع  أوبن لايف نسخة الذكاء الأصطناعي التي نملكها اكتب ناقش فكرتك معه وأرسلها لننفذ أحسن تطبيق!
+              <br />
+              <strong style={{ color: "var(--ma3k-beige)" }}>
+                سواء كنت تحتاج تطبيقًا شخصيًا، موقعًا إلكترونيًا، متجرًا إلكترونيًا، أو خدمات إضافية، نحن هنا لنساعدك!
+              </strong>
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/openlife">
+                <Button 
+                  size="lg"
+                  className="text-lg px-10 py-7 rounded-2xl font-bold"
+                  style={{
+                    background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                    color: "white",
+                    boxShadow: "0 10px 40px var(--glow-green)"
+                  }}
+                  data-testid="button-openlife"
+                >
+                  <Brain className="w-6 h-6 ml-2" />
+                  أذهب  و أكتشف أوبن لايف
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                </Button>
+              </Link>
+              <Link href="/services">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="text-lg px-10 py-7 rounded-2xl font-bold"
+                  style={{
+                    borderColor: "var(--ma3k-beige)",
+                    borderWidth: "2px",
+                    color: "var(--ma3k-beige)"
+                  }}
+                  data-testid="button-discover-services"
+                >
+                  اطلع على ذكائنا الاصطناعي
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Innovation Center & Progress Indicators Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Innovation Center */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center lg:text-right"
+            >
+              <Badge 
+                className="mb-6 px-4 py-1"
+                style={{ background: "var(--glass-bg)", border: "1px solid var(--ma3k-teal)", color: "var(--ma3k-teal)" }}
+              >
+                <Lightbulb className="w-4 h-4 ml-2" />
+                مركز الابتكار
+              </Badge>
+              <h2 
+                className="text-4xl md:text-5xl font-black mb-6"
+                style={{ color: "var(--ma3k-beige)" }}
+              >
+                حيث تنبض <span style={{ color: "var(--ma3k-green)" }}>الأفكار</span> بالحياة
+              </h2>
+              <p 
+                className="text-lg leading-relaxed mb-8"
+                style={{ color: "var(--ma3k-beige-dark)" }}
+              >
+                نقدم استراتيجيات مصممة خصيصاً لمساعدتك في بناء موقعك الإلكتروني بنجاح. موقعنا مصمم للأداء، القابلية للتوسع، والموثوقية. مع اهتمام دقيق بالتفاصيل، نقوم بإنشاء حلول نظيفة، قابلة للصيانة، وفعالة تدفع عملك للأمام.
+              </p>
+              
+              <Card 
+                className="p-8 border-0"
+                style={{ 
+                  background: "var(--glass-bg)", 
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid var(--glass-border)"
+                }}
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div 
+                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
+                  >
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 
+                    className="text-xl font-bold"
+                    style={{ color: "var(--ma3k-beige)" }}
+                  >
+                    موقع نظيف وعالي الجودة
+                  </h3>
+                </div>
+                <p style={{ color: "var(--ma3k-beige-dark)" }}>
+                  تصميم موقع متكامل يقدم خدمات متنوعة بأسعار معقولة، مع واجهة سهلة الاستخدام تلبي احتياجات العملاء الشخصية والتعليمية.
+                </p>
+              </Card>
+            </motion.div>
+
+            {/* Progress Indicators */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <Badge 
+                className="mb-6 px-4 py-1"
+                style={{ background: "var(--glass-bg)", border: "1px solid var(--ma3k-green)", color: "var(--ma3k-green)" }}
+              >
+                <BarChart3 className="w-4 h-4 ml-2" />
+                مؤشرات التقدم
+              </Badge>
+              <h3 
+                className="text-2xl font-bold mb-8"
+                style={{ color: "var(--ma3k-beige)" }}
+              >
+                نبلغ آفاقاً جديدة معاً
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-6">
+                {[
+                  { number: "500+", label: "مشروع مكتمل", icon: Trophy },
+                  { number: "98%", label: "رضا العملاء", icon: Heart },
+                  { number: "24/7", label: "دعم فني متواصل", icon: Clock },
+                  { number: "100+", label: "عميل سعيد", icon: Users }
+                ].map((stat, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <Card 
+                      className="p-6 text-center border-0 hover-elevate"
+                      style={{ 
+                        background: "var(--glass-bg)", 
+                        backdropFilter: "blur(20px)",
+                        border: "1px solid var(--glass-border)"
+                      }}
+                      data-testid={`progress-stat-${index}`}
+                    >
+                      <stat.icon 
+                        className="w-10 h-10 mx-auto mb-3"
+                        style={{ color: "var(--ma3k-green)" }}
+                      />
+                      <div 
+                        className="text-3xl font-black mb-1"
+                        style={{ color: "var(--ma3k-beige)" }}
+                      >
+                        {stat.number}
+                      </div>
+                      <div 
+                        className="text-sm"
+                        style={{ color: "var(--ma3k-beige-dark)" }}
+                      >
+                        {stat.label}
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Communication Section */}
+      <section className="py-24" style={{ background: "var(--ma3k-darker)" }}>
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <Badge 
+              className="mb-6 px-4 py-1"
+              style={{ background: "var(--glass-bg)", border: "1px solid var(--ma3k-beige)", color: "var(--ma3k-beige)" }}
+            >
+              <MessageSquare className="w-4 h-4 ml-2" />
+              التواصل الفعال
+            </Badge>
+            
+            <h2 
+              className="text-4xl md:text-5xl font-black mb-6"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              التواصل هو أهم ما في  <span style={{ color: "var(--ma3k-green)" }}>الأمر!</span>
+            </h2>
+            
+            <p 
+              className="text-xl leading-relaxed mb-10"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
+              التواصل الواضح والمتسق يدفع النجاح. نحن نولي أهمية للحوار المفتوح، مما يضمن التوافق مع أهدافك والتعاون السلس طوال كل مشروع.
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { icon: Phone, title: "اتصل بنا", desc: "متاحون على مدار الساعة" },
+                { icon: Mail, title: "راسلنا", desc: "رد سريع خلال 24 ساعة" },
+                { icon: MessageSquare, title: "دردش معنا", desc: "دعم فوري عبر الواتساب" }
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Card 
+                    className="p-8 text-center border-0 hover-elevate"
+                    style={{ 
+                      background: "var(--glass-bg)", 
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid var(--glass-border)"
+                    }}
+                  >
+                    <div 
+                      className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                      style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
+                    >
+                      <item.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 
+                      className="text-xl font-bold mb-2"
+                      style={{ color: "var(--ma3k-beige)" }}
+                    >
+                      {item.title}
+                    </h3>
+                    <p style={{ color: "var(--ma3k-beige-dark)" }}>
+                      {item.desc}
+                    </p>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge 
+              className="mb-6 px-4 py-1"
+              style={{ background: "var(--glass-bg)", border: "1px solid var(--ma3k-teal)", color: "var(--ma3k-teal)" }}
+            >
+              <HelpCircle className="w-4 h-4 ml-2" />
+              الأسئلة الشائعة
+            </Badge>
+            <h2 
+              className="text-4xl md:text-5xl font-black mb-6"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              هل أنت بحاجة <span style={{ color: "var(--ma3k-green)" }}>إلى المساعدة؟</span>
+            </h2>
+            <p 
+              className="text-xl max-w-2xl mx-auto"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
+              في هذا القسم، يمكنك الإجابة عن الأسئلة الشائعة بسهولة وفعالية
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto"
+          >
+            <Accordion type="single" collapsible className="space-y-4">
+              {[
+                {
+                  question: "ما الذي يميزنا؟",
+                  answer: "نحن نقدم حلولاً مخصصة، مما يضمن حصول كل عميل على خدمة من الدرجة الأولى مصممة خصيصاً لتلبية احتياجاته."
+                },
+                {
+                  question: "هل إنشاء الموقع الإلكتروني سهل الاستخدام؟",
+                  answer: "تم تصميم موقعنا الإلكتروني لسهولة التصفح، مما يتيح لك العثور على المعلومات التي تحتاجها بسرعة وكفاءة."
+                },
+                {
+                  question: "هل يمكنك الوثوق بشركائنا؟",
+                  answer: "نحن نتعاون مع شركاء موثوق بهم وذوي جودة عالية لنقدم لك خدمات تصميم مواقع موثوقة ومن أفضل ما يكون."
+                },
+                {
+                  question: "ما نوع الدعم الذي نقدمه؟",
+                  answer: "نحن نوفر الدعم على مدار الساعة طوال أيام الأسبوع من خلال قنوات مختلفة، بما في ذلك الدردشة المباشرة والبريد الإلكتروني والهاتف، للمساعدة في أي استفسارات."
+                },
+                {
+                  question: "كيف يتم تأمين بياناتك بشكل جيد؟",
+                  answer: "بياناتك محمية ببروتوكولات تشفير وأمان متقدمة، مما يحافظ على أمان معلوماتك الشخصية."
+                },
+                {
+                  question: "هل الروابط إلى مواقع إلكترونية أخرى معتمدة؟",
+                  answer: "على الرغم من أن هذا الموقع الإلكتروني قد يكون مرتبطاً بمواقع إلكترونية أخرى، إلا أننا لا نشير بشكل مباشر أو غير مباشر إلى أي موافقة."
+                }
+              ].map((faq, index) => (
+                <AccordionItem 
+                  key={index} 
+                  value={`item-${index}`}
+                  className="rounded-xl overflow-hidden border-0"
+                  style={{ 
+                    background: "var(--glass-bg)", 
+                    border: "1px solid var(--glass-border)"
+                  }}
+                  data-testid={`faq-item-${index}`}
+                >
+                  <AccordionTrigger 
+                    className="px-6 py-4 text-right font-bold text-lg"
+                    style={{ color: "var(--ma3k-beige)" }}
+                  >
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent 
+                    className="px-6 pb-4"
+                    style={{ color: "var(--ma3k-beige-dark)" }}
+                  >
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Join Team Section */}
+      <section className="py-24" style={{ background: "var(--ma3k-darker)" }}>
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <div 
+              className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8"
+              style={{ 
+                background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                boxShadow: "0 10px 40px var(--glow-green)"
+              }}
+            >
+              <UserPlus className="w-10 h-10 text-white" />
+            </div>
+            
+            <h2 
+              className="text-4xl md:text-5xl font-black mb-6"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              انضم إلى فريقنا التقني <span style={{ color: "var(--ma3k-green)" }}>للابتكار والنمو!</span>
+            </h2>
+            
+            <p 
+              className="text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
+              انضم إلى فريقنا الديناميكي الذي يركز على الابتكار والنمو.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/contact">
+                <Button 
+                  size="lg"
+                  className="text-lg px-10 py-7 rounded-2xl font-bold"
+                  style={{
+                    background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                    color: "white",
+                    boxShadow: "0 10px 40px var(--glow-green)"
+                  }}
+                  data-testid="button-join-team"
+                >
+                  <UserPlus className="w-6 h-6 ml-2" />
+                  انضم للفريق
+                </Button>
+              </Link>
+              <Link href="/about">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="text-lg px-10 py-7 rounded-2xl font-bold"
+                  style={{
+                    borderColor: "var(--ma3k-beige)",
+                    borderWidth: "2px",
+                    color: "var(--ma3k-beige)"
+                  }}
+                >
+                  تعرف علينا
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section 
         className="py-24 relative overflow-hidden"
-        style={{ background: "var(--ma3k-darker)" }}
       >
         {/* Background Effects */}
         <div className="absolute inset-0">
