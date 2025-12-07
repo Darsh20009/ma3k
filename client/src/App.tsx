@@ -35,6 +35,7 @@ import CertSearch from "@/pages/cert-search";
 import EmployeeProfile from "@/pages/employee-profile";
 import WebsiteForm from "@/pages/website-form";
 import StudentDashboard from "@/pages/student-dashboard";
+import ThankYou from "@/pages/thank-you";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -70,6 +71,7 @@ function Router() {
         <Route path="/ma3k-meet" component={Ma3kMeet} />
         <Route path="/website-form" component={WebsiteForm} />
         <Route path="/student-dashboard" component={StudentDashboard} />
+        <Route path="/thank-you" component={ThankYou} />
         <Route component={NotFound} />
       </Switch>
       <Footer />

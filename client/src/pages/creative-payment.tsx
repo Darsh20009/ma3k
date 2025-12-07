@@ -290,37 +290,52 @@ export default function PaymentPage() {
     setIsProcessing(true);
 
     try {
-      for (const item of cart) {
-        const orderData = {
-          clientId: userType === "client" ? user?.id : undefined,
-          customerName: customerName.trim(),
-          customerEmail: customerEmail.trim(),
-          customerPhone: customerPhone.trim(),
-          serviceId: item.id,
-          serviceName: item.name,
-          price: item.price,
-          description: `${item.name} ${discountAmount > 0 ? `- خصم ${discountPercentage}%` : ""}`,
-          paymentMethod: selectedMethod,
-          paymentReceiptUrl: receiptPreview,
-          paymentReceiptFileName: receiptFile?.name,
-          paymentNotes: paymentNotes.trim(),
-          discountCode: discountCode || undefined,
-          discountAmount: discountAmount,
-          finalAmount: Math.round(finalPrice / cart.length),
-        };
+      const orderNumber = `ORD-${Date.now()}`;
+      const createdOrderIds: string[] = [];
+      const allServices = cart.map(item => item.name).join(", ");
+      
+      const combinedOrderData = {
+        clientId: userType === "client" ? user?.id : undefined,
+        customerName: customerName.trim(),
+        customerEmail: customerEmail.trim(),
+        customerPhone: customerPhone.trim(),
+        serviceName: allServices,
+        price: cart.reduce((sum, item) => sum + item.price, 0),
+        description: `${allServices} ${discountAmount > 0 ? `- خصم ${discountPercentage}%` : ""}`,
+        paymentMethod: selectedMethod,
+        paymentReceiptUrl: receiptPreview,
+        paymentReceiptFileName: receiptFile?.name,
+        paymentNotes: paymentNotes.trim(),
+        discountCode: discountCode || undefined,
+        discountAmount: discountAmount,
+        finalAmount: finalPrice,
+        orderNumber: orderNumber,
+      };
 
-        await apiRequest("POST", "/api/orders", orderData);
-      }
+      const response = await apiRequest("POST", "/api/orders", combinedOrderData);
+      const createdOrder = await response.json();
+      createdOrderIds.push(createdOrder.id || createdOrder.orderNumber);
+
+      const orderDetails = {
+        orderNumber: createdOrder.orderNumber || orderNumber,
+        orderId: createdOrder.id || orderNumber,
+        customerName: customerName.trim(),
+        customerEmail: customerEmail.trim(),
+        serviceName: allServices,
+        finalAmount: finalPrice,
+        paymentMethod: selectedMethod,
+        timestamp: new Date().toISOString(),
+      };
+      
+      localStorage.setItem("lastOrderDetails", JSON.stringify(orderDetails));
 
       toast({
         title: "تم إرسال الطلب بنجاح!",
-        description: "سيتم مراجعة إيصال الدفع والتواصل معك قريباً",
+        description: `رقم الطلب: ${orderDetails.orderNumber}`,
       });
 
       clearCart();
-      setTimeout(() => {
-        setLocation(userType === "client" ? "/client-dashboard" : "/");
-      }, 2000);
+      setLocation("/thank-you");
     } catch (error) {
       console.error("Order creation error:", error);
       toast({
