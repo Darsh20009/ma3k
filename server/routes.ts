@@ -1671,6 +1671,177 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== Support Tickets Routes ====================
+
+  // Create a new ticket
+  app.post("/api/tickets", async (req, res) => {
+    try {
+      const { userId, userType, userName, userEmail, subject, description, category, priority, attachments } = req.body;
+      
+      if (!userId || !userType || !userName || !userEmail || !subject || !description) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      // Generate ticket number
+      const ticketNumber = `TK-${Date.now().toString(36).toUpperCase()}`;
+      
+      const ticket = await storage.createTicket({
+        ticketNumber,
+        userId,
+        userType,
+        userName,
+        userEmail,
+        subject,
+        description,
+        category: category || 'general',
+        priority: priority || 'medium',
+        attachments
+      });
+      
+      // Notify admins
+      await storage.createNotification({
+        userId: 'admin',
+        userType: 'employee',
+        title: 'تذكرة دعم جديدة',
+        message: `تذكرة جديدة من ${userName}: ${subject}`,
+        type: 'general',
+        link: `/admin-dashboard?tab=tickets`
+      });
+      
+      res.status(201).json(ticket);
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      res.status(500).json({ error: "Failed to create ticket" });
+    }
+  });
+
+  // Get user's tickets
+  app.get("/api/tickets/user/:userType/:userId", async (req, res) => {
+    try {
+      const { userType, userId } = req.params;
+      const tickets = await storage.getUserTickets(userId, userType);
+      res.json(tickets);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch tickets" });
+    }
+  });
+
+  // Get all tickets (admin)
+  app.get("/api/tickets", async (req, res) => {
+    try {
+      const tickets = await storage.getAllTickets();
+      res.json(tickets);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch tickets" });
+    }
+  });
+
+  // Get single ticket
+  app.get("/api/tickets/:id", async (req, res) => {
+    try {
+      const ticket = await storage.getTicket(req.params.id);
+      if (!ticket) {
+        return res.status(404).json({ error: "Ticket not found" });
+      }
+      res.json(ticket);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch ticket" });
+    }
+  });
+
+  // Update ticket status
+  app.put("/api/tickets/:id/status", async (req, res) => {
+    try {
+      const { status, assignedTo, assignedName, resolution } = req.body;
+      const ticket = await storage.updateTicketStatus(req.params.id, status, assignedTo, assignedName, resolution);
+      if (!ticket) {
+        return res.status(404).json({ error: "Ticket not found" });
+      }
+      
+      // Notify ticket owner
+      const originalTicket = await storage.getTicket(req.params.id);
+      if (originalTicket) {
+        await storage.createNotification({
+          userId: originalTicket.userId,
+          userType: originalTicket.userType,
+          title: 'تحديث حالة التذكرة',
+          message: `تم تحديث حالة تذكرتك #${originalTicket.ticketNumber} إلى: ${status}`,
+          type: 'general',
+          link: `/${originalTicket.userType}-dashboard?tab=tickets`
+        });
+      }
+      
+      res.json(ticket);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update ticket" });
+    }
+  });
+
+  // Add response to ticket
+  app.post("/api/tickets/:id/responses", async (req, res) => {
+    try {
+      const { responderId, responderType, responderName, content, attachments, isInternal } = req.body;
+      
+      if (!responderId || !responderType || !responderName || !content) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      const response = await storage.addTicketResponse({
+        ticketId: req.params.id,
+        responderId,
+        responderType,
+        responderName,
+        content,
+        attachments,
+        isInternal: isInternal || false
+      });
+      
+      // Notify relevant party
+      const ticket = await storage.getTicket(req.params.id);
+      if (ticket && !isInternal) {
+        const notifyId = responderType === 'employee' || responderType === 'admin' ? ticket.userId : 'admin';
+        const notifyType = responderType === 'employee' || responderType === 'admin' ? ticket.userType : 'employee';
+        
+        await storage.createNotification({
+          userId: notifyId,
+          userType: notifyType,
+          title: 'رد جديد على التذكرة',
+          message: `رد جديد من ${responderName} على التذكرة #${ticket.ticketNumber}`,
+          type: 'general',
+          link: responderType === 'employee' || responderType === 'admin' 
+            ? `/${ticket.userType}-dashboard?tab=tickets` 
+            : `/admin-dashboard?tab=tickets`
+        });
+      }
+      
+      res.status(201).json(response);
+    } catch (error) {
+      console.error('Error adding ticket response:', error);
+      res.status(500).json({ error: "Failed to add response" });
+    }
+  });
+
+  // Get ticket responses
+  app.get("/api/tickets/:id/responses", async (req, res) => {
+    try {
+      const { includeInternal } = req.query;
+      const responses = await storage.getTicketResponses(req.params.id, includeInternal === 'true');
+      res.json(responses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch responses" });
+    }
+  });
+
+  // Get ticket statistics (admin)
+  app.get("/api/tickets/stats/overview", async (req, res) => {
+    try {
+      const stats = await storage.getTicketStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch ticket stats" });
+    }
+  });
+
   // Invoice PDF Route
   app.get("/api/invoices/:id/pdf", async (req, res) => {
     try {

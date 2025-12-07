@@ -12,7 +12,8 @@ import {
   type ChatConversation, type InsertChatConversation, type ChatMessage, type InsertChatMessage,
   type ModificationRequest, type InsertModificationRequest, type FeatureRequest, type InsertFeatureRequest,
   type ProjectFile, type InsertProjectFile, type ProjectQuestion, type InsertProjectQuestion,
-  type Meeting, type InsertMeeting
+  type Meeting, type InsertMeeting,
+  type Ticket, type InsertTicket, type TicketResponse, type InsertTicketResponse
 } from "@shared/schema";
 import session from "express-session";
 import { randomUUID } from "crypto";
@@ -238,6 +239,16 @@ export interface IStorage {
     pendingPayments: number;
     averageOrderValue: number;
   }>;
+
+  // Tickets
+  createTicket(data: any): Promise<Ticket>;
+  getTicket(id: string): Promise<Ticket | undefined>;
+  getUserTickets(userId: string, userType: string): Promise<Ticket[]>;
+  getAllTickets(): Promise<Ticket[]>;
+  updateTicketStatus(id: string, status: string, assignedTo?: string, assignedName?: string, resolution?: string): Promise<Ticket | undefined>;
+  addTicketResponse(data: InsertTicketResponse): Promise<TicketResponse>;
+  getTicketResponses(ticketId: string, includeInternal?: boolean): Promise<TicketResponse[]>;
+  getTicketStats(): Promise<{ open: number; inProgress: number; resolved: number; closed: number; total: number }>;
 
   // Session Store
   sessionStore?: session.Store;
@@ -1929,6 +1940,105 @@ export class JsonStorage implements IStorage {
       paidOrders: paidOrders.length,
       pendingPayments: orders.filter(o => o.paymentStatus === 'pending').length,
       averageOrderValue: paidOrders.length > 0 ? paidOrders.reduce((sum, o) => sum + (o.finalAmount || o.price), 0) / paidOrders.length : 0,
+    };
+  }
+
+  // Ticket methods
+  private tickets: Map<string, Ticket> = new Map();
+  private ticketResponses: Map<string, TicketResponse> = new Map();
+
+  async createTicket(data: any): Promise<Ticket> {
+    const id = randomUUID();
+    const ticket: Ticket = {
+      id,
+      ticketNumber: data.ticketNumber,
+      userId: data.userId,
+      userType: data.userType,
+      userName: data.userName,
+      userEmail: data.userEmail,
+      subject: data.subject,
+      description: data.description,
+      category: data.category || 'general',
+      priority: data.priority || 'medium',
+      status: 'open',
+      assignedTo: null,
+      assignedName: null,
+      attachments: data.attachments || [],
+      resolution: null,
+      resolvedAt: null,
+      closedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.tickets.set(id, ticket);
+    this.saveData();
+    return ticket;
+  }
+
+  async getTicket(id: string): Promise<Ticket | undefined> {
+    return this.tickets.get(id);
+  }
+
+  async getUserTickets(userId: string, userType: string): Promise<Ticket[]> {
+    return Array.from(this.tickets.values())
+      .filter(t => t.userId === userId && t.userType === userType)
+      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async getAllTickets(): Promise<Ticket[]> {
+    return Array.from(this.tickets.values())
+      .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+  }
+
+  async updateTicketStatus(id: string, status: string, assignedTo?: string, assignedName?: string, resolution?: string): Promise<Ticket | undefined> {
+    const ticket = this.tickets.get(id);
+    if (!ticket) return undefined;
+
+    ticket.status = status;
+    ticket.updatedAt = new Date();
+    if (assignedTo) ticket.assignedTo = assignedTo;
+    if (assignedName) ticket.assignedName = assignedName;
+    if (resolution) ticket.resolution = resolution;
+    if (status === 'resolved') ticket.resolvedAt = new Date();
+    if (status === 'closed') ticket.closedAt = new Date();
+
+    this.tickets.set(id, ticket);
+    this.saveData();
+    return ticket;
+  }
+
+  async addTicketResponse(data: InsertTicketResponse): Promise<TicketResponse> {
+    const id = randomUUID();
+    const response: TicketResponse = {
+      id,
+      ticketId: data.ticketId,
+      responderId: data.responderId,
+      responderType: data.responderType,
+      responderName: data.responderName,
+      content: data.content,
+      attachments: data.attachments || [],
+      isInternal: data.isInternal || false,
+      createdAt: new Date(),
+    };
+    this.ticketResponses.set(id, response);
+    this.saveData();
+    return response;
+  }
+
+  async getTicketResponses(ticketId: string, includeInternal: boolean = false): Promise<TicketResponse[]> {
+    return Array.from(this.ticketResponses.values())
+      .filter(r => r.ticketId === ticketId && (includeInternal || !r.isInternal))
+      .sort((a, b) => new Date(a.createdAt!).getTime() - new Date(b.createdAt!).getTime());
+  }
+
+  async getTicketStats(): Promise<{ open: number; inProgress: number; resolved: number; closed: number; total: number }> {
+    const tickets = Array.from(this.tickets.values());
+    return {
+      open: tickets.filter(t => t.status === 'open').length,
+      inProgress: tickets.filter(t => t.status === 'in_progress').length,
+      resolved: tickets.filter(t => t.status === 'resolved').length,
+      closed: tickets.filter(t => t.status === 'closed').length,
+      total: tickets.length,
     };
   }
 }

@@ -512,6 +512,42 @@ export const projectQuestions = pgTable("project_questions", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+// Support Tickets table
+export const tickets = pgTable("tickets", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketNumber: text("ticket_number").notNull().unique(),
+  userId: varchar("user_id").notNull(),
+  userType: text("user_type").notNull(), // 'client', 'student'
+  userName: text("user_name").notNull(),
+  userEmail: text("user_email").notNull(),
+  subject: text("subject").notNull(),
+  description: text("description").notNull(),
+  category: text("category").default("general"), // 'general', 'technical', 'billing', 'project', 'course'
+  priority: text("priority").default("medium"), // 'low', 'medium', 'high', 'urgent'
+  status: text("status").default("open"), // 'open', 'in_progress', 'waiting', 'resolved', 'closed'
+  assignedTo: varchar("assigned_to").references(() => employees.id),
+  assignedName: text("assigned_name"),
+  attachments: text("attachments").array(),
+  resolution: text("resolution"),
+  resolvedAt: timestamp("resolved_at"),
+  closedAt: timestamp("closed_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Ticket Responses table
+export const ticketResponses = pgTable("ticket_responses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketId: varchar("ticket_id").references(() => tickets.id).notNull(),
+  responderId: varchar("responder_id").notNull(),
+  responderType: text("responder_type").notNull(), // 'client', 'student', 'employee', 'admin'
+  responderName: text("responder_name").notNull(),
+  content: text("content").notNull(),
+  attachments: text("attachments").array(),
+  isInternal: boolean("is_internal").default(false), // Internal notes visible only to staff
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
 // Reviews and Ratings table
 export const reviews = pgTable("reviews", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -707,3 +743,32 @@ export type ProjectFile = typeof projectFiles.$inferSelect;
 export type InsertProjectFile = z.infer<typeof insertProjectFileSchema>;
 export type ProjectQuestion = typeof projectQuestions.$inferSelect;
 export type InsertProjectQuestion = z.infer<typeof insertProjectQuestionSchema>;
+
+// Insert schemas for tickets
+export const insertTicketSchema = createInsertSchema(tickets).pick({
+  userId: true,
+  userType: true,
+  userName: true,
+  userEmail: true,
+  subject: true,
+  description: true,
+  category: true,
+  priority: true,
+  attachments: true,
+});
+
+export const insertTicketResponseSchema = createInsertSchema(ticketResponses).pick({
+  ticketId: true,
+  responderId: true,
+  responderType: true,
+  responderName: true,
+  content: true,
+  attachments: true,
+  isInternal: true,
+});
+
+// Types for tickets
+export type Ticket = typeof tickets.$inferSelect;
+export type InsertTicket = z.infer<typeof insertTicketSchema>;
+export type TicketResponse = typeof ticketResponses.$inferSelect;
+export type InsertTicketResponse = z.infer<typeof insertTicketResponseSchema>;
