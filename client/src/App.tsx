@@ -63,6 +63,8 @@ function Router() {
         <Route path="/my-courses" component={MyCoursesComplete} />
         <Route path="/my-projects" component={MyProjectsComplete} />
         <Route path="/client-dashboard" component={ClientDashboard} />
+        <Route path="/dashboard" component={ClientDashboard} />
+        <Route path="/client" component={ClientDashboard} />
         <Route path="/employee-dashboard-new" component={EmployeeDashboardNew} />
         <Route path="/cert-search" component={CertSearch} />
         <Route path="/employee-profile" component={EmployeeProfile} />
