@@ -39,7 +39,6 @@ import StudentDashboard from "@/pages/student-dashboard";
 import ThankYou from "@/pages/thank-you";
 import OpenLife from "@/pages/openlife";
 import NotFound from "@/pages/not-found";
-import ClientDashboard from "@/pages/client-dashboard";
 
 function Router() {
   return (
