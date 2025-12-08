@@ -116,7 +116,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
+  // Educational website form submission route
+  app.post("/api/educational-website-form", async (req, res) => {
+    try {
+      const formData = req.body;
+      
+      // Store the educational website request
+      const requestData = {
+        type: 'educational',
+        ...formData,
+        timestamp: new Date().toISOString(),
+        requestId: `EDU-${Date.now()}`
+      };
+      
+      // In a real app, you'd save this to the database
+      // For now, just return success
+      res.status(201).json({
+        success: true,
+        requestId: requestData.requestId,
+        message: "تم استلام طلبك بنجاح. سنتواصل معك خلال 2-24 ساعة."
+      });
+    } catch (error) {
+      res.status(400).json({ error: "Invalid form data" });
+    }
+  });
 
   // Download routes for HTML/CSS exports
   app.get("/api/download/html/:exportId", (req, res) => {

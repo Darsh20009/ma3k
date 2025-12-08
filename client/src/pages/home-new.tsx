@@ -339,6 +339,137 @@ export default function HomeNew() {
         </motion.div>
       </section>
 
+      {/* Free Planning Section */}
+      <section className="py-20 relative" style={{ background: "var(--ma3k-darker)" }}>
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <Badge 
+              className="mb-6 px-4 py-1"
+              style={{ background: "rgba(16, 185, 129, 0.15)", border: "1px solid var(--ma3k-green)", color: "var(--ma3k-green)" }}
+            >
+              <Sparkles className="w-4 h-4 ml-2" />
+              مجاني تماماً
+            </Badge>
+            <h2 
+              className="text-4xl md:text-5xl font-black mb-6"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              فلنبدأ بتنفيذ <span style={{ color: "var(--ma3k-green)" }}>فكرتك</span>
+            </h2>
+            <p 
+              className="text-xl max-w-2xl mx-auto mb-4"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
+              احصل على مخطط توضيحي لموقعك مجاناً خلال 2-24 ساعة
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <Card 
+                className="p-8 h-full border-0 hover-elevate cursor-pointer"
+                style={{ 
+                  background: "var(--glass-bg)", 
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid var(--glass-border)"
+                }}
+              >
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
+                  style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
+                >
+                  <Globe className="w-8 h-8 text-white" />
+                </div>
+                <h3 
+                  className="text-2xl font-bold mb-4"
+                  style={{ color: "var(--ma3k-beige)" }}
+                >
+                  موقع إلكتروني عام
+                </h3>
+                <p 
+                  className="mb-6"
+                  style={{ color: "var(--ma3k-beige-dark)" }}
+                >
+                  مواقع شخصية، مواقع شركات، متاجر إلكترونية، أو أي نوع آخر من المواقع
+                </p>
+                <Link href="/website-form">
+                  <Button 
+                    className="w-full text-lg py-6"
+                    style={{
+                      background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                      color: "white"
+                    }}
+                    data-testid="button-website-form"
+                  >
+                    <Rocket className="w-5 h-5 ml-2" />
+                    ابدأ التخطيط الآن
+                  </Button>
+                </Link>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              <Card 
+                className="p-8 h-full border-0 hover-elevate cursor-pointer"
+                style={{ 
+                  background: "var(--glass-bg)", 
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid var(--glass-border)"
+                }}
+              >
+                <div 
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
+                  style={{ background: "linear-gradient(135deg, var(--ma3k-green), var(--ma3k-teal))" }}
+                >
+                  <GraduationCap className="w-8 h-8 text-white" />
+                </div>
+                <h3 
+                  className="text-2xl font-bold mb-4"
+                  style={{ color: "var(--ma3k-beige)" }}
+                >
+                  موقع تعليمي
+                </h3>
+                <p 
+                  className="mb-6"
+                  style={{ color: "var(--ma3k-beige-dark)" }}
+                >
+                  منصات تعليمية، أكاديميات، مواقع دورات تدريبية مع ميزات تفاعلية
+                </p>
+                <Link href="/educational-website-form">
+                  <Button 
+                    className="w-full text-lg py-6"
+                    style={{
+                      background: "linear-gradient(135deg, var(--ma3k-green), var(--ma3k-teal))",
+                      color: "white"
+                    }}
+                    data-testid="button-educational-form"
+                  >
+                    <BookOpen className="w-5 h-5 ml-2" />
+                    ابدأ التخطيط الآن
+                  </Button>
+                </Link>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-24 relative" style={{ background: "var(--ma3k-darker)" }}>
         <div className="container mx-auto px-6">

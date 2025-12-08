@@ -34,6 +34,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import CertSearch from "@/pages/cert-search";
 import EmployeeProfile from "@/pages/employee-profile";
 import WebsiteForm from "@/pages/website-form";
+import EducationalWebsiteForm from "@/pages/educational-website-form";
 import StudentDashboard from "@/pages/student-dashboard";
 import ThankYou from "@/pages/thank-you";
 import OpenLife from "@/pages/openlife";
@@ -71,6 +72,7 @@ function Router() {
         <Route path="/code-tool" component={CodeTool} />
         <Route path="/ma3k-meet" component={Ma3kMeet} />
         <Route path="/website-form" component={WebsiteForm} />
+        <Route path="/educational-website-form" component={EducationalWebsiteForm} />
         <Route path="/student-dashboard" component={StudentDashboard} />
         <Route path="/thank-you" component={ThankYou} />
         <Route path="/openlife" component={OpenLife} />
