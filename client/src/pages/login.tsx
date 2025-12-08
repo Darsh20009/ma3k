@@ -53,7 +53,7 @@ export default function Login() {
           localStorage.removeItem("ma3k_redirect_after_login");
           setLocation(redirectUrl);
         } else if (userType === "client") {
-          setLocation("/my-projects-complete");
+          setLocation("/client-dashboard");
         } else if (userType === "student") {
           setLocation("/my-courses-complete");
         } else if (userType === "employee") {
