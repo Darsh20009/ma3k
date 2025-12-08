@@ -78,7 +78,8 @@ function Router() {
         <Route path="/student-dashboard" component={StudentDashboard} />
         <Route path="/thank-you" component={ThankYou} />
         <Route path="/openlife" component={OpenLife} />
-        <Route component={NotFound} />
+        <Route path="/404" component={NotFound} />
+        <Route path="/:rest*" component={NotFound} />
       </Switch>
       <Footer />
     </div>
