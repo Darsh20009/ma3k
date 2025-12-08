@@ -4,22 +4,23 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { 
   CheckCircle2, 
-  Sparkles, 
   Home, 
   LayoutDashboard, 
   FileText, 
   MessageCircle,
-  Star,
-  Rocket,
-  Heart,
   Clock,
   Phone,
   Mail,
-  ArrowLeft,
-  Download,
-  Gift
+  Rocket,
+  Building2,
+  Receipt,
+  Calendar,
+  User,
+  CreditCard,
+  ArrowLeft
 } from "lucide-react";
 
 interface OrderDetails {
@@ -31,66 +32,6 @@ interface OrderDetails {
   finalAmount?: number;
   paymentMethod?: string;
   timestamp?: string;
-}
-
-const confettiColors = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
-
-function Confetti() {
-  return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {[...Array(50)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-3 h-3 rounded-sm"
-          style={{
-            backgroundColor: confettiColors[i % confettiColors.length],
-            left: `${Math.random() * 100}%`,
-            top: -20,
-          }}
-          initial={{ y: -20, rotate: 0, opacity: 1 }}
-          animate={{
-            y: window.innerHeight + 20,
-            rotate: Math.random() * 720 - 360,
-            opacity: [1, 1, 0],
-          }}
-          transition={{
-            duration: Math.random() * 3 + 2,
-            delay: Math.random() * 2,
-            repeat: Infinity,
-            repeatDelay: Math.random() * 5,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function FloatingStars() {
-  return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {[...Array(20)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            scale: [1, 1.5, 1],
-            opacity: [0.3, 0.8, 0.3],
-          }}
-          transition={{
-            duration: Math.random() * 3 + 2,
-            repeat: Infinity,
-            delay: Math.random() * 2,
-          }}
-        >
-          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-        </motion.div>
-      ))}
-    </div>
-  );
 }
 
 export default function ThankYouPage() {
@@ -118,7 +59,7 @@ export default function ThankYouPage() {
       setHasValidOrder(false);
     }
     
-    setTimeout(() => setShowContent(true), 500);
+    setTimeout(() => setShowContent(true), 300);
   }, []);
 
   const formatDate = (dateString?: string) => {
@@ -154,26 +95,39 @@ export default function ThankYouPage() {
 
   if (!hasValidOrder && showContent) {
     return (
-      <div className="min-h-screen pt-24 pb-20 px-4 relative overflow-hidden">
-        <div className="container mx-auto max-w-2xl relative z-10">
+      <div className="min-h-screen pt-24 pb-20 px-4">
+        <div className="container mx-auto max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full mx-auto mb-8 flex items-center justify-center">
-              <CheckCircle2 className="w-12 h-12 text-white" />
+            <div 
+              className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"
+              style={{ backgroundColor: "var(--ma3k-green)" }}
+            >
+              <CheckCircle2 className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">
-              شكراً لزيارتك!
+            <h1 
+              className="text-3xl font-bold mb-4"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              شكراً لزيارتك
             </h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              نحن سعداء بخدمتك. تصفح خدماتنا واكتشف المزيد!
+            <p 
+              className="text-lg mb-8"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
+              نحن سعداء بخدمتك. تصفح خدماتنا واكتشف المزيد
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
                 className="gap-2"
+                style={{
+                  background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                  color: "white"
+                }}
                 onClick={() => setLocation("/services")}
                 data-testid="button-browse-services"
               >
@@ -198,263 +152,316 @@ export default function ThankYouPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4 relative overflow-hidden">
-      <Confetti />
-      <FloatingStars />
-      
-      <div className="container mx-auto max-w-4xl relative z-10">
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 200, 
-            damping: 20,
-            delay: 0.2 
-          }}
-          className="text-center mb-8"
-        >
-          <motion.div
-            animate={{ 
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, -5, 0]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              repeatType: "reverse"
-            }}
-            className="relative inline-block"
-          >
-            <div className="w-32 h-32 bg-gradient-to-br from-emerald-400 via-green-500 to-teal-600 rounded-full mx-auto flex items-center justify-center shadow-2xl shadow-green-500/30">
-              <CheckCircle2 className="w-16 h-16 text-white" />
-            </div>
-            <motion.div
-              className="absolute -top-2 -right-2"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            >
-              <Sparkles className="w-8 h-8 text-yellow-400" />
-            </motion.div>
-            <motion.div
-              className="absolute -bottom-1 -left-3"
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              <Heart className="w-6 h-6 text-pink-500 fill-pink-500" />
-            </motion.div>
-          </motion.div>
-        </motion.div>
-
+    <div className="min-h-screen pt-24 pb-20 px-4">
+      <div className="container mx-auto max-w-4xl">
         {showContent && (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ duration: 0.4 }}
           >
             <div className="text-center mb-10">
-              <motion.h1 
-                className="text-4xl md:text-6xl font-extrabold mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center"
+                style={{ backgroundColor: "var(--ma3k-green)" }}
               >
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500">
-                  شكراً لك!
-                </span>
-              </motion.h1>
-              <motion.p 
-                className="text-xl md:text-2xl text-muted-foreground"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
+                <CheckCircle2 className="w-12 h-12 text-white" />
+              </motion.div>
+              
+              <h1 
+                className="text-4xl md:text-5xl font-bold mb-3"
+                style={{ color: "var(--ma3k-beige)" }}
               >
-                تم استلام طلبك بنجاح وجاري المراجعة
-              </motion.p>
+                تم استلام طلبك بنجاح
+              </h1>
+              <p 
+                className="text-xl"
+                style={{ color: "var(--ma3k-beige-dark)" }}
+              >
+                شكراً لثقتك بنا، سيتم التواصل معك قريباً
+              </p>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.9 }}
-            >
-              <Card className="p-8 mb-8 bg-gradient-to-br from-background to-muted/30 border-2 border-primary/20 shadow-xl">
-                <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center">
-                      <FileText className="w-6 h-6 text-primary-foreground" />
+            <Card className="glass-card p-8 mb-6 rounded-2xl">
+              <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-12 h-12 rounded-xl flex items-center justify-center"
+                    style={{ backgroundColor: "var(--ma3k-teal)" }}
+                  >
+                    <Receipt className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 
+                      className="text-2xl font-bold"
+                      style={{ color: "var(--ma3k-beige)" }}
+                    >
+                      تفاصيل الطلب
+                    </h2>
+                    <p 
+                      className="text-sm"
+                      style={{ color: "var(--ma3k-beige-dark)" }}
+                    >
+                      {formatDate(orderDetails.timestamp)}
+                    </p>
+                  </div>
+                </div>
+                <Badge 
+                  className="text-sm px-4 py-2"
+                  style={{ 
+                    backgroundColor: "rgba(16, 185, 129, 0.15)",
+                    color: "var(--ma3k-green)",
+                    border: "1px solid var(--ma3k-green)"
+                  }}
+                >
+                  <CheckCircle2 className="w-4 h-4 ml-2" />
+                  تم الاستلام
+                </Badge>
+              </div>
+
+              <Separator className="mb-6 opacity-20" />
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {orderDetails.orderNumber && (
+                  <div className="flex items-start gap-3">
+                    <div 
+                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: "rgba(var(--ma3k-teal-rgb), 0.15)" }}
+                    >
+                      <FileText className="w-5 h-5" style={{ color: "var(--ma3k-teal)" }} />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold">تفاصيل الطلب</h2>
-                      <p className="text-sm text-muted-foreground">
-                        {formatDate(orderDetails.timestamp)}
+                      <p 
+                        className="text-sm mb-1"
+                        style={{ color: "var(--ma3k-beige-dark)" }}
+                      >
+                        رقم الطلب
                       </p>
-                    </div>
-                  </div>
-                  <Badge variant="secondary" className="text-lg px-4 py-2 bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
-                    <CheckCircle2 className="w-4 h-4 ml-2" />
-                    تم الاستلام
-                  </Badge>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  {orderDetails.orderNumber && (
-                    <motion.div 
-                      className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <p className="text-sm text-muted-foreground mb-1">رقم الطلب</p>
-                      <p className="text-2xl font-bold font-mono text-primary" data-testid="text-order-number">
+                      <p 
+                        className="text-lg font-bold font-mono"
+                        style={{ color: "var(--ma3k-green)" }}
+                        data-testid="text-order-number"
+                      >
                         {orderDetails.orderNumber}
                       </p>
-                    </motion.div>
-                  )}
-
-                  {orderDetails.customerName && (
-                    <motion.div 
-                      className="p-4 rounded-xl bg-muted/50 border border-border"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <p className="text-sm text-muted-foreground mb-1">اسم العميل</p>
-                      <p className="text-xl font-semibold" data-testid="text-customer-name">
-                        {orderDetails.customerName}
-                      </p>
-                    </motion.div>
-                  )}
-
-                  {orderDetails.serviceName && (
-                    <motion.div 
-                      className="p-4 rounded-xl bg-muted/50 border border-border"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <p className="text-sm text-muted-foreground mb-1">الخدمة</p>
-                      <p className="text-lg font-semibold" data-testid="text-service-name">
-                        {orderDetails.serviceName}
-                      </p>
-                    </motion.div>
-                  )}
-
-                  {orderDetails.finalAmount && (
-                    <motion.div 
-                      className="p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-green-500/5 border border-emerald-500/20"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <p className="text-sm text-muted-foreground mb-1">المبلغ</p>
-                      <p className="text-2xl font-bold text-emerald-600" data-testid="text-order-amount">
-                        ${orderDetails.finalAmount}
-                      </p>
-                    </motion.div>
-                  )}
-
-                  {orderDetails.paymentMethod && (
-                    <motion.div 
-                      className="p-4 rounded-xl bg-muted/50 border border-border md:col-span-2"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <p className="text-sm text-muted-foreground mb-1">طريقة الدفع</p>
-                      <p className="text-lg font-semibold">
-                        {getPaymentMethodName(orderDetails.paymentMethod)}
-                      </p>
-                    </motion.div>
-                  )}
-                </div>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1 }}
-            >
-              <Card className="p-6 mb-8 bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-orange-500/10 border-2 border-amber-500/30">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2 text-amber-600">الخطوات التالية</h3>
-                    <ul className="space-y-2 text-muted-foreground">
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        سيتم مراجعة إيصال التحويل خلال 24 ساعة
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        سنتواصل معك لتأكيد الطلب وبدء التنفيذ
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        يمكنك متابعة حالة طلبك من لوحة التحكم
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.3 }}
-            >
-              <Card className="p-6 mb-8 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border-2 border-blue-500/30">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Gift className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2 text-blue-600">تحتاج مساعدة؟</h3>
-                    <p className="text-muted-foreground mb-4">
-                      نحن هنا لمساعدتك! تواصل معنا في أي وقت
-                    </p>
-                    <div className="flex flex-wrap gap-3">
-                      <Button 
-                        variant="outline" 
-                        className="gap-2"
-                        onClick={sendWhatsAppMessage}
-                        data-testid="button-whatsapp-contact"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                        واتساب
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="gap-2"
-                        onClick={() => window.location.href = "tel:+966570708801"}
-                        data-testid="button-phone-contact"
-                      >
-                        <Phone className="w-4 h-4" />
-                        اتصل بنا
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="gap-2"
-                        onClick={() => window.location.href = "mailto:ma3k.2025@gmail.com"}
-                        data-testid="button-email-contact"
-                      >
-                        <Mail className="w-4 h-4" />
-                        البريد الإلكتروني
-                      </Button>
                     </div>
                   </div>
-                </div>
-              </Card>
-            </motion.div>
+                )}
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.5 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
+                {orderDetails.customerName && (
+                  <div className="flex items-start gap-3">
+                    <div 
+                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: "rgba(var(--ma3k-teal-rgb), 0.15)" }}
+                    >
+                      <User className="w-5 h-5" style={{ color: "var(--ma3k-teal)" }} />
+                    </div>
+                    <div>
+                      <p 
+                        className="text-sm mb-1"
+                        style={{ color: "var(--ma3k-beige-dark)" }}
+                      >
+                        اسم العميل
+                      </p>
+                      <p 
+                        className="text-lg font-semibold"
+                        style={{ color: "var(--ma3k-beige)" }}
+                        data-testid="text-customer-name"
+                      >
+                        {orderDetails.customerName}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {orderDetails.serviceName && (
+                  <div className="flex items-start gap-3">
+                    <div 
+                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: "rgba(var(--ma3k-teal-rgb), 0.15)" }}
+                    >
+                      <Building2 className="w-5 h-5" style={{ color: "var(--ma3k-teal)" }} />
+                    </div>
+                    <div>
+                      <p 
+                        className="text-sm mb-1"
+                        style={{ color: "var(--ma3k-beige-dark)" }}
+                      >
+                        الخدمة
+                      </p>
+                      <p 
+                        className="text-lg font-semibold"
+                        style={{ color: "var(--ma3k-beige)" }}
+                        data-testid="text-service-name"
+                      >
+                        {orderDetails.serviceName}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {orderDetails.finalAmount && (
+                  <div className="flex items-start gap-3">
+                    <div 
+                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: "rgba(16, 185, 129, 0.15)" }}
+                    >
+                      <CreditCard className="w-5 h-5" style={{ color: "var(--ma3k-green)" }} />
+                    </div>
+                    <div>
+                      <p 
+                        className="text-sm mb-1"
+                        style={{ color: "var(--ma3k-beige-dark)" }}
+                      >
+                        المبلغ الإجمالي
+                      </p>
+                      <p 
+                        className="text-xl font-bold"
+                        style={{ color: "var(--ma3k-green)" }}
+                        data-testid="text-order-amount"
+                      >
+                        ${orderDetails.finalAmount}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {orderDetails.paymentMethod && (
+                  <div className="flex items-start gap-3 md:col-span-2">
+                    <div 
+                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: "rgba(var(--ma3k-teal-rgb), 0.15)" }}
+                    >
+                      <Calendar className="w-5 h-5" style={{ color: "var(--ma3k-teal)" }} />
+                    </div>
+                    <div>
+                      <p 
+                        className="text-sm mb-1"
+                        style={{ color: "var(--ma3k-beige-dark)" }}
+                      >
+                        طريقة الدفع
+                      </p>
+                      <p 
+                        className="text-lg font-semibold"
+                        style={{ color: "var(--ma3k-beige)" }}
+                      >
+                        {getPaymentMethodName(orderDetails.paymentMethod)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            <Card className="glass-card p-6 mb-6 rounded-2xl">
+              <div className="flex items-start gap-4">
+                <div 
+                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: "rgba(251, 191, 36, 0.15)" }}
+                >
+                  <Clock className="w-6 h-6" style={{ color: "#fbbf24" }} />
+                </div>
+                <div>
+                  <h3 
+                    className="text-xl font-bold mb-3"
+                    style={{ color: "var(--ma3k-beige)" }}
+                  >
+                    الخطوات التالية
+                  </h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 flex-shrink-0" style={{ color: "var(--ma3k-green)" }} />
+                      <span style={{ color: "var(--ma3k-beige-dark)" }}>
+                        سيتم مراجعة طلبك خلال 24 ساعة عمل
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 flex-shrink-0" style={{ color: "var(--ma3k-green)" }} />
+                      <span style={{ color: "var(--ma3k-beige-dark)" }}>
+                        سنتواصل معك عبر البريد الإلكتروني أو الهاتف لتأكيد الطلب
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 flex-shrink-0" style={{ color: "var(--ma3k-green)" }} />
+                      <span style={{ color: "var(--ma3k-beige-dark)" }}>
+                        يمكنك متابعة حالة طلبك من لوحة التحكم الخاصة بك
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="glass-card p-6 mb-8 rounded-2xl">
+              <div className="flex items-start gap-4">
+                <div 
+                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: "rgba(var(--ma3k-teal-rgb), 0.15)" }}
+                >
+                  <MessageCircle className="w-6 h-6" style={{ color: "var(--ma3k-teal)" }} />
+                </div>
+                <div className="flex-1">
+                  <h3 
+                    className="text-xl font-bold mb-2"
+                    style={{ color: "var(--ma3k-beige)" }}
+                  >
+                    تحتاج مساعدة؟
+                  </h3>
+                  <p 
+                    className="mb-4"
+                    style={{ color: "var(--ma3k-beige-dark)" }}
+                  >
+                    فريق الدعم متاح لمساعدتك في أي وقت
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={sendWhatsAppMessage}
+                      data-testid="button-whatsapp-contact"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      واتساب
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => window.location.href = "tel:+966570708801"}
+                      data-testid="button-phone-contact"
+                    >
+                      <Phone className="w-4 h-4" />
+                      اتصل بنا
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => window.location.href = "mailto:ma3k.2025@gmail.com"}
+                      data-testid="button-email-contact"
+                    >
+                      <Mail className="w-4 h-4" />
+                      البريد الإلكتروني
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                className="gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-lg px-8"
-                onClick={() => setLocation("/client-dashboard")}
+                className="gap-2 text-lg px-8"
+                style={{
+                  background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                  color: "white"
+                }}
+                onClick={() => setLocation("/my-projects-complete")}
                 data-testid="button-go-dashboard"
               >
                 <LayoutDashboard className="w-5 h-5" />
-                لوحة التحكم
+                متابعة مشاريعي
               </Button>
               <Button
                 size="lg"
@@ -476,30 +483,19 @@ export default function ThankYouPage() {
                 <Rocket className="w-5 h-5" />
                 تصفح الخدمات
               </Button>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.8 }}
-              className="text-center mt-12"
-            >
-              <p className="text-muted-foreground">
+            <div className="text-center mt-10">
+              <p style={{ color: "var(--ma3k-beige-dark)" }}>
                 نقدر ثقتك بنا ونتطلع لخدمتك
               </p>
-              <div className="flex justify-center gap-1 mt-2">
-                {[...Array(5)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 2 + i * 0.1 }}
-                  >
-                    <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+              <p 
+                className="text-sm mt-2"
+                style={{ color: "var(--ma3k-beige-dark)", opacity: 0.7 }}
+              >
+                منصة معك الرقمية - شريكك في النجاح
+              </p>
+            </div>
           </motion.div>
         )}
       </div>
