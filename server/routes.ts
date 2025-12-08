@@ -185,6 +185,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const order = await storage.createOrder(validatedOrderData);
       
+      // إنشاء مشروع تلقائياً للعميل المسجل
+      if (orderData.clientId) {
+        try {
+          const websiteIdea = req.body.websiteSpecs?.idea || 
+                             req.body.websiteSpecs?.websiteIdea || 
+                             `مشروع ${order.serviceName}`;
+          
+          await storage.createProject({
+            clientId: orderData.clientId,
+            orderId: order.id,
+            projectName: order.serviceName,
+            websiteIdea: websiteIdea,
+            status: 'analysis',
+            daysRemaining: 30,
+            targetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          });
+          
+          console.log(`✅ Project created automatically for order ${order.orderNumber}`);
+        } catch (projectError) {
+          console.error('Error creating project:', projectError);
+        }
+      }
+      
       // Try to send email notification (non-blocking)
       if (orderData.customerEmail && orderData.customerName) {
         const websiteSpecs = req.body.websiteSpecs || null;

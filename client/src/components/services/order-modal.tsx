@@ -223,7 +223,7 @@ export default function OrderModal({ isOpen, onClose, service }: OrderModalProps
                 <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
             </div>
-            
+
             <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
               <p className="text-center text-blue-800 font-medium">
                 💡 بعد إرسال الطلب سيتم فتح واتساب تلقائياً لإكمال التواصل
