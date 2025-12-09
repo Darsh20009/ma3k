@@ -19,7 +19,7 @@ export default function ContactFloat() {
   const { toast } = useToast();
 
   const handleWhatsApp = () => {
-    const phoneNumber = "+201155201921";
+    const phoneNumber = "201155201921";
     const message = "مرحباً! أود التواصل معكم بخصوص خدماتكم.";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
@@ -157,11 +157,11 @@ export default function ContactFloat() {
                     style={{ color: "var(--ma3k-beige-dark)" }}
                   >
                     <a 
-                      href="mailto:MA3K.2025@GMAIL.COM"
+                      href="mailto:ma3k.2025@gmail.com"
                       className="hover:underline"
                       style={{ color: "var(--ma3k-green)" }}
                     >
-                      MA3K.2025@GMAIL.COM
+                      ma3k.2025@gmail.com
                     </a>
                   </p>
                 </div>

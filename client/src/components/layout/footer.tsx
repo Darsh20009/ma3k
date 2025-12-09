@@ -153,7 +153,7 @@ export default function Footer() {
                   className="text-sm"
                   style={{ color: "var(--ma3k-beige-dark)" }}
                 >
-                  info@ma3k.com
+                  ma3k.2025@gmail.com
                 </span>
               </li>
               <li className="flex items-center gap-3">
@@ -167,7 +167,7 @@ export default function Footer() {
                   className="text-sm"
                   style={{ color: "var(--ma3k-beige-dark)" }}
                 >
-                  +966 50 000 0000
+                  +201155201921
                 </span>
               </li>
               <li className="flex items-center gap-3">

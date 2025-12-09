@@ -41,7 +41,7 @@ export default function Contact() {
     try {
       if (formData.contactMethod === "whatsapp") {
         const whatsappMessage = `مرحباً! أريد التواصل معكم\n\nالاسم: ${formData.name}\nرقم الهاتف: ${formData.phone}\n\nالرسالة: ${formData.message}`;
-        const whatsappUrl = `https://wa.me/966532441566?text=${encodeURIComponent(whatsappMessage)}`;
+        const whatsappUrl = `https://wa.me/201155201921?text=${encodeURIComponent(whatsappMessage)}`;
         window.open(whatsappUrl, '_blank');
         setIsSubmitted(true);
       } else {
@@ -333,7 +333,7 @@ export default function Contact() {
                       >
                         <MessageCircle className="w-6 h-6 mx-auto mb-2" style={{ color: "var(--ma3k-teal)" }} />
                         <span className="font-medium" style={{ color: "var(--ma3k-beige)" }}>واتساب</span>
-                        <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>966532441566</p>
+                        <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>201155201921</p>
                       </button>
                     </div>
                   </div>
@@ -410,7 +410,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h4 className="font-semibold" style={{ color: "var(--ma3k-beige)" }}>رقم الهاتف والواتساب</h4>
-                      <p dir="ltr" style={{ color: "var(--ma3k-beige-dark)" }}>+966 53 244 1566</p>
+                      <p dir="ltr" style={{ color: "var(--ma3k-beige-dark)" }}>+20 115 520 1921</p>
                     </div>
                   </div>
 
