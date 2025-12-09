@@ -11,13 +11,17 @@ import {
   Globe, 
   MessageCircle,
   ExternalLink,
-  Download,
   CheckCircle,
   Code,
-  Database,
-  Palette,
-  Shield
+  Briefcase,
+  Crown,
+  Bolt,
+  Laptop,
+  Link2,
+  Settings,
+  Palette
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function About() {
   const teamMembers = [
@@ -30,7 +34,7 @@ export default function About() {
       certifications: ["PMP", "AWS Solutions Architect", "Scrum Master"],
       experience: "10+ سنوات",
       projects: "200+ مشروع",
-      avatar: "🎯"
+      icon: Target
     },
     {
       id: 2,
@@ -41,7 +45,7 @@ export default function About() {
       certifications: ["Executive MBA", "Digital Leadership", "Business Strategy"],
       experience: "15+ سنة",
       projects: "مؤسس الشركة",
-      avatar: "👑"
+      icon: Crown
     },
     {
       id: 3,
@@ -53,7 +57,7 @@ export default function About() {
       experience: "8+ سنوات",
       projects: "150+ موقع كبير",
       portfolio: "https://youssef.ma3k.online/",
-      avatar: "⚡"
+      icon: Bolt
     },
     {
       id: 4,
@@ -64,7 +68,7 @@ export default function About() {
       certifications: ["React Professional", "JavaScript Expert", "Web Development"],
       experience: "5+ سنوات",
       projects: "80+ تطبيق",
-      avatar: "💻"
+      icon: Laptop
     },
     {
       id: 5,
@@ -75,7 +79,7 @@ export default function About() {
       certifications: ["API Design Expert", "Cloud Integration", "Security Professional"],
       experience: "6+ سنوات",
       projects: "100+ API",
-      avatar: "🔗"
+      icon: Link2
     },
     {
       id: 6,
@@ -86,7 +90,7 @@ export default function About() {
       certifications: ["AWS Certified", "Database Administrator", "DevOps Professional"],
       experience: "7+ سنوات",
       projects: "120+ نظام خلفي",
-      avatar: "⚙️"
+      icon: Settings
     },
     {
       id: 7,
@@ -97,7 +101,7 @@ export default function About() {
       certifications: ["Frontend Expert", "UX/UI Design", "Animation Specialist"],
       experience: "4+ سنوات",
       projects: "90+ واجهة",
-      avatar: "🎨"
+      icon: Palette
     }
   ];
 
@@ -124,142 +128,120 @@ export default function About() {
     }
   ];
 
+  const stats = [
+    { value: "500+", label: "مشروع مكتمل", color: "var(--ma3k-green)" },
+    { value: "300+", label: "عميل سعيد", color: "var(--ma3k-teal)" },
+    { value: "5+", label: "سنوات خبرة", color: "var(--ma3k-beige)" },
+    { value: "7", label: "خبراء متخصصين", color: "var(--ma3k-green)" }
+  ];
+
   return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary))" }}>
+    <div className="min-h-screen py-24" style={{ background: "var(--ma3k-darker)" }}>
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
-        <div 
-          className="absolute inset-0" 
-          style={{ background: "linear-gradient(to right, var(--ma3k-green-light), var(--ma3k-teal-light))" }}
-        />
+      <section className="relative py-16 overflow-hidden">
         <div className="container mx-auto px-6 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="text-center"
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-4xl mx-auto"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span 
-                style={{ 
-                  background: "linear-gradient(to right, var(--ma3k-green), var(--ma3k-teal))",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text"
-                }}
-              >
-                من نحن
-              </span>
+            <Badge 
+              className="mb-6 px-4 py-2"
+              style={{ 
+                background: "var(--glass-bg)", 
+                border: "1px solid var(--ma3k-green)", 
+                color: "var(--ma3k-green)" 
+              }}
+              data-testid="badge-about"
+            >
+              <Users className="w-4 h-4 ml-2" />
+              تعرف علينا
+            </Badge>
+            <h1 
+              className="text-4xl md:text-6xl font-black mb-6"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              من <span style={{ color: "var(--ma3k-green)" }}>نحن</span>
             </h1>
             <p 
-              className="text-2xl max-w-4xl mx-auto leading-relaxed"
+              className="text-xl leading-relaxed"
               style={{ color: "var(--ma3k-beige-dark)" }}
             >
               نحن فريق من الخبراء المبدعين نسعى لتحويل أفكارك الرقمية إلى حقيقة مذهلة
             </p>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="mt-8 flex justify-center space-x-4"
-            >
-              {['💎', '🚀', '✨', '🌟'].map((emoji, index) => (
-                <motion.div
-                  key={index}
-                  animate={{ 
-                    y: [0, -10, 0],
-                    rotate: [0, 5, -5, 0]
-                  }}
-                  transition={{ 
-                    delay: index * 0.2, 
-                    duration: 2, 
-                    repeat: Infinity 
-                  }}
-                  className="text-4xl"
-                >
-                  {emoji}
-                </motion.div>
-              ))}
-            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Company Story */}
-      <section className="py-20">
+      <section className="py-16">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
             className="max-w-4xl mx-auto text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-white mb-8">قصة نجاحنا</h2>
-            <p className="text-xl text-gray-300 leading-relaxed">
+            <h2 
+              className="text-3xl md:text-4xl font-bold mb-6"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              قصة نجاحنا
+            </h2>
+            <p 
+              className="text-lg leading-relaxed"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
               بدأت رحلتنا برؤية واضحة: تمكين الشركات والأفراد من النجاح في العالم الرقمي. 
               اليوم، نحن فخورون بكوننا الشريك الموثوق لمئات العملاء في رحلة التحول الرقمي.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-8 mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-center"
-            >
-              <div className="text-4xl font-bold text-amber-400 mb-2">500+</div>
-              <div className="text-gray-300">مشروع مكتمل</div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="text-center"
-            >
-              <div className="text-4xl font-bold text-purple-400 mb-2">300+</div>
-              <div className="text-gray-300">عميل سعيد</div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="text-center"
-            >
-              <div className="text-4xl font-bold text-blue-400 mb-2">5+</div>
-              <div className="text-gray-300">سنوات خبرة</div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="text-center"
-            >
-              <div className="text-4xl font-bold text-green-400 mb-2">7</div>
-              <div className="text-gray-300">خبراء متخصصين</div>
-            </motion.div>
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="text-center p-6 rounded-2xl"
+                style={{ 
+                  background: "var(--glass-bg)",
+                  border: "1px solid var(--glass-border)"
+                }}
+                data-testid={`stat-${index}`}
+              >
+                <div 
+                  className="text-3xl md:text-4xl font-black mb-2"
+                  style={{ color: stat.color }}
+                >
+                  {stat.value}
+                </div>
+                <div style={{ color: "var(--ma3k-beige-dark)" }}>{stat.label}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Company Values */}
-      <section className="py-20">
+      <section className="py-16">
         <div className="container mx-auto px-6">
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl font-bold text-center text-white mb-16"
+            className="text-3xl md:text-4xl font-bold text-center mb-12"
+            style={{ color: "var(--ma3k-beige)" }}
           >
             قيمنا ومبادئنا
           </motion.h2>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {companyValues.map((value, index) => (
               <motion.div
                 key={index}
@@ -267,14 +249,26 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-                className="text-center p-8 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20"
+                className="text-center p-8 rounded-2xl hover-elevate"
+                style={{ 
+                  background: "var(--glass-bg)",
+                  border: "1px solid var(--glass-border)"
+                }}
+                data-testid={`value-${index}`}
               >
-                <div className="text-amber-400 mb-4 flex justify-center">
+                <div 
+                  className="mb-4 flex justify-center"
+                  style={{ color: "var(--ma3k-green)" }}
+                >
                   {value.icon}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{value.title}</h3>
-                <p className="text-gray-300">{value.description}</p>
+                <h3 
+                  className="text-xl font-bold mb-3"
+                  style={{ color: "var(--ma3k-beige)" }}
+                >
+                  {value.title}
+                </h3>
+                <p style={{ color: "var(--ma3k-beige-dark)" }}>{value.description}</p>
               </motion.div>
             ))}
           </div>
@@ -282,45 +276,84 @@ export default function About() {
       </section>
 
       {/* Team Section */}
-      <section className="py-20">
+      <section className="py-16">
         <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-white mb-4">فريق الخبراء</h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <h2 
+              className="text-3xl md:text-4xl font-bold mb-4"
+              style={{ color: "var(--ma3k-beige)" }}
+            >
+              فريق الخبراء
+            </h2>
+            <p 
+              className="text-lg max-w-2xl mx-auto"
+              style={{ color: "var(--ma3k-beige-dark)" }}
+            >
               تعرف على الخبراء الذين يقفون وراء نجاح مشاريعك
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-6">
             {teamMembers.map((member, index) => (
               <motion.div
                 key={member.id}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
+                transition={{ delay: index * 0.05 }}
+                data-testid={`team-member-${member.id}`}
               >
-                <Card className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border-white/20 h-full">
-                  <CardContent className="p-8">
-                    <div className="flex items-start space-x-4 mb-6">
-                      <div className="text-6xl">{member.avatar}</div>
-                      <div className="flex-1">
-                        <h3 className="text-2xl font-bold text-white mb-2">{member.name}</h3>
-                        <p className="text-amber-400 font-semibold mb-3">{member.position}</p>
-                        <p className="text-gray-300 leading-relaxed">{member.description}</p>
+                <Card 
+                  className="h-full border-0"
+                  style={{ 
+                    background: "var(--glass-bg)",
+                    border: "1px solid var(--glass-border)"
+                  }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div 
+                        className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ 
+                          background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))"
+                        }}
+                      >
+                        <member.icon className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 
+                          className="text-xl font-bold mb-1"
+                          style={{ color: "var(--ma3k-beige)" }}
+                        >
+                          {member.name}
+                        </h3>
+                        <p 
+                          className="font-medium mb-2"
+                          style={{ color: "var(--ma3k-green)" }}
+                        >
+                          {member.position}
+                        </p>
+                        <p 
+                          className="text-sm leading-relaxed"
+                          style={{ color: "var(--ma3k-beige-dark)" }}
+                        >
+                          {member.description}
+                        </p>
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       <div>
-                        <h4 className="text-white font-semibold mb-2 flex items-center">
-                          <Code className="w-4 h-4 ml-2 text-purple-400" />
+                        <h4 
+                          className="text-sm font-semibold mb-2 flex items-center"
+                          style={{ color: "var(--ma3k-beige)" }}
+                        >
+                          <Code className="w-4 h-4 ml-2" style={{ color: "var(--ma3k-teal)" }} />
                           المهارات
                         </h4>
                         <div className="flex flex-wrap gap-2">
@@ -328,7 +361,12 @@ export default function About() {
                             <Badge 
                               key={skillIndex}
                               variant="secondary"
-                              className="bg-purple-500/20 text-purple-300 border-purple-400/30"
+                              className="text-xs"
+                              style={{ 
+                                background: "rgba(0, 168, 150, 0.15)", 
+                                color: "var(--ma3k-teal)",
+                                border: "1px solid rgba(0, 168, 150, 0.3)"
+                              }}
                             >
                               {skill}
                             </Badge>
@@ -337,8 +375,11 @@ export default function About() {
                       </div>
 
                       <div>
-                        <h4 className="text-white font-semibold mb-2 flex items-center">
-                          <Award className="w-4 h-4 ml-2 text-amber-400" />
+                        <h4 
+                          className="text-sm font-semibold mb-2 flex items-center"
+                          style={{ color: "var(--ma3k-beige)" }}
+                        >
+                          <Award className="w-4 h-4 ml-2" style={{ color: "var(--ma3k-green)" }} />
                           الشهادات
                         </h4>
                         <div className="flex flex-wrap gap-2">
@@ -346,7 +387,11 @@ export default function About() {
                             <Badge 
                               key={certIndex}
                               variant="outline"
-                              className="border-amber-400/50 text-amber-300"
+                              className="text-xs"
+                              style={{ 
+                                borderColor: "rgba(122, 201, 67, 0.4)", 
+                                color: "var(--ma3k-green)"
+                              }}
                             >
                               {cert}
                             </Badge>
@@ -354,14 +399,14 @@ export default function About() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          <span className="text-gray-300">{member.experience}</span>
+                      <div className="flex items-center gap-6 pt-2">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4" style={{ color: "var(--ma3k-green)" }} />
+                          <span style={{ color: "var(--ma3k-beige-dark)" }}>{member.experience}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Star className="w-4 h-4 text-amber-400" />
-                          <span className="text-gray-300">{member.projects}</span>
+                        <div className="flex items-center gap-2">
+                          <Star className="w-4 h-4" style={{ color: "var(--ma3k-green)" }} />
+                          <span style={{ color: "var(--ma3k-beige-dark)" }}>{member.projects}</span>
                         </div>
                       </div>
 
@@ -375,22 +420,17 @@ export default function About() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="border-blue-400/50 text-blue-300 hover:bg-blue-400/20"
+                            style={{ 
+                              borderColor: "var(--ma3k-teal)",
+                              color: "var(--ma3k-teal)"
+                            }}
+                            data-testid={`button-portfolio-${member.id}`}
                           >
                             <ExternalLink className="w-4 h-4 ml-2" />
                             عرض الأعمال
                           </Button>
                         </a>
                       )}
-
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-gray-400/50 text-gray-300 hover:bg-gray-400/20"
-                      >
-                        <Download className="w-4 h-4 ml-2" />
-                        تحميل السيرة الذاتية
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -401,40 +441,54 @@ export default function About() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-20">
+      <section className="py-16">
         <div className="container mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto"
+            className="max-w-3xl mx-auto p-8 md:p-12 rounded-3xl"
+            style={{ 
+              background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))"
+            }}
           >
-            <h2 className="text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               مستعدون لبدء مشروعك؟
             </h2>
-            <p className="text-xl text-gray-300 mb-8">
+            <p className="text-lg text-white/80 mb-8">
               تواصل معنا اليوم ودعنا نحول أفكارك إلى حقيقة رقمية مذهلة
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="https://wa.me/966532441566" target="_blank" rel="noopener noreferrer">
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold py-4 px-8 rounded-full text-lg shadow-xl"
+                  className="w-full sm:w-auto"
+                  style={{ 
+                    background: "white",
+                    color: "var(--ma3k-darker)"
+                  }}
+                  data-testid="button-whatsapp-cta"
                 >
-                  <MessageCircle className="w-6 h-6 ml-2" />
+                  <MessageCircle className="w-5 h-5 ml-2" />
                   تواصل معنا عبر واتساب
                 </Button>
               </a>
-              <a href="/services">
+              <Link href="/services">
                 <Button 
                   variant="outline" 
                   size="lg"
-                  className="border-2 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white py-4 px-8 rounded-full text-lg font-bold"
+                  className="w-full sm:w-auto border-2"
+                  style={{ 
+                    borderColor: "white",
+                    color: "white",
+                    background: "transparent"
+                  }}
+                  data-testid="button-services-cta"
                 >
-                  <Globe className="w-6 h-6 ml-2" />
+                  <Briefcase className="w-5 h-5 ml-2" />
                   استكشف خدماتنا
                 </Button>
-              </a>
+              </Link>
             </div>
           </motion.div>
         </div>

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, Mail, Phone, MessageCircle, CheckCircle } from "lucide-react";
+import { Send, Mail, Phone, MessageCircle, CheckCircle, Clock, Users, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Contact() {
@@ -12,7 +14,7 @@ export default function Contact() {
     name: "",
     phone: "",
     message: "",
-    contactMethod: "email" // email or whatsapp
+    contactMethod: "email"
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -38,12 +40,11 @@ export default function Contact() {
 
     try {
       if (formData.contactMethod === "whatsapp") {
-        // إرسال إلى واتساب
         const whatsappMessage = `مرحباً! أريد التواصل معكم\n\nالاسم: ${formData.name}\nرقم الهاتف: ${formData.phone}\n\nالرسالة: ${formData.message}`;
         const whatsappUrl = `https://wa.me/966532441566?text=${encodeURIComponent(whatsappMessage)}`;
         window.open(whatsappUrl, '_blank');
+        setIsSubmitted(true);
       } else {
-        // إرسال إلى الإيميل
         const response = await fetch("/api/messages", {
           method: "POST",
           headers: {
@@ -51,7 +52,7 @@ export default function Contact() {
           },
           body: JSON.stringify({
             name: formData.name,
-            email: "ma3k.2025@gmail.com", // الإيميل المطلوب للإرسال إليه
+            email: "ma3k.2025@gmail.com",
             phone: formData.phone,
             message: `طلب تواصل جديد من العميل:\n\nاسم العميل: ${formData.name}\nرقم الهاتف: ${formData.phone}\n\nرسالة العميل:\n${formData.message}\n\nطريقة التواصل المفضلة: إيميل`
           }),
@@ -81,260 +82,411 @@ export default function Contact() {
     }
   };
 
+  const benefits = [
+    { icon: Clock, text: "استجابة سريعة خلال ساعة" },
+    { icon: Users, text: "فريق متخصص ومحترف" },
+    { icon: Shield, text: "أسعار تنافسية ومناسبة" },
+    { icon: CheckCircle, text: "دعم فني مستمر" }
+  ];
+
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center pt-20 pb-10">
+      <div 
+        className="min-h-screen flex items-center justify-center py-24 px-6"
+        style={{ background: "var(--ma3k-darker)" }}
+      >
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-center max-w-2xl mx-auto px-6"
+          className="text-center max-w-lg mx-auto"
         >
-          <div className="glass-card rounded-3xl p-12">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <CheckCircle className="w-10 h-10 text-white" />
-            </motion.div>
-            
-            <h1 className="text-3xl font-bold text-white mb-4">تم إرسال رسالتك بنجاح!</h1>
-            <p className="text-gray-300 mb-8">
-              شكراً لتواصلك معنا. تم استلام رسالتك وسنرد عليك في أقرب وقت ممكن إن شاء الله.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => setIsSubmitted(false)}
-                className="luxury-btn bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold"
+          <Card 
+            className="border-0"
+            style={{ 
+              background: "var(--glass-bg)",
+              border: "1px solid var(--glass-border)"
+            }}
+          >
+            <CardContent className="p-8 md:p-12">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ background: "var(--ma3k-green)" }}
               >
-                إرسال رسالة أخرى
-              </Button>
+                <CheckCircle className="w-10 h-10 text-white" />
+              </motion.div>
               
-              <Button 
-                variant="outline"
-                onClick={() => window.location.href = "/"}
-                className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black"
+              <h1 
+                className="text-2xl md:text-3xl font-bold mb-4"
+                style={{ color: "var(--ma3k-beige)" }}
               >
-                العودة للرئيسية
-              </Button>
-            </div>
-          </div>
+                تم إرسال رسالتك بنجاح!
+              </h1>
+              <p 
+                className="mb-8"
+                style={{ color: "var(--ma3k-beige-dark)" }}
+              >
+                شكراً لتواصلك معنا. تم استلام رسالتك وسنرد عليك في أقرب وقت ممكن إن شاء الله.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={() => setIsSubmitted(false)}
+                  style={{ 
+                    background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                    color: "white"
+                  }}
+                  data-testid="button-send-another"
+                >
+                  إرسال رسالة أخرى
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  onClick={() => window.location.href = "/"}
+                  style={{ 
+                    borderColor: "var(--ma3k-green)",
+                    color: "var(--ma3k-green)"
+                  }}
+                  data-testid="button-back-home"
+                >
+                  العودة للرئيسية
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-10">
+    <div 
+      className="min-h-screen py-24"
+      style={{ background: "var(--ma3k-darker)" }}
+    >
       <div className="container mx-auto px-6">
         {/* Header Section */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
         >
-          <h1 className="luxury-h1 text-amber-400 mb-6">تواصل معنا</h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <Badge 
+            className="mb-6 px-4 py-2"
+            style={{ 
+              background: "var(--glass-bg)", 
+              border: "1px solid var(--ma3k-green)", 
+              color: "var(--ma3k-green)" 
+            }}
+            data-testid="badge-contact"
+          >
+            <MessageCircle className="w-4 h-4 ml-2" />
+            نحن هنا لمساعدتك
+          </Badge>
+          <h1 
+            className="text-4xl md:text-5xl font-black mb-4"
+            style={{ color: "var(--ma3k-beige)" }}
+          >
+            تواصل <span style={{ color: "var(--ma3k-green)" }}>معنا</span>
+          </h1>
+          <p 
+            className="text-lg max-w-2xl mx-auto"
+            style={{ color: "var(--ma3k-beige-dark)" }}
+          >
             نحن هنا للإجابة على استفساراتك ومساعدتك في تحقيق أهدافك الرقمية
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Contact Form */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="glass-card rounded-3xl p-8"
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h2 className="text-2xl font-bold text-white mb-6">أرسل لنا رسالة</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-gray-300 mb-2">الاسم *</label>
-                <Input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="bg-gray-800/50 border-gray-600 text-white"
-                  placeholder="اكتب اسمك الكريم"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-2">رقم الهاتف *</label>
-                <Input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                  className="bg-gray-800/50 border-gray-600 text-white"
-                  placeholder="05xxxxxxxx"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-2">الرسالة *</label>
-                <Textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  required
-                  rows={5}
-                  className="bg-gray-800/50 border-gray-600 text-white resize-none"
-                  placeholder="اكتب رسالتك هنا..."
-                />
-              </div>
-
-              {/* Contact Method Selection */}
-              <div>
-                <label className="block text-gray-300 mb-4">طريقة التواصل المفضلة</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleContactMethodChange("email")}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                      formData.contactMethod === "email"
-                        ? "border-amber-400 bg-amber-400/10"
-                        : "border-gray-600 bg-gray-800/30"
-                    }`}
-                  >
-                    <Mail className="w-6 h-6 mx-auto mb-2 text-amber-400" />
-                    <span className="text-white font-medium">الإيميل</span>
-                    <p className="text-sm text-gray-400 mt-1">ma3k.2025@gmail.com</p>
-                  </motion.button>
-
-                  <motion.button
-                    type="button"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleContactMethodChange("whatsapp")}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                      formData.contactMethod === "whatsapp"
-                        ? "border-green-400 bg-green-400/10"
-                        : "border-gray-600 bg-gray-800/30"
-                    }`}
-                  >
-                    <MessageCircle className="w-6 h-6 mx-auto mb-2 text-green-400" />
-                    <span className="text-white font-medium">واتساب</span>
-                    <p className="text-sm text-gray-400 mt-1">966532441566</p>
-                  </motion.button>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full luxury-btn bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold py-3"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                    جاري الإرسال...
+            <Card 
+              className="border-0"
+              style={{ 
+                background: "var(--glass-bg)",
+                border: "1px solid var(--glass-border)"
+              }}
+            >
+              <CardContent className="p-6 md:p-8">
+                <h2 
+                  className="text-2xl font-bold mb-6"
+                  style={{ color: "var(--ma3k-beige)" }}
+                >
+                  أرسل لنا رسالة
+                </h2>
+                
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div>
+                    <label 
+                      className="block mb-2 text-sm font-medium"
+                      style={{ color: "var(--ma3k-beige-dark)" }}
+                    >
+                      الاسم *
+                    </label>
+                    <Input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="border"
+                      style={{ 
+                        background: "var(--ma3k-dark)",
+                        borderColor: "var(--ma3k-border)",
+                        color: "var(--ma3k-beige)"
+                      }}
+                      placeholder="اكتب اسمك الكريم"
+                      data-testid="input-name"
+                    />
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Send className="w-5 h-5" />
-                    {formData.contactMethod === "whatsapp" ? "إرسال عبر واتساب" : "إرسال الرسالة"}
+
+                  <div>
+                    <label 
+                      className="block mb-2 text-sm font-medium"
+                      style={{ color: "var(--ma3k-beige-dark)" }}
+                    >
+                      رقم الهاتف *
+                    </label>
+                    <Input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="border"
+                      style={{ 
+                        background: "var(--ma3k-dark)",
+                        borderColor: "var(--ma3k-border)",
+                        color: "var(--ma3k-beige)"
+                      }}
+                      placeholder="05xxxxxxxx"
+                      data-testid="input-phone"
+                    />
                   </div>
-                )}
-              </Button>
-            </form>
+
+                  <div>
+                    <label 
+                      className="block mb-2 text-sm font-medium"
+                      style={{ color: "var(--ma3k-beige-dark)" }}
+                    >
+                      الرسالة *
+                    </label>
+                    <Textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={4}
+                      className="resize-none border"
+                      style={{ 
+                        background: "var(--ma3k-dark)",
+                        borderColor: "var(--ma3k-border)",
+                        color: "var(--ma3k-beige)"
+                      }}
+                      placeholder="اكتب رسالتك هنا..."
+                      data-testid="textarea-message"
+                    />
+                  </div>
+
+                  {/* Contact Method Selection */}
+                  <div>
+                    <label 
+                      className="block mb-3 text-sm font-medium"
+                      style={{ color: "var(--ma3k-beige-dark)" }}
+                    >
+                      طريقة التواصل المفضلة
+                    </label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        type="button"
+                        onClick={() => handleContactMethodChange("email")}
+                        className="p-4 rounded-xl border-2 transition-all"
+                        style={{
+                          borderColor: formData.contactMethod === "email" ? "var(--ma3k-green)" : "var(--ma3k-border)",
+                          background: formData.contactMethod === "email" ? "rgba(122, 201, 67, 0.1)" : "var(--ma3k-dark)"
+                        }}
+                        data-testid="button-method-email"
+                      >
+                        <Mail className="w-6 h-6 mx-auto mb-2" style={{ color: "var(--ma3k-green)" }} />
+                        <span className="font-medium" style={{ color: "var(--ma3k-beige)" }}>الإيميل</span>
+                        <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>ma3k.2025@gmail.com</p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleContactMethodChange("whatsapp")}
+                        className="p-4 rounded-xl border-2 transition-all"
+                        style={{
+                          borderColor: formData.contactMethod === "whatsapp" ? "var(--ma3k-teal)" : "var(--ma3k-border)",
+                          background: formData.contactMethod === "whatsapp" ? "rgba(0, 168, 150, 0.1)" : "var(--ma3k-dark)"
+                        }}
+                        data-testid="button-method-whatsapp"
+                      >
+                        <MessageCircle className="w-6 h-6 mx-auto mb-2" style={{ color: "var(--ma3k-teal)" }} />
+                        <span className="font-medium" style={{ color: "var(--ma3k-beige)" }}>واتساب</span>
+                        <p className="text-xs mt-1" style={{ color: "var(--ma3k-beige-dark)" }}>966532441566</p>
+                      </button>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full"
+                    style={{ 
+                      background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                      color: "white"
+                    }}
+                    data-testid="button-submit"
+                  >
+                    {isSubmitting ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        جاري الإرسال...
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Send className="w-5 h-5" />
+                        {formData.contactMethod === "whatsapp" ? "إرسال عبر واتساب" : "إرسال الرسالة"}
+                      </div>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </motion.div>
 
           {/* Contact Info */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="space-y-8"
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="space-y-6"
           >
-            <div className="glass-card rounded-3xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-6">معلومات التواصل</h3>
-              
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-black" />
+            <Card 
+              className="border-0"
+              style={{ 
+                background: "var(--glass-bg)",
+                border: "1px solid var(--glass-border)"
+              }}
+            >
+              <CardContent className="p-6">
+                <h3 
+                  className="text-xl font-bold mb-6"
+                  style={{ color: "var(--ma3k-beige)" }}
+                >
+                  معلومات التواصل
+                </h3>
+                
+                <div className="space-y-5">
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
+                    >
+                      <Mail className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold" style={{ color: "var(--ma3k-beige)" }}>البريد الإلكتروني</h4>
+                      <p style={{ color: "var(--ma3k-beige-dark)" }}>ma3k.2025@gmail.com</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-semibold">البريد الإلكتروني</h4>
-                    <p className="text-gray-300">ma3k.2025@gmail.com</p>
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                    <Phone className="w-6 h-6 text-white" />
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg, var(--ma3k-green), var(--ma3k-teal))" }}
+                    >
+                      <Phone className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold" style={{ color: "var(--ma3k-beige)" }}>رقم الهاتف والواتساب</h4>
+                      <p dir="ltr" style={{ color: "var(--ma3k-beige-dark)" }}>+966 53 244 1566</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-semibold">رقم الهاتف والواتساب</h4>
-                    <p className="text-gray-300" dir="ltr">+966 53 244 1566</p>
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                    <MessageCircle className="w-6 h-6 text-white" />
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
+                    >
+                      <MessageCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold" style={{ color: "var(--ma3k-beige)" }}>الدعم الفني</h4>
+                      <p style={{ color: "var(--ma3k-beige-dark)" }}>متاح 24/7 لخدمتك</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-semibold">الدعم الفني</h4>
-                    <p className="text-gray-300">متاح 24/7 لخدمتك</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="border-0"
+              style={{ 
+                background: "var(--glass-bg)",
+                border: "1px solid var(--glass-border)"
+              }}
+            >
+              <CardContent className="p-6">
+                <h3 
+                  className="text-xl font-bold mb-6"
+                  style={{ color: "var(--ma3k-beige)" }}
+                >
+                  أوقات العمل
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center gap-4">
+                    <span style={{ color: "var(--ma3k-beige-dark)" }}>السبت - الخميس</span>
+                    <span className="font-semibold" style={{ color: "var(--ma3k-beige)" }}>9:00 ص - 11:00 م</span>
+                  </div>
+                  <div className="flex justify-between items-center gap-4">
+                    <span style={{ color: "var(--ma3k-beige-dark)" }}>الجمعة</span>
+                    <span className="font-semibold" style={{ color: "var(--ma3k-beige)" }}>2:00 م - 11:00 م</span>
+                  </div>
+                  <div className="flex justify-between items-center gap-4">
+                    <span style={{ color: "var(--ma3k-beige-dark)" }}>الاستجابة</span>
+                    <span className="font-semibold" style={{ color: "var(--ma3k-green)" }}>خلال ساعة واحدة</span>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            <div className="glass-card rounded-3xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-6">أوقات العمل</h3>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">السبت - الخميس</span>
-                  <span className="text-white font-semibold">9:00 ص - 11:00 م</span>
+            <Card 
+              className="border-0"
+              style={{ 
+                background: "var(--glass-bg)",
+                border: "1px solid var(--glass-border)"
+              }}
+            >
+              <CardContent className="p-6">
+                <h3 
+                  className="text-xl font-bold mb-4"
+                  style={{ color: "var(--ma3k-beige)" }}
+                >
+                  لماذا تختارنا؟
+                </h3>
+                
+                <div className="space-y-3">
+                  {benefits.map((benefit, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <benefit.icon className="w-5 h-5 flex-shrink-0" style={{ color: "var(--ma3k-green)" }} />
+                      <span style={{ color: "var(--ma3k-beige-dark)" }}>{benefit.text}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">الجمعة</span>
-                  <span className="text-white font-semibold">2:00 م - 11:00 م</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">الاستجابة</span>
-                  <span className="text-amber-400 font-semibold">خلال ساعة واحدة</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-card rounded-3xl p-8">
-              <h3 className="text-2xl font-bold text-white mb-4">لماذا تختارنا؟</h3>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span className="text-gray-300">استجابة سريعة خلال ساعة</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span className="text-gray-300">فريق متخصص ومحترف</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span className="text-gray-300">أسعار تنافسية ومناسبة</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span className="text-gray-300">دعم فني مستمر</span>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
       </div>
