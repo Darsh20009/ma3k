@@ -1,27 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingCart, User, GraduationCap, Home, Briefcase, Info } from "lucide-react";
+import { Menu, X, ShoppingCart, User, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import logoImage from "@assets/Screenshot 2025-01-18 200736_1760982548460.png";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [location] = useLocation();
   const { totalItems } = useCart();
   
   const cartItemsCount = totalItems;
 
-  // القوائم اليمنى واليسرى مع اللوجو في المنتصف
-  const leftLinks = [
-    { href: "/", label: "الرئيسية", icon: Home },
-    { href: "/services", label: "الخدمات", icon: Briefcase },
-    { href: "/courses", label: "الدورات", icon: GraduationCap },
-  ];
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  const rightLinks = [
-    { href: "/about", label: "تعرف علينا", icon: Info },
+  const navLinks = [
+    { href: "/", label: "الرئيسية" },
+    { href: "/services", label: "الخدمات" },
+    { href: "/courses", label: "الدورات" },
+    { href: "/about", label: "من نحن" },
+    { href: "/contact", label: "تواصل معنا" },
   ];
 
   const isActive = (path: string) => location === path;
@@ -31,164 +38,120 @@ export default function Navbar() {
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="fixed top-0 w-full z-50 glass-morphism backdrop-blur-xl border-b"
-        style={{ borderColor: "var(--ma3k-teal-light)" }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          isScrolled ? "py-2" : "py-3"
+        }`}
+        style={{ 
+          background: isScrolled 
+            ? "rgba(13, 25, 25, 0.95)" 
+            : "rgba(13, 25, 25, 0.8)",
+          backdropFilter: "blur(20px)",
+          borderBottom: isScrolled ? "1px solid rgba(79, 169, 152, 0.15)" : "none"
+        }}
       >
         <div className="container mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between h-20">
-            {/* Desktop: القائمة اليسرى */}
-            <div className="hidden lg:flex items-center space-x-6 space-x-reverse flex-1">
-              {leftLinks.map((link) => (
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link href="/">
+              <div
+                className="flex items-center gap-3 cursor-pointer"
+                data-testid="link-logo"
+              >
+                <img 
+                  src={logoImage} 
+                  alt="معك" 
+                  className="w-12 h-12 rounded-full object-cover"
+                  style={{
+                    border: "2px solid rgba(79, 169, 152, 0.3)"
+                  }}
+                />
+                <span 
+                  className="text-xl font-bold hidden sm:block"
+                  style={{ color: "var(--ma3k-beige)" }}
+                >
+                  معك
+                </span>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-1">
+              {navLinks.map((link) => (
                 <Link key={link.href} href={link.href}>
-                  <motion.div
-                    whileHover={{ y: -2 }}
-                    className={`relative py-2 px-4 transition-all duration-300 flex items-center gap-2 ${
+                  <div
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
                       isActive(link.href)
-                        ? "font-semibold"
-                        : "hover:text-ma3k-beige"
+                        ? ""
+                        : "hover:bg-white/5"
                     }`}
                     style={{
-                      color: isActive(link.href) ? "var(--ma3k-green)" : "var(--ma3k-beige-dark)"
+                      color: isActive(link.href) ? "var(--ma3k-green)" : "var(--ma3k-beige-dark)",
+                      background: isActive(link.href) ? "rgba(16, 185, 129, 0.1)" : "transparent"
                     }}
                     data-testid={`link-${link.label}`}
                   >
-                    <link.icon size={18} />
                     {link.label}
-                    {isActive(link.href) && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full"
-                        style={{
-                          background: "linear-gradient(90deg, var(--ma3k-teal), var(--ma3k-green))"
-                        }}
-                        initial={false}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      />
-                    )}
-                  </motion.div>
+                  </div>
                 </Link>
               ))}
             </div>
 
-            {/* Logo في المنتصف */}
-            <Link href="/">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center justify-center mx-4"
-                data-testid="link-logo"
-              >
-                <div className="relative">
-                  <img 
-                    src={logoImage} 
-                    alt="معك - Ma3k" 
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover"
-                    style={{
-                      boxShadow: "0 0 20px var(--glow-teal), 0 0 40px var(--glow-green)"
-                    }}
-                  />
-                  <div 
-                    className="absolute -inset-1 rounded-full blur opacity-30 -z-10"
-                    style={{
-                      background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))"
-                    }}
-                  />
-                </div>
-              </motion.div>
-            </Link>
-
-            {/* Desktop: القائمة اليمنى */}
-            <div className="hidden lg:flex items-center space-x-6 space-x-reverse flex-1 justify-end">
-              {rightLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <motion.div
-                    whileHover={{ y: -2 }}
-                    className={`relative py-2 px-4 transition-all duration-300 flex items-center gap-2 ${
-                      isActive(link.href)
-                        ? "font-semibold"
-                        : "hover:text-ma3k-beige"
-                    }`}
-                    style={{
-                      color: isActive(link.href) ? "var(--ma3k-green)" : "var(--ma3k-beige-dark)"
-                    }}
-                    data-testid={`link-${link.label}`}
-                  >
-                    <link.icon size={18} />
-                    {link.label}
-                    {isActive(link.href) && (
-                      <motion.div
-                        layoutId="activeTabRight"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full"
-                        style={{
-                          background: "linear-gradient(90deg, var(--ma3k-teal), var(--ma3k-green))"
-                        }}
-                        initial={false}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      />
-                    )}
-                  </motion.div>
-                </Link>
-              ))}
-
-              {/* Cart Icon */}
+            {/* Desktop Actions */}
+            <div className="hidden lg:flex items-center gap-3">
+              {/* Cart */}
               <Link href="/cart">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="relative p-2 rounded-lg glass-morphism transition-colors"
-                  style={{
-                    background: "var(--glass-bg)",
-                    border: "1px solid var(--glass-border)"
-                  }}
+                <div
+                  className="relative p-2 rounded-lg transition-colors cursor-pointer hover:bg-white/5"
                   data-testid="button-cart"
                 >
-                  <ShoppingCart className="w-6 h-6" style={{ color: "var(--ma3k-beige)" }} />
+                  <ShoppingCart className="w-5 h-5" style={{ color: "var(--ma3k-beige)" }} />
                   {cartItemsCount > 0 && (
                     <Badge 
-                      className="absolute -top-2 -right-2 text-xs min-w-[20px] h-5 flex items-center justify-center p-0"
+                      className="absolute -top-1 -right-1 text-xs min-w-[18px] h-[18px] flex items-center justify-center p-0"
                       style={{
                         background: "var(--ma3k-green)",
                         color: "var(--ma3k-darker)"
                       }}
-                      data-testid={`text-cart-count`}
+                      data-testid="text-cart-count"
                     >
                       {cartItemsCount}
                     </Badge>
                   )}
-                </motion.div>
+                </div>
               </Link>
 
-              {/* Login Icon */}
+              {/* Login Button */}
               <Link href="/login">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg glass-morphism transition-colors"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
                   style={{
-                    background: "var(--glass-bg)",
-                    border: "1px solid var(--glass-border)"
+                    borderColor: "rgba(79, 169, 152, 0.3)",
+                    color: "var(--ma3k-beige)",
+                    background: "transparent"
                   }}
                   data-testid="button-login"
                 >
-                  <User className="w-5 h-5" style={{ color: "var(--ma3k-beige)" }} />
-                  <span style={{ color: "var(--ma3k-beige)" }} className="text-sm">تسجيل الدخول</span>
-                </motion.div>
+                  <User className="w-4 h-4" />
+                  تسجيل الدخول
+                </Button>
               </Link>
             </div>
 
-            {/* Mobile: Cart & Menu Toggle */}
-            <div className="flex lg:hidden items-center space-x-3 space-x-reverse">
+            {/* Mobile Actions */}
+            <div className="flex lg:hidden items-center gap-2">
+              {/* Mobile Cart */}
               <Link href="/cart">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="relative p-2 rounded-lg glass-morphism"
+                <div
+                  className="relative p-2 rounded-lg cursor-pointer"
                   data-testid="button-cart-mobile"
                 >
                   <ShoppingCart className="w-5 h-5" style={{ color: "var(--ma3k-beige)" }} />
                   {cartItemsCount > 0 && (
                     <Badge 
-                      className="absolute -top-1 -right-1 text-xs min-w-[18px] h-4 flex items-center justify-center p-0"
+                      className="absolute -top-1 -right-1 text-xs min-w-[16px] h-[16px] flex items-center justify-center p-0"
                       style={{
                         background: "var(--ma3k-green)",
                         color: "var(--ma3k-darker)"
@@ -197,13 +160,13 @@ export default function Navbar() {
                       {cartItemsCount}
                     </Badge>
                   )}
-                </motion.div>
+                </div>
               </Link>
 
-              <motion.button
-                whileTap={{ scale: 0.95 }}
+              {/* Menu Toggle */}
+              <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-lg glass-morphism"
+                className="p-2 rounded-lg hover:bg-white/5"
                 data-testid="button-menu-toggle"
               >
                 {isMenuOpen ? (
@@ -211,7 +174,7 @@ export default function Navbar() {
                 ) : (
                   <Menu className="w-6 h-6" style={{ color: "var(--ma3k-beige)" }} />
                 )}
-              </motion.button>
+              </button>
             </div>
           </div>
         </div>
@@ -220,59 +183,97 @@ export default function Navbar() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed top-20 left-0 right-0 z-40 lg:hidden"
-          >
-            <div className="mx-4 mt-2 glass-card rounded-2xl overflow-hidden">
-              <div className="py-4">
-                {[...leftLinks, ...rightLinks].map((link, index) => (
-                  <Link key={link.href} href={link.href}>
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`flex items-center gap-3 px-6 py-4 text-lg transition-colors ${
-                        isActive(link.href)
-                          ? "font-semibold"
-                          : ""
-                      }`}
-                      style={{
-                        color: isActive(link.href) ? "var(--ma3k-green)" : "var(--ma3k-beige-dark)",
-                        background: isActive(link.href) ? "var(--glass-bg)" : "transparent"
-                      }}
-                      data-testid={`mobile-link-${link.label}`}
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              className="fixed inset-0 z-40 lg:hidden"
+              style={{ background: "rgba(0, 0, 0, 0.5)" }}
+            />
+            
+            {/* Menu Panel */}
+            <motion.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 100 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-0 left-0 bottom-0 w-72 z-50 lg:hidden overflow-y-auto"
+              style={{ 
+                background: "var(--ma3k-darker)",
+                borderRight: "1px solid rgba(79, 169, 152, 0.15)"
+              }}
+            >
+              <div className="p-4">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6 pb-4" style={{ borderBottom: "1px solid rgba(79, 169, 152, 0.15)" }}>
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={logoImage} 
+                      alt="معك" 
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <span 
+                      className="text-lg font-bold"
+                      style={{ color: "var(--ma3k-beige)" }}
                     >
-                      <link.icon size={20} />
-                      {link.label}
-                    </motion.div>
-                  </Link>
-                ))}
-                
-                <Link href="/login">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 }}
+                      معك
+                    </span>
+                  </div>
+                  <button
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 px-6 py-4 text-lg"
-                    style={{
-                      color: location === "/login" ? "var(--ma3k-green)" : "var(--ma3k-beige-dark)",
-                      background: location === "/login" ? "var(--glass-bg)" : "transparent"
-                    }}
-                    data-testid="mobile-link-login"
+                    className="p-2 rounded-lg hover:bg-white/5"
                   >
-                    <User size={20} />
-                    تسجيل الدخول
-                  </motion.div>
-                </Link>
+                    <X className="w-5 h-5" style={{ color: "var(--ma3k-beige)" }} />
+                  </button>
+                </div>
+
+                {/* Navigation Links */}
+                <div className="space-y-1">
+                  {navLinks.map((link, index) => (
+                    <Link key={link.href} href={link.href}>
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-base transition-colors cursor-pointer ${
+                          isActive(link.href) ? "" : "hover:bg-white/5"
+                        }`}
+                        style={{
+                          color: isActive(link.href) ? "var(--ma3k-green)" : "var(--ma3k-beige-dark)",
+                          background: isActive(link.href) ? "rgba(16, 185, 129, 0.1)" : "transparent"
+                        }}
+                        data-testid={`mobile-link-${link.label}`}
+                      >
+                        {link.label}
+                      </motion.div>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Login Button */}
+                <div className="mt-6 pt-6" style={{ borderTop: "1px solid rgba(79, 169, 152, 0.15)" }}>
+                  <Link href="/login">
+                    <Button
+                      className="w-full gap-2"
+                      style={{
+                        background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                        color: "white"
+                      }}
+                      onClick={() => setIsMenuOpen(false)}
+                      data-testid="mobile-button-login"
+                    >
+                      <User className="w-4 h-4" />
+                      تسجيل الدخول
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
