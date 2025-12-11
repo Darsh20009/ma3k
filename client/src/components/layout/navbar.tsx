@@ -1,17 +1,27 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingCart, User, ChevronDown } from "lucide-react";
+import { Menu, X, ShoppingCart, User, ChevronDown, LogOut, LayoutDashboard, BookOpen, Briefcase } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import logoImage from "@assets/Screenshot 2025-01-18 200736_1760982548460.png";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { totalItems } = useCart();
+  const { user, isAuthenticated, userType, logout } = useAuth();
   
   const cartItemsCount = totalItems;
 
@@ -32,6 +42,34 @@ export default function Navbar() {
   ];
 
   const isActive = (path: string) => location === path;
+
+  const handleLogout = () => {
+    logout();
+    setLocation("/");
+  };
+
+  const getDashboardLink = () => {
+    if (userType === "student") return "/student-dashboard";
+    if (userType === "client") return "/client-dashboard";
+    if (userType === "employee") return "/employee-dashboard-new";
+    return "/";
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return "م";
+    const parts = name.split(" ");
+    if (parts.length >= 2) {
+      return parts[0][0] + parts[1][0];
+    }
+    return name.substring(0, 2);
+  };
+
+  const getUserTypeLabel = () => {
+    if (userType === "student") return "طالب";
+    if (userType === "client") return "عميل";
+    if (userType === "employee") return "موظف";
+    return "";
+  };
 
   return (
     <>
@@ -121,23 +159,125 @@ export default function Navbar() {
                 </div>
               </Link>
 
-              {/* Login Button */}
-              <Link href="/login">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  style={{
-                    borderColor: "rgba(79, 169, 152, 0.3)",
-                    color: "var(--ma3k-beige)",
-                    background: "transparent"
-                  }}
-                  data-testid="button-login"
-                >
-                  <User className="w-4 h-4" />
-                  تسجيل الدخول
-                </Button>
-              </Link>
+              {/* User Menu or Login Button */}
+              {isAuthenticated && user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="gap-2 px-2"
+                      style={{
+                        color: "var(--ma3k-beige)",
+                      }}
+                      data-testid="button-user-menu"
+                    >
+                      <Avatar className="w-8 h-8">
+                        <AvatarFallback 
+                          className="text-xs font-bold"
+                          style={{
+                            background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                            color: "white"
+                          }}
+                        >
+                          {getInitials(user.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="hidden xl:flex flex-col items-start">
+                        <span className="text-sm font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                          {user.fullName}
+                        </span>
+                        <span className="text-xs" style={{ color: "var(--ma3k-beige-dark)" }}>
+                          {getUserTypeLabel()}
+                        </span>
+                      </div>
+                      <ChevronDown className="w-4 h-4" style={{ color: "var(--ma3k-beige-dark)" }} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-56"
+                    style={{
+                      background: "var(--ma3k-darker)",
+                      border: "1px solid rgba(79, 169, 152, 0.2)"
+                    }}
+                  >
+                    <div className="px-3 py-2">
+                      <p className="text-sm font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                        مرحباً، {user.fullName}
+                      </p>
+                      <p className="text-xs" style={{ color: "var(--ma3k-beige-dark)" }}>
+                        {user.email}
+                      </p>
+                    </div>
+                    <DropdownMenuSeparator style={{ background: "rgba(79, 169, 152, 0.15)" }} />
+                    
+                    <Link href={getDashboardLink()}>
+                      <DropdownMenuItem 
+                        className="cursor-pointer gap-2"
+                        style={{ color: "var(--ma3k-beige)" }}
+                        data-testid="menu-dashboard"
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        لوحة التحكم
+                      </DropdownMenuItem>
+                    </Link>
+                    
+                    {userType === "student" && (
+                      <Link href="/my-courses">
+                        <DropdownMenuItem 
+                          className="cursor-pointer gap-2"
+                          style={{ color: "var(--ma3k-beige)" }}
+                          data-testid="menu-my-courses"
+                        >
+                          <BookOpen className="w-4 h-4" />
+                          دوراتي
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
+                    
+                    {userType === "client" && (
+                      <Link href="/my-projects">
+                        <DropdownMenuItem 
+                          className="cursor-pointer gap-2"
+                          style={{ color: "var(--ma3k-beige)" }}
+                          data-testid="menu-my-projects"
+                        >
+                          <Briefcase className="w-4 h-4" />
+                          مشاريعي
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
+                    
+                    <DropdownMenuSeparator style={{ background: "rgba(79, 169, 152, 0.15)" }} />
+                    
+                    <DropdownMenuItem 
+                      className="cursor-pointer gap-2 text-red-400"
+                      onClick={handleLogout}
+                      data-testid="menu-logout"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      تسجيل الخروج
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    style={{
+                      borderColor: "rgba(79, 169, 152, 0.3)",
+                      color: "var(--ma3k-beige)",
+                      background: "transparent"
+                    }}
+                    data-testid="button-login"
+                  >
+                    <User className="w-4 h-4" />
+                    تسجيل الدخول
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Mobile Actions */}
@@ -230,6 +370,36 @@ export default function Navbar() {
                   </button>
                 </div>
 
+                {/* User Info (Mobile) */}
+                {isAuthenticated && user && (
+                  <div 
+                    className="mb-4 p-3 rounded-lg"
+                    style={{ background: "rgba(79, 169, 152, 0.1)" }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-10 h-10">
+                        <AvatarFallback 
+                          className="text-sm font-bold"
+                          style={{
+                            background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                            color: "white"
+                          }}
+                        >
+                          {getInitials(user.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-medium" style={{ color: "var(--ma3k-beige)" }}>
+                          {user.fullName}
+                        </p>
+                        <p className="text-xs" style={{ color: "var(--ma3k-beige-dark)" }}>
+                          {getUserTypeLabel()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Navigation Links */}
                 <div className="space-y-1">
                   {navLinks.map((link, index) => (
@@ -254,22 +424,82 @@ export default function Navbar() {
                   ))}
                 </div>
 
-                {/* Login Button */}
+                {/* User Actions */}
                 <div className="mt-6 pt-6" style={{ borderTop: "1px solid rgba(79, 169, 152, 0.15)" }}>
-                  <Link href="/login">
-                    <Button
-                      className="w-full gap-2"
-                      style={{
-                        background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
-                        color: "white"
-                      }}
-                      onClick={() => setIsMenuOpen(false)}
-                      data-testid="mobile-button-login"
-                    >
-                      <User className="w-4 h-4" />
-                      تسجيل الدخول
-                    </Button>
-                  </Link>
+                  {isAuthenticated && user ? (
+                    <div className="space-y-2">
+                      <Link href={getDashboardLink()}>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start gap-2"
+                          style={{ color: "var(--ma3k-beige)" }}
+                          onClick={() => setIsMenuOpen(false)}
+                          data-testid="mobile-menu-dashboard"
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          لوحة التحكم
+                        </Button>
+                      </Link>
+                      
+                      {userType === "student" && (
+                        <Link href="/my-courses">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-2"
+                            style={{ color: "var(--ma3k-beige)" }}
+                            onClick={() => setIsMenuOpen(false)}
+                            data-testid="mobile-menu-my-courses"
+                          >
+                            <BookOpen className="w-4 h-4" />
+                            دوراتي
+                          </Button>
+                        </Link>
+                      )}
+                      
+                      {userType === "client" && (
+                        <Link href="/my-projects">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-2"
+                            style={{ color: "var(--ma3k-beige)" }}
+                            onClick={() => setIsMenuOpen(false)}
+                            data-testid="mobile-menu-my-projects"
+                          >
+                            <Briefcase className="w-4 h-4" />
+                            مشاريعي
+                          </Button>
+                        </Link>
+                      )}
+                      
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start gap-2 text-red-400"
+                        onClick={() => {
+                          handleLogout();
+                          setIsMenuOpen(false);
+                        }}
+                        data-testid="mobile-menu-logout"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        تسجيل الخروج
+                      </Button>
+                    </div>
+                  ) : (
+                    <Link href="/login">
+                      <Button
+                        className="w-full gap-2"
+                        style={{
+                          background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
+                          color: "white"
+                        }}
+                        onClick={() => setIsMenuOpen(false)}
+                        data-testid="mobile-button-login"
+                      >
+                        <User className="w-4 h-4" />
+                        تسجيل الدخول
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </motion.div>

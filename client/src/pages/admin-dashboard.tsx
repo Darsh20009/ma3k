@@ -894,10 +894,129 @@ export default function AdminDashboard() {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div>
-                    <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>إدارة الموظفين</h1>
-                    <p style={{ color: "var(--ma3k-beige-dark)" }}>فريق العمل</p>
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold" style={{ color: "var(--ma3k-beige)" }}>إدارة الموظفين</h1>
+                      <p style={{ color: "var(--ma3k-beige-dark)" }}>فريق العمل</p>
+                    </div>
                   </div>
+
+                  <Card style={{ background: "var(--ma3k-dark)", border: "1px solid var(--ma3k-border)" }}>
+                    <CardHeader>
+                      <CardTitle style={{ color: "var(--ma3k-beige)" }}>إضافة موظف جديد</CardTitle>
+                      <CardDescription style={{ color: "var(--ma3k-beige-dark)" }}>أضف موظف جديد للفريق بسهولة</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <form 
+                        className="grid md:grid-cols-2 gap-4"
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const formData = new FormData(e.currentTarget);
+                          const empData = {
+                            adminEmail: user?.email,
+                            fullName: formData.get('empName'),
+                            email: formData.get('empEmail'),
+                            password: formData.get('empPassword'),
+                            position: formData.get('empPosition'),
+                            jobTitle: formData.get('empJobTitle'),
+                            isAdmin: formData.get('empIsAdmin') === 'on'
+                          };
+                          
+                          try {
+                            const res = await fetch('/api/admin/employees', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify(empData)
+                            });
+                            
+                            if (!res.ok) {
+                              const err = await res.json();
+                              throw new Error(err.error || 'فشل إضافة الموظف');
+                            }
+                            
+                            toast({ title: 'تم إضافة الموظف بنجاح!' });
+                            queryClient.invalidateQueries({ queryKey: ['/api/employees'] });
+                            (e.target as HTMLFormElement).reset();
+                          } catch (err: any) {
+                            toast({ title: 'خطأ', description: err.message, variant: 'destructive' });
+                          }
+                        }}
+                      >
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium" style={{ color: "var(--ma3k-beige)" }}>الاسم الكامل</label>
+                          <Input 
+                            name="empName" 
+                            required 
+                            placeholder="أدخل اسم الموظف"
+                            style={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                            data-testid="input-emp-name"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium" style={{ color: "var(--ma3k-beige)" }}>البريد الإلكتروني</label>
+                          <Input 
+                            name="empEmail" 
+                            type="email" 
+                            required 
+                            placeholder="email@example.com"
+                            style={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                            data-testid="input-emp-email"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium" style={{ color: "var(--ma3k-beige)" }}>كلمة المرور</label>
+                          <Input 
+                            name="empPassword" 
+                            type="password" 
+                            required 
+                            minLength={6}
+                            placeholder="6 أحرف على الأقل"
+                            style={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                            data-testid="input-emp-password"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium" style={{ color: "var(--ma3k-beige)" }}>المنصب</label>
+                          <Select name="empPosition" defaultValue="موظف">
+                            <SelectTrigger style={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", color: "var(--ma3k-beige)" }} data-testid="select-emp-position">
+                              <SelectValue placeholder="اختر المنصب" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="موظف">موظف</SelectItem>
+                              <SelectItem value="مطور">مطور</SelectItem>
+                              <SelectItem value="مصمم">مصمم</SelectItem>
+                              <SelectItem value="مدير مشروع">مدير مشروع</SelectItem>
+                              <SelectItem value="مدير">مدير</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium" style={{ color: "var(--ma3k-beige)" }}>المسمى الوظيفي</label>
+                          <Input 
+                            name="empJobTitle" 
+                            placeholder="مثال: مطور Full-Stack"
+                            style={{ background: "var(--ma3k-darker)", border: "1px solid var(--ma3k-border)", color: "var(--ma3k-beige)" }}
+                            data-testid="input-emp-job-title"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input type="checkbox" name="empIsAdmin" id="empIsAdmin" className="rounded" data-testid="checkbox-emp-admin" />
+                          <label htmlFor="empIsAdmin" className="text-sm" style={{ color: "var(--ma3k-beige)" }}>صلاحيات مدير</label>
+                        </div>
+                        <div className="md:col-span-2">
+                          <Button 
+                            type="submit" 
+                            className="w-full"
+                            style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))", color: "white" }}
+                            data-testid="button-add-employee"
+                          >
+                            <Users className="w-4 h-4 ml-2" />
+                            إضافة الموظف
+                          </Button>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
 
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {employees.map((emp) => (
@@ -923,6 +1042,7 @@ export default function AdminDashboard() {
                         <CardContent className="text-center py-16">
                           <Award className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--ma3k-beige-dark)" }} />
                           <h3 className="text-xl font-bold mb-2" style={{ color: "var(--ma3k-beige)" }}>لا يوجد موظفين</h3>
+                          <p style={{ color: "var(--ma3k-beige-dark)" }}>استخدم النموذج أعلاه لإضافة موظفين جدد</p>
                         </CardContent>
                       </Card>
                     )}

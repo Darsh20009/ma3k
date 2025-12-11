@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, GraduationCap, Briefcase, Users, ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { UserPlus, GraduationCap, Briefcase, Users, ArrowLeft, Sparkles, Loader2, CheckCircle } from "lucide-react";
 
 type UserType = "student" | "client" | "employee";
 
@@ -47,6 +48,7 @@ interface EmployeeFormData {
 export default function Register() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { registerStudent, registerClient } = useAuth();
   const [userType, setUserType] = useState<UserType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -87,9 +89,6 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      let endpoint = "";
-      let payload: any = {};
-
       if (userType === "student") {
         if (studentForm.password !== studentForm.confirmPassword) {
           throw new Error("كلمات المرور غير متطابقة");
@@ -97,8 +96,8 @@ export default function Register() {
         if (!studentForm.selectedLanguage) {
           throw new Error("يرجى اختيار لغة البرمجة");
         }
-        endpoint = "/api/auth/register-student";
-        payload = {
+        
+        const result = await registerStudent({
           fullName: studentForm.fullName,
           email: studentForm.email,
           phone: studentForm.phone,
@@ -106,13 +105,24 @@ export default function Register() {
           age: studentForm.age,
           selectedLanguage: studentForm.selectedLanguage,
           learningGoal: studentForm.learningGoal || undefined
-        };
+        });
+        
+        if (!result.success) {
+          throw new Error(result.error || "فشل إنشاء الحساب");
+        }
+        
+        toast({
+          title: "مرحباً بك في معك!",
+          description: "تم إنشاء حسابك وتسجيل دخولك تلقائياً",
+        });
+        setLocation("/student-dashboard");
+        
       } else if (userType === "client") {
         if (clientForm.password !== clientForm.confirmPassword) {
           throw new Error("كلمات المرور غير متطابقة");
         }
-        endpoint = "/api/auth/register-client";
-        payload = {
+        
+        const result = await registerClient({
           fullName: clientForm.fullName,
           email: clientForm.email,
           phone: clientForm.phone || undefined,
@@ -120,7 +130,18 @@ export default function Register() {
           websiteType: clientForm.websiteType || undefined,
           budget: clientForm.budget || undefined,
           websiteIdea: clientForm.websiteIdea || undefined
-        };
+        });
+        
+        if (!result.success) {
+          throw new Error(result.error || "فشل إنشاء الحساب");
+        }
+        
+        toast({
+          title: "مرحباً بك في معك!",
+          description: "تم إنشاء حسابك وتسجيل دخولك تلقائياً",
+        });
+        setLocation("/client-dashboard");
+        
       } else if (userType === "employee") {
         if (employeeForm.password !== employeeForm.confirmPassword) {
           throw new Error("كلمات المرور غير متطابقة");
@@ -128,33 +149,31 @@ export default function Register() {
         if (!employeeForm.employeeCode) {
           throw new Error("يرجى إدخال رمز الموظف");
         }
-        endpoint = "/api/auth/register-employee";
-        payload = {
-          fullName: employeeForm.fullName,
-          email: employeeForm.email,
-          password: employeeForm.password,
-          position: employeeForm.position,
-          jobTitle: employeeForm.jobTitle,
-          employeeCode: employeeForm.employeeCode
-        };
+        
+        const response = await fetch("/api/auth/register-employee", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: employeeForm.fullName,
+            email: employeeForm.email,
+            password: employeeForm.password,
+            position: employeeForm.position,
+            jobTitle: employeeForm.jobTitle,
+            employeeCode: employeeForm.employeeCode
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "فشل إنشاء الحساب");
+        }
+
+        toast({
+          title: "تم إنشاء الحساب بنجاح!",
+          description: "يمكنك الآن تسجيل الدخول كموظف",
+        });
+        setLocation("/employee-login");
       }
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "فشل إنشاء الحساب");
-      }
-
-      toast({
-        title: "تم إنشاء الحساب بنجاح!",
-        description: "يمكنك الآن تسجيل الدخول",
-      });
-      setLocation("/login");
     } catch (error: any) {
       toast({
         title: "فشل التسجيل",
