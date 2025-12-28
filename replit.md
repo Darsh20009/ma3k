@@ -1,204 +1,362 @@
-# Overview
+# Ma3k Company Platform - Complete Vision
 
-Ma3k (معك) is a comprehensive Arabic digital services platform that provides website development, e-commerce solutions, educational programming courses, project management, and employee productivity tools. The platform serves three distinct user types: Students (for educational courses), Clients (for web development projects), and Employees (with administrative tools). It features an innovative website creation form, integrated payment processing (PayPal with USD conversion, Stripe, bank transfers, and Saudi payment methods), automated invoice generation, course management system, and a complete service marketplace with luxury design and Arabic RTL support.
+**Last Updated**: December 28, 2025
 
-## Recent Changes (December 3, 2025)
+---
 
-### New Chat System
-- **Chat Conversations**: Real-time messaging between clients and employees for project communication
-- **WebSocket Integration**: Instant message delivery using WebSocket notifications
-- **Message Types**: Support for text messages and file attachments
-- **Read Receipts**: Track unread messages with mark-as-read functionality
-- **Security**: Participant verification and authorization checks
+## 📋 Overview
 
-### Modification Requests System
-- **Project Modifications**: Clients can request changes to their projects
-- **Priority Levels**: Support for low, medium, high, and urgent priorities
-- **Status Tracking**: Track request status from pending to completed
-- **Admin Notifications**: Automatic notifications for employees/admins
+**Ma3k Company Platform** is a unified ecosystem serving multiple brands and business models:
 
-### Feature Requests System
-- **New Features**: Clients can request new features for their projects
-- **Cost Estimation**: Admin can provide estimated cost and timeline
-- **Category Classification**: Organize requests by category
-- **Approval Workflow**: Status tracking from pending to approved/rejected
+- **Public Website**: Service discovery, pricing, and lead generation
+- **Client Portal**: Service requests, order tracking, payments, file delivery
+- **Employee Portal**: Order management, task tracking, client communication, project delivery
+- **Edutiy by Ma3k**: Complete education platform with courses, lessons, quizzes, certificates
+- **Menuza by Ma3k**: Restaurant services (menu design, branding, QR codes, content)
+- **Ma3k Edits**: Web development and app services
+- **Kafayat Services**: Professional services marketplace
 
-### Project Files Management
-- **File Upload**: Upload and manage project-related files
-- **Access Control**: Only project owners can upload files
-- **File Types**: Support for various file types with metadata
+---
 
-### Project Questions System
-- **Default Questions**: Auto-generated questions for new projects
-- **Categories**: Questions organized by category (general, design, features, etc.)
-- **Client Answers**: Clients can answer project-related questions
+## 🎯 Core Principles (Sprint 0 - Foundation)
 
-### API Validation & Security
-- **Input Validation**: All new endpoints validate required fields
-- **Authorization Checks**: Verify user permissions before operations
-- **Error Handling**: Proper 404/403/400 responses for edge cases
+### Database Strategy
+- **Primary DB**: PostgreSQL (via Neon) using Drizzle ORM
+- **Core Tables**: Users, Orders, Services, Payments, Invoices, Employees, Clients, Projects
+- **No duplication**: Single source of truth for all data
+- **Clean schema**: Only essential fields, no unnecessary timestamps
 
-### MongoDB Integration
-- **Primary Database**: MongoDB Atlas now serves as the primary database via Mongoose ODM
-- **Three-Tier Storage**: Priority system: MongoDB (primary) → PostgreSQL (fallback) → JSON (last resort)
-- **Session Management**: MongoDB-backed sessions using connect-mongo for production reliability
-- **Complete Models**: All 17 Mongoose models matching the original Drizzle schema structure
-- **Auto-Initialization**: MongoDB automatically seeds with default services, courses, and discount codes
-- **Connection Handling**: Robust connection management with automatic reconnection
+### Authentication & Roles
+Three user types with role-based access:
+1. **Client**: Customer requesting services
+2. **Student**: Learning from courses
+3. **Employee**: Staff with roles (Admin, Sales, Support, PM, Specialist)
 
-### Client Dashboard Improvements
-- **Invoice Download**: Added download invoice button for completed orders in client dashboard
-- **Responsive Layout**: Improved orders section with flex-wrap and gap for better mobile responsiveness
-- **UI Consistency**: Invoice button uses Ma3k teal color scheme matching the platform design
+### Architecture
+```
+Frontend (React + Wouter + TanStack Query)
+    ↓
+Backend (Express.js + PostgreSQL)
+    ↓
+Services (Payment, Email, File Storage)
+```
 
-### Code Quality
-- **TypeScript Safety**: Added Download and Eye icons to lucide-react imports
-- **Browserslist Update**: Updated caniuse-lite database for better browser compatibility
+---
 
-## Previous Changes (December 2, 2025)
+## 🏗️ Current Project Status
 
-### Authentication Security Hardening
-- **Password Hashing**: All registration endpoints (students, clients, employees) now use scrypt password hashing
-- **Secure Login**: Login route uses comparePasswords for timing-safe password verification
-- **Employee Registration**: Secure registration with environment variable-based access code (EMPLOYEE_REGISTRATION_CODE)
-- **Input Validation**: Added proper validation for all required fields in registration endpoints
+### ✅ COMPLETED (Already Implemented)
+- Basic authentication (students, clients, employees)
+- Database setup (PostgreSQL + Drizzle ORM)
+- Services catalog (website/app development, courses)
+- Order management system
+- Invoice generation
+- Payment integration (PayPal, Stripe, local methods)
+- Course and student management (basic)
+- WebSocket chat system
+- Project management basics
+- File upload and management
 
-### Session Management & Authentication
-- **Passport.js Integration**: Implemented multi-strategy authentication for students, clients, and employees
-- **PostgreSQL Sessions**: Session storage using connect-pg-simple for production-ready session management
-- **Password Security**: Secure password hashing with scrypt and timing-safe comparison
-- **Auth Middleware**: Express-session with passport.js for protected routes
+### ⏳ IN PROGRESS - Sprint 0 (Foundation Cleanup)
+- Code cleanup and removing duplicate pages
+- Consolidating database schema for clarity
+- Setting up environment variables properly
+- Establishing folder structure separation
+- Creating RBAC framework for employee roles
 
-### Reviews/Ratings System
-- **Review Creation**: API for creating reviews with rating (1-5), comment, and reviewer info
-- **Approval Workflow**: Reviews require admin approval before public display
-- **Average Ratings**: Automatic calculation of average ratings for services and courses
-- **Database Storage**: Full PostgreSQL integration for review persistence
+### 📝 PENDING (Requires Autonomous Mode for Complete Implementation)
+- **Employee Portal Redesign**: Full UI overhaul with employee dashboard, task board, CRM pipeline
+- **Client Portal Enhancements**: Service request wizard, status tracking, file delivery system
+- **Public Website Redesign**: New brand identity (beige/white/gray/green colors), modern luxury design
+- **Edutiy Full Implementation**: Lesson pages, quiz system, certificate generation
+- **Menuza Integration**: Restaurant service packages, QR code system
+- **Meeting Scheduler**: Zoom/Google Meet integration, scheduling system
+- **Activity Logging**: Complete audit trail for all user actions
+- **Advanced CRM**: Lead pipeline, conversion tracking, email templates
+- **Advanced File Management**: Drag-drop uploads, preview system, versioning
 
-### Real-time Notifications
-- **WebSocket Server**: WebSocket support at /ws path for real-time notifications
-- **Notification API**: Full CRUD operations for notifications (create, read, mark as read)
-- **User Notifications**: Notifications scoped by user ID and user type (student/client/employee)
-- **Unread Count**: API endpoint for getting unread notification count
+---
 
-### Dashboard Statistics
-- **Stats API**: New /api/dashboard/stats endpoint providing platform metrics
-- **Metrics Included**: Total orders, students, clients, projects, revenue, pending orders, active projects, completed courses
+## 📁 Folder Structure (Standardized)
 
-### PostgreSQL Database Migration
-- **Database Storage**: Migrated from JSON file storage to PostgreSQL database using Drizzle ORM
-- **DatabaseStorage Class**: Created new `server/database-storage.ts` implementing IStorage interface with full PostgreSQL support
-- **Auto-Initialization**: Database automatically initializes with default services, courses, and discount codes
-- **Fallback Support**: System falls back to JsonStorage if database is unavailable
-- **Schema Sync**: Database schema pushed using `drizzle-kit push`
+```
+project/
+├── client/                   # Frontend React app
+│   └── src/
+│       ├── pages/           # Route pages (public, client, employee, student)
+│       ├── components/      # Reusable UI components
+│       │   ├── ui/         # Shadcn components
+│       │   ├── layout/     # Header, footer, sidebar
+│       │   ├── forms/      # Form components
+│       │   └── features/   # Domain-specific components
+│       ├── hooks/          # Custom React hooks
+│       ├── context/        # Context providers (Auth, Cart, etc)
+│       ├── lib/            # Utilities and constants
+│       └── index.css       # Global styles
+├── server/                  # Backend Node.js/Express
+│       ├── index.ts        # Entry point
+│       ├── routes.ts       # API routes
+│       ├── auth.ts         # Authentication logic
+│       ├── storage.ts      # Database interface
+│       ├── db.ts           # Database connection
+│       ├── email.ts        # Email sending
+│       └── paypal.ts       # PayPal integration
+├── shared/                  # Shared types & schemas
+│       └── schema.ts       # Database schema + Zod validations
+├── data/                    # JSON seed data (deprecated, use DB)
+└── package.json            # Dependencies
+```
 
-### Storage Architecture
-- **Dual Storage System**: Application now supports both PostgreSQL (production) and JSON file (fallback)
-- **Database Storage**: Full CRUD operations for all 17 data models (users, services, orders, reviews, notifications, etc.)
-- **Type Safety**: Complete TypeScript integration with Drizzle ORM for type-safe database operations
+---
 
-## Previous Changes (November 30, 2025)
+## 🗄️ Database Schema (Core Models)
 
-### Session State Management & Cart Persistence
-- **CartContext Hydration**: Implemented automatic loading of cartItems and discountCode from localStorage on app startup
-- **Persistent Storage**: Cart data now persists across page reloads and browser sessions
-- **Auto-Save System**: CartContext uses useEffect hooks to automatically save items and discounts to localStorage whenever they change
-- **Loading State**: Added isLoading state to cart page to show loading message while data is being restored from storage
-- **Session Recovery**: Customer can close browser and return later - all cart data and customer info preserved
-- **Internal Linking**: Fixed navigation flow - users can now add products, navigate away, and return with cart intact
+### User-Related Tables
+- **users**: Basic platform users (legacy, prefer role-specific tables)
+- **employees**: Staff with roles and permissions
+- **clients**: Business customers
+- **students**: Course learners
 
-### Pricing and Checkout Features  
-- **Dynamic Pricing Tiers**: Added step 2.5 in services page for restaurant/café service (monthly: 235 SAR, yearly: 399 SAR)
-- **Discount Integration**: Fixed all discount calculations - payment now uses discountedPrice throughout
-- **Payment Summary**: Added discount display in payment page showing savings amount and percentage
-- **Order Preservation**: Last order details saved in localStorage for user reference
+### Service & Order Management
+- **services**: Service catalog (price, features, category)
+- **orders**: Service requests from clients
+- **invoices**: Billing and payment records
+- **payments**: Payment transaction history
 
-## Previous Changes (October 23, 2025)
-- **Authentication System Enhancement**: Added `isLoading` state to AuthContext to prevent race conditions during authentication hydration
-- **Protected Pages Fix**: Updated all dashboard pages (students, clients, employees) to properly wait for AuthContext loading before redirecting
-- **Employee Dashboard Modernization**: Removed legacy localStorage-based authentication and migrated to centralized AuthContext
-- **PayPal Configuration**: Configured PayPal client ID to use environment variables (VITE_PAYPAL_CLIENT_ID) for proper integration
-- **Services Page Registration**: Added mandatory client registration before adding services to cart with comprehensive form
-- **Dashboard Authentication**: All three dashboards now use unified AuthContext for consistent authentication and session management
-- **Code Quality**: Eliminated all legacy authentication code and localStorage dependencies in favor of centralized auth system
+### Project Management
+- **projects**: Client projects linked to orders
+- **employee_tasks**: Individual task assignments
+- **project_files**: File uploads for projects
+- **project_questions**: Requirements questionnaire
 
-# User Preferences
+### Communication
+- **chat_conversations**: Conversation threads
+- **chat_messages**: Individual messages
+- **messages**: Legacy message system (deprecate)
+- **tickets**: Support tickets
+- **ticket_responses**: Support ticket replies
 
-Preferred communication style: Simple, everyday language. User prefers direct problem-solving without extra explanations.
+### Education
+- **courses**: Course catalog
+- **lessons**: Individual lessons within courses
+- **enrollments**: Student course registrations
+- **quiz_attempts**: Quiz/exam submissions
+- **certificates**: Issued certificates
 
-# System Architecture
+### Business Features
+- **modifications_requests**: Change requests for projects
+- **feature_requests**: New feature requests
+- **reviews**: Customer reviews and ratings
+- **notifications**: Real-time notifications
+- **meetings**: Meeting scheduling
+- **discount_codes**: Promotional codes
 
-## Frontend Architecture
-- **Framework**: React 18 with TypeScript for type safety and modern development practices
-- **Routing**: Wouter for lightweight client-side routing without the complexity of React Router
-- **State Management**: TanStack Query for server state, CartContext for cart/discount state with localStorage persistence
-- **UI Framework**: Shadcn/ui components built on Radix UI primitives for accessible, customizable components
-- **Styling**: Tailwind CSS with custom CSS variables for consistent theming and Arabic RTL support
-- **Typography**: Tajawal font for Arabic text with Inter as fallback for enhanced readability
-- **Storage**: localStorage for session persistence (cart items, customer info, discount codes)
+---
 
-## Backend Architecture
-- **Runtime**: Node.js with Express.js framework for RESTful API development
-- **Primary Database**: MongoDB Atlas with Mongoose ODM for document-based data storage
-- **Fallback Database**: PostgreSQL with Drizzle ORM (Neon serverless) as secondary storage
-- **Storage Priority**: MongoDB → PostgreSQL → JSON file (three-tier fallback system)
-- **Session Management**: MongoDB-backed sessions using connect-mongo
-- **Development**: Hot module replacement with Vite for fast development cycles
+## 🔐 Authentication & Roles (Framework)
 
-## Payment Integration
-- **PayPal SDK**: Official PayPal Server SDK with automatic SAR to USD conversion for international payments
-- **Local Payment Methods**: Support for Saudi payment systems (STC Pay, UR Pay, Alinma Pay) with manual verification workflow
-- **Bank Transfers**: Traditional bank transfer support with receipt verification via WhatsApp integration
-- **Invoice System**: Automated HTML invoice generation with downloadable receipts for customers
-- **Discount System**: Discount code validation with percentage-based savings and persistent application
+### User Types & Roles
+```typescript
+STUDENT:
+  - View courses
+  - Submit assignments
+  - Take quizzes
+  - Download certificates
 
-## Data Models
-- **Users**: Basic authentication system with username/password
-- **Services**: Updated service catalog with competitive pricing (400-1499 SAR range)
-- **Orders**: Complete order lifecycle management from creation to completion
-- **Invoices**: Automated invoice generation with HTML download functionality
-- **Website Forms**: Customer specification collection with HTML/CSS template generation
-- **Consultations**: Customer inquiry and consultation request handling
-- **Messages**: Internal messaging system for customer communication
-- **Discount Codes**: Code-based discounts with percentage values and expiration dates
+CLIENT:
+  - View services
+  - Create orders
+  - Track order status
+  - Communicate with staff
+  - Download invoices
+  - Upload files
 
-## UI/UX Design Patterns
-- **RTL Support**: Full right-to-left layout support for Arabic content
-- **Responsive Design**: Mobile-first approach with breakpoint-based layouts
-- **Component Library**: Consistent design system using Shadcn/ui components
-- **Theme System**: CSS custom properties for flexible theming and brand consistency
-- **Loading States**: Optimistic updates and loading indicators for better user experience
-- **Session Persistence**: Automatic cart and customer data preservation across sessions
+EMPLOYEE:
+  - SYSTEM_ADMIN: Full platform access
+  - SALES_MANAGER: Lead management, order tracking
+  - SUPPORT: Client communication, ticket handling
+  - PROJECT_MANAGER: Task assignment, progress tracking
+  - SPECIALIST: Task execution, file delivery
+  - EDUCATOR: Course and student management
+```
 
-# External Dependencies
+---
 
-## Database Services
-- **Neon Database**: Serverless PostgreSQL hosting with automatic scaling and connection pooling
-- **Drizzle Kit**: Database migration and schema management tool
+## 🚀 Frontend Pages Structure
 
-## Payment Processors
-- **PayPal**: International payment processing with official server SDK integration
-- **Saudi Payment Systems**: STC Pay, UR Pay, and Alinma Pay for local market support
+### Public Pages (No Auth Required)
+- `/` - Home page
+- `/about` - About Ma3k
+- `/services` - Service catalog with brand filters
+- `/pricing` - Pricing and packages
+- `/contact` - Contact form
+- `/portfolio` - Case studies / Portfolio
+- `/faq` - Frequently asked questions
+- `/privacy` - Privacy policy
+- `/terms` - Terms of service
 
-## Communication Services
-- **WhatsApp Business API**: Customer communication and payment receipt verification
-- **Email Services**: Order confirmations and customer notifications (configured via environment variables)
+### Client Pages (After Login)
+- `/client/dashboard` - My orders, stats
+- `/client/orders` - Order list and tracking
+- `/client/messages` - Chat with employees
+- `/client/invoices` - Billing and payment history
+- `/client/deliverables` - Download files
+- `/client/meetings` - Meeting schedule
+- `/client/support` - Support tickets
 
-## Development Tools
-- **Vite**: Build tool and development server with hot module replacement
-- **TypeScript**: Type checking and enhanced developer experience
-- **ESLint/Prettier**: Code quality and formatting tools
+### Student Pages (After Login)
+- `/student/dashboard` - Learning progress
+- `/student/courses` - Enrolled courses
+- `/student/lessons` - Lesson content
+- `/student/quizzes` - Quiz and exam submissions
+- `/student/certificates` - Certificate list
 
-## UI Libraries
-- **Radix UI**: Headless component primitives for accessibility and customization
-- **Tailwind CSS**: Utility-first CSS framework for rapid styling
-- **Lucide React**: Modern icon library for consistent iconography
-- **Font Awesome**: Additional icon set for specialized icons
+### Employee Pages (Requires Role)
+- `/employee/dashboard` - Stats and overview
+- `/employee/clients` - Client list and CRM
+- `/employee/orders` - Order queue and status
+- `/employee/tasks` - Task board (Kanban)
+- `/employee/messages` - Internal messaging
+- `/employee/meetings` - Schedule meetings
+- `/employee/finance` - Invoices and payments
+- `/employee/settings` - Role and permission management
 
-## Utility Libraries
-- **date-fns**: Date manipulation and formatting
-- **class-variance-authority**: Type-safe CSS class variants
-- **clsx**: Conditional CSS class composition
-- **nanoid**: Unique ID generation for orders and invoices
-- **Framer Motion**: Animation library for smooth transitions
-- **wouter**: Lightweight routing library for client-side navigation
+---
+
+## 📊 Development Roadmap
+
+### Sprint 0: Foundation & Cleanup (Current)
+- [x] Analyze current codebase
+- [ ] Clean up duplicate pages
+- [ ] Consolidate database schema
+- [ ] Set up environment variables
+- [ ] Create folder structure
+- [ ] Document architecture
+
+### Sprint 1-6: (Requires Autonomous Mode)
+See attached document for detailed multi-week implementation plan
+
+---
+
+## 🛠️ Environment Setup
+
+### Required Environment Variables
+
+**Development (.env.development)**
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/ma3k_dev
+PAYPAL_CLIENT_ID=xxxxx
+PAYPAL_SECRET=xxxxx
+SENDGRID_API_KEY=xxxxx
+EMPLOYEE_REGISTRATION_CODE=xxxxx
+```
+
+**Production (.env.production)**
+```
+DATABASE_URL=postgresql://user:password@prod-host:5432/ma3k_prod
+PAYPAL_CLIENT_ID=xxxxx (production)
+PAYPAL_SECRET=xxxxx (production)
+SENDGRID_API_KEY=xxxxx (production)
+```
+
+---
+
+## 📚 Key Dependencies
+
+### Frontend
+- React 18 + TypeScript
+- Wouter (routing)
+- TanStack Query (data fetching)
+- Shadcn/ui + Tailwind CSS
+- Framer Motion (animations)
+
+### Backend
+- Node.js + Express
+- PostgreSQL + Drizzle ORM
+- Passport.js (authentication)
+- Zod (validation)
+- SendGrid (email)
+- PayPal SDK
+
+---
+
+## 👥 User Personas & Journeys
+
+### Client Journey
+1. Discover service on public website
+2. Click "Request Service"
+3. Select service package
+4. Fill smart request form (or answer interview questions)
+5. Create account / Login
+6. Submit order
+7. Receive order number and SLA
+8. Support contacts within SLA
+9. Schedule meeting if needed
+10. PM breaks into tasks
+11. Specialist completes work
+12. Receive files and invoice
+13. Pay via PayPal/Stripe/Bank/Local
+14. Leave review
+
+### Employee Workflow
+1. Review new leads/orders
+2. Assign to appropriate team
+3. Update client via chat
+4. Schedule meeting if needed
+5. Create tasks in task board
+6. Assign to specialists
+7. Track progress on Kanban
+8. Get approval from PM
+9. Deliver files to client
+10. Mark complete, send invoice
+
+---
+
+## 🎨 Design System (To Be Implemented)
+
+### Brand Colors
+- **Primary**: Beige (#D4C4B9) / Soft
+- **Secondary**: White (#FFFFFF)
+- **Accent**: Green (#4CAF50) / Ma3k Green
+- **Neutral**: Gray (#8C8C8C) / Sidebar & borders
+- **Text**: Dark Gray (#333333)
+
+### Typography
+- Arabic: Tajawal (primary)
+- English: Inter (fallback)
+- Sizes: 12px, 14px, 16px, 18px, 20px, 24px, 32px
+
+### Components
+- Cards with subtle elevation
+- Buttons with ripple effect
+- Input fields with labels
+- Modals for confirmations
+- Toast notifications
+- Skeleton loaders
+
+---
+
+## 📞 Contact & Support
+
+- **Email**: support@ma3k.co
+- **WhatsApp**: +966 xx xxx xxxx
+- **Phone**: +966 xx xxx xxxx
+- **Hours**: 9 AM - 5 PM (Saudi Arabia Time)
+
+---
+
+## 📝 Notes for Developers
+
+1. **Always use Drizzle ORM** for database operations - no raw SQL
+2. **Validate all inputs** with Zod schemas before processing
+3. **Use TanStack Query** for all client-side data fetching
+4. **Add data-testid** to all interactive elements
+5. **RTL-first CSS** - Arabic text flows right-to-left
+6. **Environment variables** - Never hardcode secrets
+7. **Error handling** - Provide user-friendly error messages
+8. **Logging** - Log important business events for auditing
+
+---
+
+## Last Modified
+- December 28, 2025 - Sprint 0 Foundation Planning
