@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
@@ -27,7 +28,7 @@ const createService = (id: string, name: string, price: number, originalPrice: n
   description,
   category,
   subcategory: null,
-  features,
+  features: features || [],
   isActive: true,
   isFeatured: false,
 });
@@ -118,7 +119,7 @@ export default function ServicesNew() {
                     </div>
                     <p className="text-muted-foreground">{service.description}</p>
                     <div className="flex flex-wrap gap-2">
-                      {service.features.map((f, i) => (
+                      {selection.service?.features?.map((f, i) => (
                         <Badge key={i} variant="secondary" className="text-xs">{f}</Badge>
                       ))}
                     </div>

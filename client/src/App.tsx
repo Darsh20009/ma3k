@@ -34,6 +34,7 @@ import EducationalWebsiteForm from "@/pages/educational-website-form";
 import StudentDashboard from "@/pages/student-dashboard";
 import FAQ from "@/pages/faq";
 import Pricing from "@/pages/pricing";
+import ThankYou from "@/pages/thank-you";
 import NotFound from "@/pages/not-found";
 
 function Router() {
