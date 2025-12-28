@@ -40,44 +40,73 @@ import ThankYou from "@/pages/thank-you";
 import OpenLife from "@/pages/openlife";
 import NotFound from "@/pages/not-found";
 
+/**
+ * Main Router
+ * Ma3k Company Platform - Unified Routes
+ * 
+ * Route organization:
+ * - Public pages: /
+ * - Client portal: /client/*
+ * - Employee portal: /employee/*
+ * - Student portal: /student/*
+ * - Authentication: /login, /register, /employee-login
+ */
 function Router() {
   return (
     <div className="min-h-screen royal-gradient">
       <Navbar />
       <ContactFloat />
       <Switch>
+        {/* === PUBLIC PAGES === */}
         <Route path="/" component={HomeNew} />
-        <Route path="/digital-welcome" component={DigitalWelcome} />
-        <Route path="/splash" component={SplashScreen} />
-        <Route path="/welcome" component={WelcomeNew} />
-        <Route path="/services" component={ServicesComplete} />
-        <Route path="/cart" component={Cart} />
-        <Route path="/payment" component={CreativePayment} />
         <Route path="/about" component={About} />
         <Route path="/privacy" component={PrivacyPolicy} />
         <Route path="/portfolio" component={Portfolio} />
         <Route path="/contact" component={Contact} />
-        <Route path="/courses" component={CoursesComplete} />
+        <Route path="/services" component={ServicesComplete} />
+
+        {/* === AUTHENTICATION === */}
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
-        <Route path="/my-courses" component={MyCoursesComplete} />
-        <Route path="/my-projects" component={MyProjectsComplete} />
+        <Route path="/employee-login" component={EmployeeLogin} />
+
+        {/* === CLIENT PORTAL === */}
         <Route path="/client-dashboard" component={ClientDashboard} />
         <Route path="/dashboard" component={ClientDashboard} />
         <Route path="/client" component={ClientDashboard} />
-        <Route path="/employee-dashboard-new" component={EmployeeDashboardNew} />
-        <Route path="/cert-search" component={CertSearch} />
+        <Route path="/cart" component={Cart} />
+        <Route path="/payment" component={CreativePayment} />
+        <Route path="/my-projects" component={MyProjectsComplete} />
+
+        {/* === EMPLOYEE PORTAL === */}
+        <Route path="/employee-dashboard" component={EmployeeDashboardNew} />
         <Route path="/employee-profile" component={EmployeeProfile} />
-        <Route path="/employee-login" component={EmployeeLogin} />
-        <Route path="/employee-dashboard" component={EmployeeDashboard} />
         <Route path="/admin-dashboard" component={AdminDashboard} />
-        <Route path="/code-tool" component={CodeTool} />
-        <Route path="/ma3k-meet" component={Ma3kMeet} />
+
+        {/* === STUDENT PORTAL === */}
+        <Route path="/student-dashboard" component={StudentDashboard} />
+        <Route path="/courses" component={CoursesComplete} />
+        <Route path="/my-courses" component={MyCoursesComplete} />
+        <Route path="/cert-search" component={CertSearch} />
+
+        {/* === SERVICE FORMS === */}
         <Route path="/website-form" component={WebsiteForm} />
         <Route path="/educational-website-form" component={EducationalWebsiteForm} />
-        <Route path="/student-dashboard" component={StudentDashboard} />
+
+        {/* === TOOLS & FEATURES === */}
+        <Route path="/code-tool" component={CodeTool} />
+        <Route path="/ma3k-meet" component={Ma3kMeet} />
+
+        {/* === UTILITY PAGES === */}
         <Route path="/thank-you" component={ThankYou} />
+        <Route path="/welcome" component={WelcomeNew} />
+
+        {/* === DEPRECATED (for backwards compatibility) === */}
+        <Route path="/digital-welcome" component={DigitalWelcome} />
+        <Route path="/splash" component={SplashScreen} />
         <Route path="/openlife" component={OpenLife} />
+
+        {/* === 404 FALLBACK === */}
         <Route component={NotFound} />
       </Switch>
       <Footer />
