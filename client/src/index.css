@@ -1,34 +1,34 @@
 :root {
-  /* Corporate Minimal Luxury Palette - باليت ألوان مؤسسية فاخرة */
-  --background: 45 30% 98%; /* Light Beige / Off White */
-  --foreground: 220 15% 15%; /* Dark Gray */
+  /* Corporate Minimal Luxury Palette - Beige Focus */
+  --background: 45 30% 96%; /* #F8F5F0 - Warm Beige Background */
+  --foreground: 220 15% 15%; /* Dark Gray Text */
   
-  --card: 0 0% 100%; /* Pure White */
+  --card: 45 30% 98%; /* Lighter Beige for cards */
   --card-foreground: 220 15% 15%;
   
-  --popover: 0 0% 100%;
+  --popover: 45 30% 98%;
   --popover-foreground: 220 15% 15%;
   
-  --primary: 155 35% 25%; /* Deep Corporate Green */
+  --primary: 142.1 76.2% 36.3%; /* Ma3k Green */
   --primary-foreground: 45 30% 98%;
   
-  --secondary: 45 20% 90%; /* Soft Beige */
-  --secondary-foreground: 155 35% 25%;
+  --secondary: 45 20% 90%; /* Soft Gray-Beige */
+  --secondary-foreground: 142.1 76.2% 36.3%;
   
-  --muted: 220 10% 94%;
+  --muted: 45 20% 92%;
   --muted-foreground: 220 10% 45%;
   
-  --accent: 155 35% 35%; /* Mid Green */
+  --accent: 142.1 76.2% 36.3%;
   --accent-foreground: 45 30% 98%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 45 30% 98%;
   
-  --border: 220 10% 90%;
-  --input: 220 10% 90%;
-  --ring: 155 35% 25%;
+  --border: 45 15% 88%;
+  --input: 45 15% 88%;
+  --ring: 142.1 76.2% 36.3%;
   
-  --radius: 0.5rem; /* More minimal radius */
+  --radius: 0.5rem;
 }
 
 .dark {

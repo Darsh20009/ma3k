@@ -26,8 +26,8 @@ export default function Portfolio() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Real Projects */}
             {projects?.filter(p => p.status === 'completed').map((project, i) => (
-              <Card key={project.id} className="luxury-card overflow-hidden group">
-                <div className="aspect-video bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
+              <Card key={project.id} className="luxury-card overflow-hidden group bg-card">
+                <div className="aspect-video bg-secondary/20 flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
                   <Layout className="w-12 h-12 text-muted-foreground opacity-20" />
                 </div>
                 <div className="p-8 space-y-4">
@@ -46,8 +46,8 @@ export default function Portfolio() {
 
             {/* Static Examples if no real projects */}
             {!projects?.length && [1, 2, 3].map((item) => (
-              <Card key={item} className="luxury-card overflow-hidden group">
-                <div className="aspect-video bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+              <Card key={item} className="luxury-card overflow-hidden group bg-card">
+                <div className="aspect-video bg-secondary/20 flex items-center justify-center">
                   <Globe className="w-12 h-12 text-muted-foreground opacity-20" />
                 </div>
                 <div className="p-8 space-y-4">

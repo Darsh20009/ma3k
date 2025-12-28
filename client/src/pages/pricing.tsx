@@ -88,7 +88,7 @@ export default function Pricing() {
           ))}
         </div>
 
-        <div className="mt-20 p-8 rounded-2xl bg-primary/5 text-center">
+        <div className="mt-20 p-8 rounded-2xl bg-primary/5 text-center border border-primary/10">
           <p className="text-muted-foreground">
             هل لديك متطلبات خاصة؟ <Link href="/contact" className="text-primary font-bold underline">تواصل معنا</Link> للحصول على عرض مخصص.
           </p>

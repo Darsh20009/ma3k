@@ -90,7 +90,7 @@ export default function ServicesNew() {
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid md:grid-cols-3 gap-8">
               {categories.map((cat) => (
-                <Card key={cat.id} className="luxury-card p-10 text-center space-y-6 cursor-pointer" onClick={() => handleSelectCategory(cat.id)}>
+                <Card key={cat.id} className="luxury-card p-10 text-center space-y-6 cursor-pointer bg-card shadow-sm" onClick={() => handleSelectCategory(cat.id)}>
                   <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                     <cat.icon className="w-8 h-8" />
                   </div>

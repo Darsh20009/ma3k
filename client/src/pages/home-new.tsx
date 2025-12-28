@@ -77,7 +77,7 @@ export default function HomeNew() {
       </section>
 
       {/* Trust Stats */}
-      <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
+      <section className="py-20 bg-secondary/30">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
@@ -141,8 +141,8 @@ export default function HomeNew() {
       </section>
 
       {/* Why Us Section */}
-      <section className="py-24 bg-slate-900 text-white overflow-hidden relative">
-        <div className="absolute top-0 left-1/4 -z-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] opacity-20" />
+      <section className="py-24 bg-primary text-primary-foreground overflow-hidden relative">
+        <div className="absolute top-0 left-1/4 -z-0 w-[800px] h-[800px] bg-white/5 rounded-full blur-[120px] opacity-20" />
         
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -155,20 +155,20 @@ export default function HomeNew() {
                   { title: "دعم فني مستمر", desc: "فريقنا معك دائماً للمساعدة والتطوير المستمر.", icon: Headphones },
                 ].map((item, i) => (
                   <div key={i} className="flex gap-6">
-                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary-foreground/20 flex items-center justify-center text-primary-foreground">
                       <item.icon className="w-6 h-6" />
                     </div>
                     <div>
                       <h4 className="text-xl font-bold mb-2">{item.title}</h4>
-                      <p className="text-slate-400">{item.desc}</p>
+                      <p className="text-primary-foreground/80">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-primary/20 to-transparent rounded-3xl border border-white/10 p-8 flex items-center justify-center">
-                <Rocket className="w-48 h-48 text-primary animate-pulse" />
+              <div className="aspect-square bg-gradient-to-br from-primary-foreground/20 to-transparent rounded-3xl border border-white/10 p-8 flex items-center justify-center">
+                <Rocket className="w-48 h-48 text-primary-foreground animate-pulse" />
               </div>
             </div>
           </div>

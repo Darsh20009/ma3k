@@ -51,7 +51,7 @@ export default function FAQ() {
           ))}
         </Accordion>
 
-        <div className="mt-20 text-center space-y-6 p-10 rounded-3xl bg-slate-50 dark:bg-slate-900 border">
+        <div className="mt-20 text-center space-y-6 p-10 rounded-3xl bg-secondary/20 border">
           <h3 className="text-2xl font-bold">لم تجد إجابة لاستفسارك؟</h3>
           <p className="text-muted-foreground">نحن متواجدون للرد على كافة أسئلتك عبر الواتساب أو الإيميل</p>
           <div className="flex justify-center gap-4">
