@@ -20,10 +20,6 @@ import PrivacyPolicy from "@/pages/privacy-policy";
 import Portfolio from "@/pages/portfolio";
 import Contact from "@/pages/contact";
 import EmployeeLogin from "@/pages/employee-login";
-import EmployeeDashboard from "@/pages/employee-dashboard";
-import CodeTool from "@/pages/code-tool";
-import Ma3kMeet from "@/pages/ma3k-meet";
-import CoursesComplete from "@/pages/courses-complete";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
 import MyCoursesComplete from "@/pages/my-courses-complete";
@@ -39,80 +35,46 @@ import StudentDashboard from "@/pages/student-dashboard";
 import ThankYou from "@/pages/thank-you";
 import NotFound from "@/pages/not-found";
 
-/**
- * Main Router
- * Ma3k Company Platform - Unified Routes
- * 
- * Route organization:
- * - Public pages: /
- * - Client portal: /client/*
- * - Employee portal: /employee/*
- * - Student portal: /student/*
- * - Authentication: /login, /register, /employee-login
- */
 function Router() {
   return (
-    <div className="min-h-screen royal-gradient">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
       <ContactFloat />
-      <Switch>
-        {/* === PUBLIC PAGES === */}
-        <Route path="/" component={HomeNew} />
-        <Route path="/about" component={About} />
-        <Route path="/privacy" component={PrivacyPolicy} />
-        <Route path="/portfolio" component={Portfolio} />
-        <Route path="/contact" component={Contact} />
-        <Route path="/services" component={ServicesComplete} />
-
-        {/* === AUTHENTICATION === */}
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
-        <Route path="/employee-login" component={EmployeeLogin} />
-
-        {/* === CLIENT PORTAL === */}
-        <Route path="/client-dashboard" component={ClientDashboard} />
-        <Route path="/dashboard" component={ClientDashboard} />
-        <Route path="/client" component={ClientDashboard} />
-        <Route path="/cart" component={Cart} />
-        <Route path="/payment" component={CreativePayment} />
-        <Route path="/my-projects" component={MyProjectsComplete} />
-
-        {/* === EMPLOYEE PORTAL === */}
-        <Route path="/employee-dashboard" component={EmployeeDashboardNew} />
-        <Route path="/employee-profile" component={EmployeeProfile} />
-        <Route path="/admin-dashboard" component={AdminDashboard} />
-
-        {/* === STUDENT PORTAL === */}
-        <Route path="/student-dashboard" component={StudentDashboard} />
-        <Route path="/courses" component={CoursesComplete} />
-        <Route path="/my-courses" component={MyCoursesComplete} />
-        <Route path="/cert-search" component={CertSearch} />
-
-        {/* === SERVICE FORMS === */}
-        <Route path="/website-form" component={WebsiteForm} />
-        <Route path="/educational-website-form" component={EducationalWebsiteForm} />
-
-        {/* === TOOLS & FEATURES === */}
-        <Route path="/code-tool" component={CodeTool} />
-        <Route path="/ma3k-meet" component={Ma3kMeet} />
-
-        {/* === UTILITY PAGES === */}
-        <Route path="/thank-you" component={ThankYou} />
-        <Route path="/welcome" component={WelcomeNew} />
-
-        {/* === DEPRECATED (for backwards compatibility) === */}
-        <Route path="/digital-welcome" component={DigitalWelcome} />
-        <Route path="/splash" component={SplashScreen} />
-
-        {/* === 404 FALLBACK === */}
-        <Route component={NotFound} />
-      </Switch>
+      <main className="flex-grow">
+        <Switch>
+          <Route path="/" component={HomeNew} />
+          <Route path="/about" component={About} />
+          <Route path="/privacy" component={PrivacyPolicy} />
+          <Route path="/portfolio" component={Portfolio} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/services" component={ServicesComplete} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          <Route path="/employee-login" component={EmployeeLogin} />
+          <Route path="/client-dashboard" component={ClientDashboard} />
+          <Route path="/dashboard" component={ClientDashboard} />
+          <Route path="/cart" component={Cart} />
+          <Route path="/payment" component={CreativePayment} />
+          <Route path="/my-projects" component={MyProjectsComplete} />
+          <Route path="/employee-dashboard" component={EmployeeDashboardNew} />
+          <Route path="/employee-profile" component={EmployeeProfile} />
+          <Route path="/admin-dashboard" component={AdminDashboard} />
+          <Route path="/student-dashboard" component={StudentDashboard} />
+          <Route path="/my-courses" component={MyCoursesComplete} />
+          <Route path="/cert-search" component={CertSearch} />
+          <Route path="/website-form" component={WebsiteForm} />
+          <Route path="/educational-website-form" component={EducationalWebsiteForm} />
+          <Route path="/thank-you" component={ThankYou} />
+          <Route path="/welcome" component={WelcomeNew} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
       <Footer />
     </div>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -126,5 +88,3 @@ function App() {
     </QueryClientProvider>
   );
 }
-
-export default App;

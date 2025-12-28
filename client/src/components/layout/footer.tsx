@@ -8,225 +8,87 @@ export default function Footer() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const quickLinks = [
-    { href: "/services", label: "خدماتنا" },
-    { href: "/courses", label: "الدورات التدريبية" },
-    { href: "/about", label: "من نحن" },
-    { href: "/contact", label: "تواصل معنا" },
-    { href: "/portfolio", label: "أعمالنا" },
-  ];
-
-  const services = [
-    { href: "/services", label: "تصميم المواقع" },
-    { href: "/services", label: "المتاجر الإلكترونية" },
-    { href: "/services", label: "المنصات التعليمية" },
-    { href: "/services", label: "تطوير التطبيقات" },
-  ];
-
-  const socialLinks = [
-    { icon: SiWhatsapp, href: "https://wa.me/", label: "واتساب" },
-    { icon: SiInstagram, href: "https://instagram.com/", label: "انستقرام" },
-    { icon: SiX, href: "https://x.com/", label: "إكس" },
-    { icon: SiLinkedin, href: "https://linkedin.com/", label: "لينكدإن" },
-  ];
-
   return (
-    <footer 
-      className="relative overflow-hidden"
-      style={{ background: "var(--ma3k-darker)" }}
-    >
-      {/* Main Footer Content */}
-      <div className="container mx-auto px-6 py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          
-          {/* About Section */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <img 
-                src={logoImage} 
-                alt="معك" 
-                className="w-12 h-12 rounded-full object-cover"
-                style={{ border: "2px solid rgba(79, 169, 152, 0.3)" }}
-              />
-              <span 
-                className="text-xl font-bold"
-                style={{ color: "var(--ma3k-beige)" }}
-              >
-                معك
-              </span>
-            </div>
-            <p 
-              className="text-sm leading-relaxed mb-4"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              شريكك الموثوق في التحول الرقمي. نقدم حلول رقمية متكاملة تساعدك على تحقيق أهدافك.
+    <footer className="bg-slate-50 dark:bg-slate-900 border-t border-border mt-20">
+      <div className="container mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="space-y-6">
+            <Link href="/">
+              <div className="flex items-center gap-3 cursor-pointer">
+                <img 
+                  src={logoImage} 
+                  alt="Ma3k" 
+                  className="w-10 h-10 rounded-lg object-cover"
+                />
+                <span className="text-xl font-bold tracking-tight text-primary">معك</span>
+              </div>
+            </Link>
+            <p className="text-muted-foreground leading-relaxed">
+              حلول رقمية مبتكرة لمستقبل أعمالك. نساعدك في بناء هويتك الرقمية بأعلى معايير الجودة والاحترافية.
             </p>
-            
-            {/* Social Links */}
-            <div className="flex items-center gap-3">
-              {socialLinks.map((social, index) => (
-                <a
-                  key={index}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
-                  style={{ 
-                    background: "rgba(79, 169, 152, 0.1)",
-                    color: "var(--ma3k-beige-dark)"
-                  }}
-                  aria-label={social.label}
-                  data-testid={`social-${social.label}`}
-                >
-                  <social.icon className="w-4 h-4" />
+            <div className="flex gap-4">
+              {[SiWhatsapp, SiInstagram, SiX, SiLinkedin].map((Icon, i) => (
+                <a key={i} href="#" className="p-2 rounded-full bg-background border border-border hover:border-primary hover:text-primary transition-all">
+                  <Icon className="w-4 h-4" />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h4 
-              className="text-base font-semibold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              روابط سريعة
-            </h4>
-            <ul className="space-y-2">
-              {quickLinks.map((link, index) => (
-                <li key={index}>
-                  <Link href={link.href}>
-                    <span
-                      className="text-sm transition-colors cursor-pointer hover:underline"
-                      style={{ color: "var(--ma3k-beige-dark)" }}
-                      data-testid={`footer-link-${link.label}`}
-                    >
-                      {link.label}
-                    </span>
+            <h4 className="font-bold text-lg mb-6">الروابط السريعة</h4>
+            <ul className="space-y-4">
+              {["الخدمات", "الأسعار", "أعمالنا", "من نحن", "تواصل معنا"].map((item, i) => (
+                <li key={i}>
+                  <Link href="#">
+                    <span className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">{item}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Services */}
           <div>
-            <h4 
-              className="text-base font-semibold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              خدماتنا
-            </h4>
-            <ul className="space-y-2">
-              {services.map((service, index) => (
-                <li key={index}>
-                  <Link href={service.href}>
-                    <span
-                      className="text-sm transition-colors cursor-pointer hover:underline"
-                      style={{ color: "var(--ma3k-beige-dark)" }}
-                    >
-                      {service.label}
-                    </span>
+            <h4 className="font-bold text-lg mb-6">خدماتنا</h4>
+            <ul className="space-y-4">
+              {["تطوير المواقع", "المتاجر الإلكترونية", "تطبيقات الجوال", "الهوية البصرية"].map((item, i) => (
+                <li key={i}>
+                  <Link href="#">
+                    <span className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">{item}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact Info */}
           <div>
-            <h4 
-              className="text-base font-semibold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              تواصل معنا
-            </h4>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-3">
-                <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ background: "rgba(79, 169, 152, 0.1)" }}
-                >
-                  <Mail className="w-4 h-4" style={{ color: "var(--ma3k-green)" }} />
-                </div>
-                <span 
-                  className="text-sm"
-                  style={{ color: "var(--ma3k-beige-dark)" }}
-                >
-                  ma3k.2025@gmail.com
-                </span>
+            <h4 className="font-bold text-lg mb-6">تواصل معنا</h4>
+            <ul className="space-y-4">
+              <li className="flex items-center gap-3 text-muted-foreground">
+                <Mail className="w-4 h-4 text-primary" />
+                <span>info@ma3k.com</span>
               </li>
-              <li className="flex items-center gap-3">
-                <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ background: "rgba(79, 169, 152, 0.1)" }}
-                >
-                  <Phone className="w-4 h-4" style={{ color: "var(--ma3k-green)" }} />
-                </div>
-                <span 
-                  className="text-sm"
-                  style={{ color: "var(--ma3k-beige-dark)" }}
-                >
-                  +201155201921
-                </span>
+              <li className="flex items-center gap-3 text-muted-foreground">
+                <Phone className="w-4 h-4 text-primary" />
+                <span>+966 50 000 0000</span>
               </li>
-              <li className="flex items-center gap-3">
-                <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ background: "rgba(79, 169, 152, 0.1)" }}
-                >
-                  <Clock className="w-4 h-4" style={{ color: "var(--ma3k-green)" }} />
-                </div>
-                <span 
-                  className="text-sm"
-                  style={{ color: "var(--ma3k-beige-dark)" }}
-                >
-                  24/7 متاحون دائماً
-                </span>
+              <li className="flex items-center gap-3 text-muted-foreground">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span>المملكة العربية السعودية، الرياض</span>
               </li>
             </ul>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Bar */}
-      <div 
-        className="border-t"
-        style={{ borderColor: "rgba(79, 169, 152, 0.15)" }}
-      >
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p 
-              className="text-sm text-center md:text-right"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              جميع الحقوق محفوظة &copy; {new Date().getFullYear()} معك
-            </p>
-            
-            <div className="flex items-center gap-4">
-              <Link href="/privacy">
-                <span 
-                  className="text-sm cursor-pointer hover:underline"
-                  style={{ color: "var(--ma3k-beige-dark)" }}
-                >
-                  سياسة الخصوصية
-                </span>
-              </Link>
-              
-              <button
-                onClick={scrollToTop}
-                className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
-                style={{ 
-                  background: "rgba(79, 169, 152, 0.1)",
-                  color: "var(--ma3k-beige)"
-                }}
-                aria-label="العودة للأعلى"
-                data-testid="button-scroll-top"
-              >
-                <ArrowUp className="w-4 h-4" />
-              </button>
-            </div>
+        <div className="border-t border-border mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+          <p>© {new Date().getFullYear()} معك. جميع الحقوق محفوظة.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy"><span className="hover:text-primary cursor-pointer">سياسة الخصوصية</span></Link>
+            <Link href="/terms"><span className="hover:text-primary cursor-pointer">الشروط والأحكام</span></Link>
           </div>
+          <Button variant="ghost" size="icon" onClick={scrollToTop} className="rounded-full">
+            <ArrowUp className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </footer>

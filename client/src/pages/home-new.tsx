@@ -1,864 +1,178 @@
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
   Rocket, 
-  Globe, 
-  Code, 
-  Users,
-  Award,
-  CheckCircle,
-  Sparkles,
-  GraduationCap,
   ArrowLeft,
+  CheckCircle2,
   Zap,
-  Shield,
-  Clock,
-  Laptop,
-  Palette,
-  MessageSquare,
-  Target,
-  Lightbulb,
-  BookOpen,
-  Trophy,
-  Phone,
-  Mail,
-  ChevronDown,
-  Star,
-  Play,
-  Headphones,
-  Building2,
-  ShoppingBag,
-  Briefcase
+  ShieldCheck,
+  Layout,
+  Globe2,
+  Users2,
+  Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import type { Service } from "@shared/schema";
 
 export default function HomeNew() {
-  const { data: services = [] } = useQuery<Service[]>({
-    queryKey: ["/api/services"],
-  });
-
-  const testimonials = [
-    {
-      name: "أحمد محمد",
-      role: "صاحب متجر إلكتروني",
-      text: "فريق معك حول فكرتي البسيطة إلى متجر إلكتروني احترافي. النتيجة فاقت كل التوقعات والدعم الفني ممتاز.",
-      rating: 5,
-      company: "متجر الأناقة"
-    },
-    {
-      name: "فاطمة السعيد",
-      role: "مديرة مطعم",
-      text: "موقعنا الجديد ساعد في زيادة الطلبات بنسبة كبيرة. الفريق محترف ويفهم احتياجات العمل.",
-      rating: 5,
-      company: "مطعم الذواقة"
-    },
-    {
-      name: "خالد العتيبي",
-      role: "رائد أعمال",
-      text: "خدمة ممتازة وسعر مناسب. أنصح أي شخص يبحث عن حلول رقمية احترافية بالتعامل مع معك.",
-      rating: 5,
-      company: "شركة الابتكار"
-    }
-  ];
-
-  const features = [
-    { icon: Laptop, title: "تصميم متجاوب", desc: "يعمل بشكل مثالي على جميع الأجهزة والشاشات" },
-    { icon: Shield, title: "أمان عالي", desc: "حماية متقدمة لبياناتك ومعلومات عملائك" },
-    { icon: Zap, title: "سرعة فائقة", desc: "أداء محسن لتجربة مستخدم سلسة وسريعة" },
-    { icon: Palette, title: "تصميم احترافي", desc: "واجهات عصرية تعكس هوية علامتك التجارية" },
-    { icon: Clock, title: "تسليم سريع", desc: "التزام صارم بمواعيد التسليم المتفق عليها" },
-    { icon: MessageSquare, title: "دعم متواصل", desc: "فريق دعم متاح على مدار الساعة لمساعدتك" }
-  ];
-
-  const processSteps = [
-    { step: "01", title: "اختر خدمتك", desc: "تصفح خدماتنا المتنوعة واختر ما يناسب مشروعك", icon: Target },
-    { step: "02", title: "شاركنا رؤيتك", desc: "أخبرنا بتفاصيل مشروعك وأهدافك", icon: Lightbulb },
-    { step: "03", title: "نبدأ التنفيذ", desc: "فريقنا المتخصص يحول فكرتك إلى واقع", icon: Code },
-    { step: "04", title: "استلم مشروعك", desc: "مشروعك جاهز للانطلاق مع الدعم الكامل", icon: Rocket }
-  ];
-
-  const services_categories = [
-    { icon: Globe, title: "مواقع الشركات", desc: "مواقع احترافية تعزز تواجدك الرقمي" },
-    { icon: ShoppingBag, title: "متاجر إلكترونية", desc: "متاجر متكاملة لبيع منتجاتك عبر الإنترنت" },
-    { icon: GraduationCap, title: "منصات تعليمية", desc: "أكاديميات ومنصات تدريب تفاعلية" },
-    { icon: Building2, title: "أنظمة إدارة", desc: "حلول إدارية متكاملة لعملك" },
-  ];
-
-  const faqs = [
-    {
-      question: "كم تستغرق عملية تطوير الموقع؟",
-      answer: "تعتمد المدة على حجم المشروع وتعقيده. المواقع البسيطة تستغرق من 3-7 أيام، بينما المشاريع الأكبر قد تستغرق 2-4 أسابيع."
-    },
-    {
-      question: "هل تقدمون الدعم الفني بعد التسليم؟",
-      answer: "نعم، نقدم دعم فني مجاني لمدة 30 يوم بعد التسليم، ونوفر باقات دعم ممتدة حسب احتياجاتك."
-    },
-    {
-      question: "هل يمكنني تعديل الموقع بنفسي بعد التسليم؟",
-      answer: "بالتأكيد، جميع مواقعنا تأتي مع لوحة تحكم سهلة الاستخدام تمكنك من إدارة المحتوى بكل سهولة."
-    },
-    {
-      question: "ما هي طرق الدفع المتاحة؟",
-      answer: "نقبل الدفع عبر التحويل البنكي، البطاقات الائتمانية، وخدمات الدفع الإلكتروني المختلفة."
-    }
-  ];
-
-  const stats = [
-    { number: "150+", label: "مشروع مكتمل", icon: Trophy },
-    { number: "98%", label: "عملاء راضون", icon: Users },
-    { number: "50+", label: "دورة تدريبية", icon: BookOpen },
-    { number: "24/7", label: "دعم فني", icon: Headphones }
-  ];
-
   return (
-    <div className="min-h-screen">
+    <div className="flex flex-col w-full">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div 
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: `
-                linear-gradient(var(--ma3k-teal) 1px, transparent 1px),
-                linear-gradient(90deg, var(--ma3k-teal) 1px, transparent 1px)
-              `,
-              backgroundSize: "80px 80px",
-            }}
-          />
-          <div 
-            className="absolute top-1/4 right-0 w-[500px] h-[500px] rounded-full opacity-10"
-            style={{ background: "radial-gradient(circle, var(--ma3k-green) 0%, transparent 70%)" }}
-          />
-          <div 
-            className="absolute bottom-1/4 left-0 w-[400px] h-[400px] rounded-full opacity-10"
-            style={{ background: "radial-gradient(circle, var(--ma3k-teal) 0%, transparent 70%)" }}
-          />
-        </div>
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div className="absolute top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl opacity-50 translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl opacity-50 -translate-x-1/2 translate-y-1/2" />
         
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            {/* Trust Badge */}
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="mb-8"
-            >
-              <Badge 
-                className="px-5 py-2 text-sm font-medium"
-                style={{
-                  background: "rgba(16, 185, 129, 0.1)",
-                  border: "1px solid rgba(16, 185, 129, 0.3)",
-                  color: "var(--ma3k-green)",
-                }}
-              >
-                <Sparkles className="w-4 h-4 ml-2" />
-                شريكك الموثوق في التحول الرقمي
-              </Badge>
-            </motion.div>
-
-            {/* Main Heading */}
-            <motion.h1 
-              className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              style={{ color: "var(--ma3k-beige)" }}
+              transition={{ duration: 0.5 }}
             >
-              نبني مستقبلك
-              <span 
-                className="block mt-2"
-                style={{ color: "var(--ma3k-green)" }}
-              >
-                الرقمي باحترافية
-              </span>
+              <Badge variant="secondary" className="px-4 py-1 text-sm rounded-full bg-primary/10 text-primary border-none">
+                نصنع التميز الرقمي لمشروعك
+              </Badge>
+            </motion.div>
+            
+            <motion.h1 
+              className="text-5xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              حلول رقمية <span className="text-primary">مبتكرة</span> تنقل أعمالك للمستقبل
             </motion.h1>
             
             <motion.p 
-              className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              نحول أفكارك إلى مواقع ومتاجر إلكترونية احترافية مع دورات تدريبية مجانية في البرمجة والتصميم
-            </motion.p>
-            
-            {/* CTA Buttons */}
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+              className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              نحن في معك نؤمن بأن كل فكرة تستحق الظهور بأفضل حلة رقمية. نصمم ونطور المواقع والمتاجر الإلكترونية باحترافية تليق بطموحاتك.
+            </motion.p>
+            
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
             >
               <Link href="/services">
-                <Button 
-                  size="lg"
-                  className="text-base px-8 py-6 rounded-xl font-semibold"
-                  style={{
-                    background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
-                    color: "white",
-                  }}
-                  data-testid="button-services"
-                >
-                  <Rocket className="w-5 h-5 ml-2" />
+                <Button size="lg" className="h-14 px-8 text-lg rounded-xl shadow-lg shadow-primary/20">
                   ابدأ مشروعك الآن
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  <ArrowLeft className="mr-2 h-5 w-5" />
                 </Button>
               </Link>
-              
-              <Link href="/courses">
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="text-base px-8 py-6 rounded-xl font-semibold"
-                  style={{
-                    borderColor: "var(--ma3k-beige-dark)",
-                    borderWidth: "1px",
-                    color: "var(--ma3k-beige)",
-                    background: "transparent"
-                  }}
-                  data-testid="button-courses"
-                >
-                  <GraduationCap className="w-5 h-5 ml-2" />
-                  تعلم البرمجة مجاناً
+              <Link href="/portfolio">
+                <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-xl">
+                  مشاهدة أعمالنا
                 </Button>
               </Link>
             </motion.div>
-
-            {/* Stats */}
-            <motion.div 
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-            >
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 + index * 0.1 }}
-                  className="glass-morphism rounded-xl p-5 text-center"
-                  data-testid={`stat-${index}`}
-                >
-                  <stat.icon 
-                    className="w-6 h-6 mx-auto mb-2"
-                    style={{ color: "var(--ma3k-green)" }}
-                  />
-                  <div 
-                    className="text-2xl font-bold mb-1"
-                    style={{ color: "var(--ma3k-beige)" }}
-                  >
-                    {stat.number}
-                  </div>
-                  <div 
-                    className="text-xs"
-                    style={{ color: "var(--ma3k-beige-dark)" }}
-                  >
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
+          </div>
         </div>
-        
-        {/* Scroll Indicator */}
-        <motion.div 
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <ChevronDown 
-            className="w-6 h-6"
-            style={{ color: "var(--ma3k-beige-dark)" }}
-          />
-        </motion.div>
       </section>
 
-      {/* Services Categories Section */}
-      <section className="py-20" style={{ background: "var(--ma3k-darker)" }}>
+      {/* Trust Stats */}
+      <section className="py-20 bg-slate-50 dark:bg-slate-900/50">
         <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <h2 
-              className="text-3xl md:text-4xl font-bold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              خدماتنا <span style={{ color: "var(--ma3k-green)" }}>المتميزة</span>
-            </h2>
-            <p 
-              className="text-base max-w-xl mx-auto"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              نقدم حلول رقمية متكاملة تناسب جميع احتياجات عملك
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services_categories.map((category, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { label: "مشروع مكتمل", value: "+150", icon: CheckCircle2 },
+              { label: "عميل راضٍ", value: "+100", icon: Users2 },
+              { label: "دولة حول العالم", value: "12", icon: Globe2 },
+              { label: "سنة خبرة", value: "+5", icon: Target },
+            ].map((stat, i) => (
+              <motion.div 
+                key={i}
+                className="text-center space-y-2"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
               >
+                <div className="mx-auto w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4">
+                  <stat.icon className="w-6 h-6" />
+                </div>
+                <div className="text-3xl font-bold">{stat.value}</div>
+                <div className="text-muted-foreground">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Hub Preview */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold">خدماتنا المتميزة</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">نقدم حلولاً متكاملة تغطي كافة جوانب حضورك الرقمي</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { title: "تطوير المواقع", desc: "مواقع تعريفية وتفاعلية بأحدث التقنيات العالمية.", icon: Layout },
+              { title: "المتاجر الإلكترونية", desc: "بناء متاجر متكاملة مع أنظمة دفع وشحن ذكية.", icon: ShoppingCart },
+              { title: "التحول الرقمي", desc: "استشارات وحلول تقنية لنقل أعمالك للعالم الرقمي.", icon: Rocket },
+            ].map((service, i) => (
+              <motion.div 
+                key={i}
+                className="luxury-card p-8 space-y-6"
+                whileHover={{ y: -5 }}
+              >
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                  <service.icon className="w-7 h-7" />
+                </div>
+                <h3 className="text-xl font-bold">{service.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{service.desc}</p>
                 <Link href="/services">
-                  <Card 
-                    className="p-6 h-full border-0 cursor-pointer transition-all duration-300 hover:-translate-y-1"
-                    style={{ 
-                      background: "var(--glass-bg)", 
-                      backdropFilter: "blur(20px)",
-                      border: "1px solid var(--glass-border)"
-                    }}
-                    data-testid={`category-card-${index}`}
-                  >
-                    <div 
-                      className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                      style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
-                    >
-                      <category.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 
-                      className="text-lg font-semibold mb-2"
-                      style={{ color: "var(--ma3k-beige)" }}
-                    >
-                      {category.title}
-                    </h3>
-                    <p 
-                      className="text-sm"
-                      style={{ color: "var(--ma3k-beige-dark)" }}
-                    >
-                      {category.desc}
-                    </p>
-                  </Card>
+                  <Button variant="link" className="p-0 text-primary h-auto font-bold">
+                    اكتشف المزيد
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                  </Button>
                 </Link>
               </motion.div>
             ))}
           </div>
-
-          <motion.div 
-            className="text-center mt-10"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            <Link href="/services">
-              <Button 
-                variant="outline"
-                className="px-6"
-                style={{
-                  borderColor: "var(--ma3k-green)",
-                  color: "var(--ma3k-green)",
-                }}
-                data-testid="button-all-services"
-              >
-                عرض جميع الخدمات
-                <ArrowLeft className="w-4 h-4 mr-2" />
-              </Button>
-            </Link>
-          </motion.div>
         </div>
       </section>
 
-      {/* Free Planning Section */}
-      <section className="py-20 relative">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <Badge 
-              className="mb-4 px-4 py-1"
-              style={{ background: "rgba(16, 185, 129, 0.1)", border: "1px solid rgba(16, 185, 129, 0.3)", color: "var(--ma3k-green)" }}
-            >
-              مجاني تماماً
-            </Badge>
-            <h2 
-              className="text-3xl md:text-4xl font-bold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              احصل على مخطط مشروعك <span style={{ color: "var(--ma3k-green)" }}>مجاناً</span>
-            </h2>
-            <p 
-              className="text-base max-w-xl mx-auto"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              أرسل لنا فكرتك واحصل على مخطط تفصيلي لموقعك خلال 24 ساعة
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <Link href="/website-form">
-                <Card 
-                  className="p-6 h-full border-0 cursor-pointer transition-all duration-300 hover:-translate-y-1"
-                  style={{ 
-                    background: "var(--glass-bg)", 
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid var(--glass-border)"
-                  }}
-                  data-testid="card-website-form"
-                >
-                  <div 
-                    className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                    style={{ background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))" }}
-                  >
-                    <Globe className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 
-                    className="text-xl font-semibold mb-2"
-                    style={{ color: "var(--ma3k-beige)" }}
-                  >
-                    موقع إلكتروني
-                  </h3>
-                  <p 
-                    className="text-sm mb-4"
-                    style={{ color: "var(--ma3k-beige-dark)" }}
-                  >
-                    مواقع شخصية، مواقع شركات، أو متاجر إلكترونية
-                  </p>
-                  <Button 
-                    className="w-full"
-                    style={{
-                      background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
-                      color: "white"
-                    }}
-                  >
-                    ابدأ التخطيط
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                  </Button>
-                </Card>
-              </Link>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              viewport={{ once: true }}
-            >
-              <Link href="/educational-website-form">
-                <Card 
-                  className="p-6 h-full border-0 cursor-pointer transition-all duration-300 hover:-translate-y-1"
-                  style={{ 
-                    background: "var(--glass-bg)", 
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid var(--glass-border)"
-                  }}
-                  data-testid="card-educational-form"
-                >
-                  <div 
-                    className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                    style={{ background: "linear-gradient(135deg, var(--ma3k-green), var(--ma3k-teal))" }}
-                  >
-                    <GraduationCap className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 
-                    className="text-xl font-semibold mb-2"
-                    style={{ color: "var(--ma3k-beige)" }}
-                  >
-                    منصة تعليمية
-                  </h3>
-                  <p 
-                    className="text-sm mb-4"
-                    style={{ color: "var(--ma3k-beige-dark)" }}
-                  >
-                    أكاديميات، مواقع دورات تدريبية، أو منصات تعليم
-                  </p>
-                  <Button 
-                    className="w-full"
-                    style={{
-                      background: "linear-gradient(135deg, var(--ma3k-green), var(--ma3k-teal))",
-                      color: "white"
-                    }}
-                  >
-                    ابدأ التخطيط
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                  </Button>
-                </Card>
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20" style={{ background: "var(--ma3k-darker)" }}>
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <h2 
-              className="text-3xl md:text-4xl font-bold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              لماذا تختار <span style={{ color: "var(--ma3k-green)" }}>معك</span>؟
-            </h2>
-            <p 
-              className="text-base max-w-xl mx-auto"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              نلتزم بأعلى معايير الجودة والاحترافية في كل مشروع
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card 
-                  className="p-6 h-full border-0"
-                  style={{ 
-                    background: "var(--glass-bg)", 
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid var(--glass-border)"
-                  }}
-                  data-testid={`feature-card-${index}`}
-                >
-                  <div 
-                    className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                    style={{ background: "rgba(16, 185, 129, 0.15)" }}
-                  >
-                    <feature.icon className="w-6 h-6" style={{ color: "var(--ma3k-green)" }} />
-                  </div>
-                  <h3 
-                    className="text-lg font-semibold mb-2"
-                    style={{ color: "var(--ma3k-beige)" }}
-                  >
-                    {feature.title}
-                  </h3>
-                  <p 
-                    className="text-sm"
-                    style={{ color: "var(--ma3k-beige-dark)" }}
-                  >
-                    {feature.desc}
-                  </p>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Process Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <h2 
-              className="text-3xl md:text-4xl font-bold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              كيف <span style={{ color: "var(--ma3k-green)" }}>نعمل</span>؟
-            </h2>
-            <p 
-              className="text-base max-w-xl mx-auto"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              4 خطوات بسيطة لتحويل فكرتك إلى مشروع ناجح
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {processSteps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.15 }}
-                viewport={{ once: true }}
-                className="text-center relative"
-              >
-                <div 
-                  className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4 relative"
-                  style={{ 
-                    background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
-                  }}
-                >
-                  <span 
-                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ background: "var(--ma3k-beige)", color: "var(--ma3k-darker)" }}
-                  >
-                    {step.step}
-                  </span>
-                  <step.icon className="w-7 h-7 text-white" />
-                </div>
-                
-                <h3 
-                  className="text-lg font-semibold mb-2"
-                  style={{ color: "var(--ma3k-beige)" }}
-                >
-                  {step.title}
-                </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: "var(--ma3k-beige-dark)" }}
-                >
-                  {step.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20" style={{ background: "var(--ma3k-darker)" }}>
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <h2 
-              className="text-3xl md:text-4xl font-bold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              ماذا يقول <span style={{ color: "var(--ma3k-green)" }}>عملاؤنا</span>؟
-            </h2>
-            <p 
-              className="text-base max-w-xl mx-auto"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              نفخر بثقة عملائنا ورضاهم عن خدماتنا
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card 
-                  className="p-6 h-full border-0"
-                  style={{ 
-                    background: "var(--glass-bg)", 
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid var(--glass-border)"
-                  }}
-                  data-testid={`testimonial-card-${index}`}
-                >
-                  <div className="flex items-center gap-1 mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className="w-4 h-4 fill-current"
-                        style={{ color: "var(--ma3k-green)" }}
-                      />
-                    ))}
-                  </div>
-                  <p 
-                    className="text-sm mb-6 leading-relaxed"
-                    style={{ color: "var(--ma3k-beige-dark)" }}
-                  >
-                    "{testimonial.text}"
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarFallback 
-                        style={{ 
-                          background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
-                          color: "white"
-                        }}
-                      >
-                        {testimonial.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+      {/* Why Us Section */}
+      <section className="py-24 bg-slate-900 text-white overflow-hidden relative">
+        <div className="absolute top-0 left-1/4 -z-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] opacity-20" />
+        
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <h2 className="text-4xl lg:text-5xl font-bold leading-tight">لماذا تختار <span className="text-primary">معك</span> لشريكك الرقمي؟</h2>
+              <div className="space-y-6">
+                {[
+                  { title: "جودة لا تضاهى", desc: "نلتزم بأعلى معايير البرمجة والتصميم العالمية.", icon: Zap },
+                  { title: "أمان وموثوقية", desc: "نظام حماية متقدم لبياناتك وضمان استقرار موقعك.", icon: ShieldCheck },
+                  { title: "دعم فني مستمر", desc: "فريقنا معك دائماً للمساعدة والتطوير المستمر.", icon: Headphones },
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-6">
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                      <item.icon className="w-6 h-6" />
+                    </div>
                     <div>
-                      <div 
-                        className="text-sm font-semibold"
-                        style={{ color: "var(--ma3k-beige)" }}
-                      >
-                        {testimonial.name}
-                      </div>
-                      <div 
-                        className="text-xs"
-                        style={{ color: "var(--ma3k-beige-dark)" }}
-                      >
-                        {testimonial.role} - {testimonial.company}
-                      </div>
+                      <h4 className="text-xl font-bold mb-2">{item.title}</h4>
+                      <p className="text-slate-400">{item.desc}</p>
                     </div>
                   </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
-            <h2 
-              className="text-3xl md:text-4xl font-bold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              الأسئلة <span style={{ color: "var(--ma3k-green)" }}>الشائعة</span>
-            </h2>
-            <p 
-              className="text-base max-w-xl mx-auto"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              إجابات على أكثر الأسئلة تكراراً
-            </p>
-          </motion.div>
-
-          <div className="max-w-2xl mx-auto">
-            <Accordion type="single" collapsible className="space-y-3">
-              {faqs.map((faq, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <AccordionItem 
-                    value={`item-${index}`}
-                    className="border-0 rounded-lg overflow-hidden"
-                    style={{ 
-                      background: "var(--glass-bg)", 
-                      border: "1px solid var(--glass-border)"
-                    }}
-                    data-testid={`faq-item-${index}`}
-                  >
-                    <AccordionTrigger 
-                      className="px-5 py-4 text-right hover:no-underline"
-                      style={{ color: "var(--ma3k-beige)" }}
-                    >
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent 
-                      className="px-5 pb-4 text-sm"
-                      style={{ color: "var(--ma3k-beige-dark)" }}
-                    >
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                </motion.div>
-              ))}
-            </Accordion>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20" style={{ background: "var(--ma3k-darker)" }}>
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center max-w-2xl mx-auto"
-          >
-            <h2 
-              className="text-3xl md:text-4xl font-bold mb-4"
-              style={{ color: "var(--ma3k-beige)" }}
-            >
-              جاهز لبدء مشروعك؟
-            </h2>
-            <p 
-              className="text-base mb-8"
-              style={{ color: "var(--ma3k-beige-dark)" }}
-            >
-              تواصل معنا اليوم ودعنا نساعدك في تحقيق أهدافك الرقمية
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/services">
-                <Button 
-                  size="lg"
-                  className="px-8"
-                  style={{
-                    background: "linear-gradient(135deg, var(--ma3k-teal), var(--ma3k-green))",
-                    color: "white",
-                  }}
-                  data-testid="button-cta-services"
-                >
-                  <Rocket className="w-5 h-5 ml-2" />
-                  اطلب خدمتك الآن
-                </Button>
-              </Link>
-              
-              <Link href="/contact">
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="px-8"
-                  style={{
-                    borderColor: "var(--ma3k-beige-dark)",
-                    color: "var(--ma3k-beige)",
-                  }}
-                  data-testid="button-cta-contact"
-                >
-                  <Phone className="w-5 h-5 ml-2" />
-                  تواصل معنا
-                </Button>
-              </Link>
+                ))}
+              </div>
             </div>
-          </motion.div>
+            <div className="relative">
+              <div className="aspect-square bg-gradient-to-br from-primary/20 to-transparent rounded-3xl border border-white/10 p-8 flex items-center justify-center">
+                <Rocket className="w-48 h-48 text-primary animate-pulse" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
   );
 }
+import { Headphones } from "lucide-react";
