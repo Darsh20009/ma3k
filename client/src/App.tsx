@@ -37,7 +37,6 @@ import WebsiteForm from "@/pages/website-form";
 import EducationalWebsiteForm from "@/pages/educational-website-form";
 import StudentDashboard from "@/pages/student-dashboard";
 import ThankYou from "@/pages/thank-you";
-import OpenLife from "@/pages/openlife";
 import NotFound from "@/pages/not-found";
 
 /**
@@ -104,7 +103,6 @@ function Router() {
         {/* === DEPRECATED (for backwards compatibility) === */}
         <Route path="/digital-welcome" component={DigitalWelcome} />
         <Route path="/splash" component={SplashScreen} />
-        <Route path="/openlife" component={OpenLife} />
 
         {/* === 404 FALLBACK === */}
         <Route component={NotFound} />

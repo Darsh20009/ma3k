@@ -19,6 +19,7 @@ import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./payp
 import { sendOrderNotificationEmail } from "./email";
 import { generateInvoiceHTML, generateInvoicePDF } from "./invoice-generator";
 import { setupAuth, hashPassword } from "./auth";
+import { requireAuth, requireRole, requirePermission, parseUserFromSession } from "./middleware/rbac";
 import passport from "passport";
 
 const connectedClients = new Map<string, WebSocket>();
@@ -34,6 +35,9 @@ export function broadcastNotification(userId: string, userType: string, notifica
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
+  
+  // Parse user from session for RBAC
+  app.use(parseUserFromSession);
 
   // PayPal routes
   app.get("/api/paypal/setup", async (req, res) => {
@@ -60,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await capturePaypalOrder(req, res);
   });
 
-  // Services routes
+  // Services routes (Public - no auth required)
   app.get("/api/services", async (req, res) => {
     try {
       const services = await storage.getServices();
@@ -156,8 +160,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send(generateSampleCss(exportId));
   });
 
-  // Orders routes with email notification
-  app.post("/api/orders", async (req, res) => {
+  // Orders routes with email notification and RBAC
+  // POST: Create order (Clients only)
+  app.post("/api/orders", requireAuth, async (req, res) => {
     try {
       const orderData = insertOrderSchema.parse(req.body);
       
