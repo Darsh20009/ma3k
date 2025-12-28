@@ -326,8 +326,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Invoice routes
-  app.post("/api/invoices", async (req, res) => {
+  // Invoice routes (SUPPORT_SPECIALIST و SALES_MANAGER يمكنهم إنشاء الفواتير)
+  app.post("/api/invoices", requireRole(["SUPPORT_SPECIALIST", "SALES_MANAGER"]), async (req, res) => {
     try {
       const { orderId, customerName, customerEmail, serviceName, amount } = req.body;
       const invoice = await storage.createInvoice(orderId);
@@ -493,16 +493,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // مسار إضافة موظف من قبل المدير
-  app.post("/api/admin/employees", async (req, res) => {
+  // مسار إضافة موظف من قبل المدير (SYSTEM_ADMIN فقط)
+  app.post("/api/admin/employees", requireRole(["SYSTEM_ADMIN"]), async (req, res) => {
     try {
-      const { adminEmail, fullName, email, password, position, jobTitle, isAdmin } = req.body;
-      
-      // التحقق من صلاحية المدير
-      const admin = await storage.getEmployeeByEmail(adminEmail);
-      if (!admin || !admin.isAdmin) {
-        return res.status(403).json({ error: "غير مصرح لك بإضافة موظفين" });
-      }
+      const { fullName, email, password, position, jobTitle, isAdmin } = req.body;
       
       // التحقق من البيانات المطلوبة
       if (!fullName || !email || !password) {
@@ -538,19 +532,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // مسار الحصول على جميع الموظفين (للمدير فقط)
-  app.get("/api/admin/employees", async (req, res) => {
+  // مسار الحصول على جميع الموظفين (SYSTEM_ADMIN و SALES_MANAGER فقط)
+  app.get("/api/admin/employees", requireRole(["SYSTEM_ADMIN", "SALES_MANAGER"]), async (req, res) => {
     try {
-      const adminEmail = req.query.adminEmail as string;
-      
-      if (!adminEmail) {
-        return res.status(400).json({ error: "البريد الإلكتروني للمدير مطلوب" });
-      }
-      
-      const admin = await storage.getEmployeeByEmail(adminEmail);
-      if (!admin || !admin.isAdmin) {
-        return res.status(403).json({ error: "غير مصرح لك بعرض الموظفين" });
-      }
       
       const employees = await storage.getEmployees();
       const employeesWithoutPasswords = employees.map(emp => {
@@ -865,8 +849,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Projects routes
-  app.get("/api/projects", async (req, res) => {
+  // Projects routes (CLIENT و PROJECT_MANAGER يمكنهم عرض المشاريع)
+  app.get("/api/projects", requireAuth, async (req, res) => {
     try {
       const projects = await storage.getAllProjects();
       res.json(projects);
@@ -875,7 +859,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects", async (req, res) => {
+  // POST projects (CLIENT و PROJECT_MANAGER يمكنهم إنشاء المشاريع)
+  app.post("/api/projects", requireAuth, async (req, res) => {
     try {
       const projectData = insertProjectSchema.parse(req.body);
       const project = await storage.createProject(projectData);
@@ -898,7 +883,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/projects/:id/status", async (req, res) => {
+  // UPDATE project status (PROJECT_MANAGER فقط)
+  app.put("/api/projects/:id/status", requireRole(["PROJECT_MANAGER"]), async (req, res) => {
     try {
       const { status } = req.body;
       if (!status) {
@@ -915,7 +901,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/projects/:id/idea", async (req, res) => {
+  // UPDATE project idea (PROJECT_MANAGER فقط)
+  app.put("/api/projects/:id/idea", requireRole(["PROJECT_MANAGER"]), async (req, res) => {
     try {
       const { idea } = req.body;
       if (!idea) {
@@ -1166,7 +1153,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/reviews/:id/approve", async (req, res) => {
+  // Approve review (SUPPORT_SPECIALIST و SYSTEM_ADMIN فقط)
+  app.put("/api/reviews/:id/approve", requireRole(["SUPPORT_SPECIALIST", "SYSTEM_ADMIN"]), async (req, res) => {
     try {
       const review = await storage.approveReview(req.params.id);
       if (!review) {
