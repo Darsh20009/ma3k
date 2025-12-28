@@ -37,7 +37,7 @@ export default function HomeNew() {
             </motion.div>
             
             <motion.h1 
-              className="text-5xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white"
+              className="text-5xl lg:text-7xl font-bold tracking-tight text-foreground"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -147,7 +147,7 @@ export default function HomeNew() {
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
-              <h2 className="text-4xl lg:text-5xl font-bold leading-tight">لماذا تختار <span className="text-primary">معك</span> لشريكك الرقمي؟</h2>
+              <h2 className="text-4xl lg:text-5xl font-bold leading-tight">لماذا تختار <span className="text-white">معك</span> لشريكك الرقمي؟</h2>
               <div className="space-y-6">
                 {[
                   { title: "جودة لا تضاهى", desc: "نلتزم بأعلى معايير البرمجة والتصميم العالمية.", icon: Zap },
