@@ -77,7 +77,7 @@
 
 @layer components {
   .luxury-card {
-    @apply bg-card border border-border/50 shadow-sm hover:shadow-md transition-all duration-300 rounded-lg;
+    @apply bg-card border border-border shadow-sm hover:shadow-md transition-all duration-300 rounded-lg;
   }
   
   .luxury-button {

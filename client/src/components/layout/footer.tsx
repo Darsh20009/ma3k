@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Phone, Mail, MapPin, Globe, Clock, ArrowUp } from "lucide-react";
 import { SiWhatsapp, SiInstagram, SiX, SiLinkedin } from "react-icons/si";
 import logoImage from "@assets/Screenshot 2025-01-18 200736_1760982548460.png";
+import { Button } from "@/components/ui/button";
 
 export default function Footer() {
   const scrollToTop = () => {

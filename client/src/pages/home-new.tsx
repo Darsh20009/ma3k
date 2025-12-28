@@ -9,7 +9,9 @@ import {
   Layout,
   Globe2,
   Users2,
-  Target
+  Target,
+  ShoppingCart,
+  Headphones
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -175,4 +177,3 @@ export default function HomeNew() {
     </div>
   );
 }
-import { Headphones } from "lucide-react";
