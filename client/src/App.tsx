@@ -32,7 +32,8 @@ import EmployeeProfile from "@/pages/employee-profile";
 import WebsiteForm from "@/pages/website-form";
 import EducationalWebsiteForm from "@/pages/educational-website-form";
 import StudentDashboard from "@/pages/student-dashboard";
-import ThankYou from "@/pages/thank-you";
+import FAQ from "@/pages/faq";
+import Pricing from "@/pages/pricing";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -48,6 +49,8 @@ function Router() {
           <Route path="/portfolio" component={Portfolio} />
           <Route path="/contact" component={Contact} />
           <Route path="/services" component={ServicesComplete} />
+          <Route path="/pricing" component={Pricing} />
+          <Route path="/faq" component={FAQ} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/employee-login" component={EmployeeLogin} />

@@ -39,9 +39,9 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-lg mb-6">الروابط السريعة</h4>
             <ul className="space-y-4">
-              {["الخدمات", "الأسعار", "أعمالنا", "من نحن", "تواصل معنا"].map((item, i) => (
+              {["الخدمات", "الأسعار", "الأسئلة الشائعة", "أعمالنا", "من نحن", "تواصل معنا"].map((item, i) => (
                 <li key={i}>
-                  <Link href="#">
+                  <Link href={item === "الأسئلة الشائعة" ? "/faq" : "#"}>
                     <span className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">{item}</span>
                   </Link>
                 </li>

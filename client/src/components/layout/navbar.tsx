@@ -35,6 +35,7 @@ export default function Navbar() {
     { href: "/", label: "الرئيسية" },
     { href: "/services", label: "الخدمات" },
     { href: "/pricing", label: "الأسعار" },
+    { href: "/faq", label: "الأسئلة الشائعة" },
     { href: "/portfolio", label: "أعمالنا" },
     { href: "/about", label: "من نحن" },
     { href: "/contact", label: "تواصل معنا" },
