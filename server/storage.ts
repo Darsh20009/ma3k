@@ -2071,36 +2071,39 @@ async function initializeStorage(): Promise<IStorage> {
   return new JsonStorage();
 }
 
-// Initialize storage synchronously for backward compatibility
+// Initialize storage - MongoDB is primary, PostgreSQL is fallback
 if (process.env.MONGODB_URI) {
+  // Try MongoDB first (primary)
   connectMongoDB().then(connected => {
     if (connected) {
       storage = new MongoStorage();
-      console.log('✅ Using MongoDB database storage');
+      console.log('✅ Using MongoDB database storage (PRIMARY)');
     } else if (db) {
       storage = new DatabaseStorage();
-      console.log('✅ Using PostgreSQL database storage');
+      console.log('✅ Using PostgreSQL database storage (FALLBACK)');
     } else {
       storage = new JsonStorage();
-      console.log('📁 Using JSON file storage (fallback)');
+      console.log('📁 Using JSON file storage (FALLBACK)');
     }
   }).catch(() => {
     if (db) {
       storage = new DatabaseStorage();
-      console.log('✅ Using PostgreSQL database storage');
+      console.log('✅ Using PostgreSQL database storage (FALLBACK)');
     } else {
       storage = new JsonStorage();
-      console.log('📁 Using JSON file storage (fallback)');
+      console.log('📁 Using JSON file storage (FALLBACK)');
     }
   });
-  // Set initial storage for sync access
+  // Set initial storage for sync access (JsonStorage while MongoDB connects)
   storage = new JsonStorage();
 } else if (db) {
+  // MongoDB not configured, use PostgreSQL
   storage = new DatabaseStorage();
   console.log('✅ Using PostgreSQL database storage');
 } else {
+  // Fallback to JSON
   storage = new JsonStorage();
-  console.log('📁 Using JSON file storage (fallback)');
+  console.log('📁 Using JSON file storage (FALLBACK)');
 }
 
 export { storage };
