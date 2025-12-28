@@ -1,0 +1,286 @@
+1) الهدف النهائي (Ma3k Company Platform)
+
+منصة موحّدة فيها:
+
+Website Public (قبل التسجيل): واجهة رسمية بألوان (بيج/أبيض/رصاصي/أخضر) + عرض الخدمات + التسعير + CTA واضح “اطلب الخدمة”.
+
+Client Portal: العميل يسجل، يطلب خدمة، يتابع الحالة، يستلم عروض/فاتورة، يدفع، يستلم الملفات.
+
+Employee Portal: الموظفين يديروا العملاء والطلبات، يتواصلوا، يعملوا اجتماعات، يرفعوا تحديثات، ويسلموا الملفات.
+
+Edutiy by Ma3k (قسم تعليم): طلاب + كورسات + تقدّم + اختبارات/واجبات + شهادات.
+
+Brands داخل نفس المنصة:
+
+Menuza by Ma3k (مطاعم/منيو/خدمات مطاعم)
+
+Ma3k Edits (متاجر/مواقع/تطبيقات وخدمات تطوير)
+
+Kafayat Services (الكفايات)
+
+Edutiy by Ma3k (تعليم)
+
+2) تجربة العميل (User Journey) المطلوبة
+A) يختار الخدمة + التسعير
+
+صفحة “الخدمات” مصنّفة حسب البراند (Tabs أو Sections).
+
+كل خدمة لها:
+
+وصف مختصر + مخرجات + مدة التنفيذ + السعر/الباقات
+
+زر اطلب الآن
+
+B) فورم ذكي (Self-fill أو Interview)
+
+بعد اختيار الخدمة:
+
+خيار 1: أملا الفورم بنفسي
+
+خيار 2: جاوبني أسئلة ذكية لاستخراج أقصى فكرة من دماغي
+(Wizard / Chat-like form) → يحوّل لإجابات منظمة داخل الطلب.
+
+C) إنشاء حساب + إرسال الطلب
+
+تسجيل سريع (Email/Phone)
+
+بعد الإرسال يظهر:
+
+رقم الطلب + الحالة + SLA (الرد خلال “دقائق إلى ساعات” حسب نوع الخدمة)
+
+D) الدفع “بعد التواصل”
+
+الحالة تكون مثلًا:
+
+Submitted
+
+Under Review
+
+Clarification Needed
+
+Quote Ready (عرض سعر نهائي/فاتورة)
+
+Awaiting Payment
+
+In Progress
+
+Delivered
+
+Completed
+
+الدفع لا يتم فورًا — يتم بعد تواصل خدمة العملاء وإصدار الفاتورة.
+
+3) نظام الموظفين (Employees) — التشغيل الحقيقي للشركة
+Roles مقترحة
+
+System Admin: إعدادات المنصة/الصلاحيات/المالية
+
+Sales / Account Manager: استقبال ليدز + تحويل لطلبات + متابعة الدفع
+
+Customer Support: تواصل + تحديد اجتماع + جمع متطلبات
+
+Project Manager: تقسيم مهام + متابعة تقدم + تحديثات للعميل
+
+Specialist/Designer/Developer: تنفيذ + رفع ملفات + ملاحظات داخلية
+
+Education Admin (Edutiy): كورسات + طلاب + اختبارات
+
+أدوات لازم تتبني داخل Employee Portal
+
+CRM Pipeline (Leads → Qualified → Proposal → Won/Lost)
+
+Client Inbox: رسائل داخلية + Email Templates
+
+Meeting Scheduler: حجز اجتماع (Zoom/Google Meet link) + إشعار
+
+Task Board (Kanban): To-Do / Doing / Review / Done
+
+File Delivery: رفع الملفات للعميل + نسخة محفوظة + سجل تسليم
+
+Activity Log: مين عدّل إيه؟ ومتى؟
+
+4) Front-End Redesign (الواجهة الرسمية)
+الهوية والألوان
+
+خلفيات: أبيض + بيج فاتح
+
+عناصر/حدود: رصاصي
+
+Accent: أخضر Ma3k
+
+Typography رسمي (عربي واضح + إنجليزي نظيف)
+
+شكل قريب من “Saly & Z”:
+Minimal + Luxury + spacing كبير + cards نظيفة + صور/Icons بسيطة
+
+صفحات أساسية (Public)
+
+Home
+
+About Ma3k
+
+Services (مع فلاتر حسب البراند)
+
+Pricing (باقات واضحة)
+
+Case Studies / Portfolio
+
+Contact / Request Service
+
+FAQ
+
+Terms/Privacy
+
+صفحات بعد التسجيل (Client)
+
+Dashboard
+
+My Orders
+
+Messages
+
+Invoices & Payments
+
+Deliverables (Downloads)
+
+Meetings
+
+صفحات بعد التسجيل (Employee/Admin)
+
+CRM
+
+Orders Management
+
+Clients
+
+Tasks
+
+Messages/Email
+
+Meetings
+
+Finance (Invoices/Payments)
+
+Settings/RBAC
+
+5) Edutiy by Ma3k (طلاب + تعليم)
+Modules أساسية
+
+Courses Catalog
+
+Student Dashboard (Progress)
+
+Lessons + Attachments
+
+Quizzes/Exams + Gradebook
+
+Certificates
+
+Teacher/Admin panels
+
+أنت فعلًا عندك خبرات جاهزة من مشاريع زي منصات التعليم/الاختبارات—هنحوّلها كـ “Module” داخل نفس المنصة بدل ما تكون موقع منفصل.
+
+6) Menuza by Ma3k (مطاعم)
+
+مش لازم يبقى POS كامل الآن—لكن “خدمات المطاعم” داخل المنصة:
+
+طلب تصميم/تطوير منيو
+
+QR Menu landing
+
+Branding للمنيو
+
+تصوير/كتابة وصف منتجات
+
+باقات شهرية للتحديثات
+
+وبعدين نقدر نطلع “منتج مستقل” لـ Menuza لو حبيت.
+
+7) Sprint-by-Sprint Roadmap (تنفيذ عملي)
+Sprint 0 — تثبيت الأساس (3–5 أيام)
+
+تنظيف المشروع + توحيد DB (Postgres كمصدر رسمي)
+
+RBAC Roles + Permissions
+
+تحسين تسجيل الدخول + حماية لوحات التحكم
+
+إعداد بيئات (Dev/Staging/Prod)
+
+Sprint 1 — الواجهة العامة الجديدة (7–10 أيام)
+
+تطبيق الهوية (الألوان/المكونات/الخطوط)
+
+Pages: Home/Services/Pricing/Contact/FAQ
+
+خدمات مصنّفة حسب البراند (Menuza / Edutiy / Edits / Kafayat)
+
+Sprint 2 — طلب الخدمة + الفورم الذكي (7–10 أيام)
+
+Service Request Wizard
+
+اختيار: Self-fill vs Interview
+
+إنشاء حساب + ربط الطلب بالعميل
+
+SLA + حالات الطلب
+
+Sprint 3 — لوحة العميل (7–10 أيام)
+
+My Orders + Status timeline
+
+Messages
+
+Meetings
+
+Deliverables Downloads
+
+Invoices list
+
+Sprint 4 — لوحة الموظف (10–14 يوم)
+
+إدارة العملاء + الطلبات
+
+Task Board + Assignments
+
+Email داخل النظام + Templates
+
+Meeting scheduler + إشعارات
+
+Activity Log
+
+Sprint 5 — الفوترة والدفع (7–10 أيام)
+
+Quote → Invoice
+
+دفع بعد إصدار الفاتورة (Stripe/PayPal الموجودين)
+
+إيصالات + PDF Invoice
+
+حالات دفع واضحة
+
+Sprint 6 — Edutiy MVP (10–14 يوم)
+
+كورسات + دروس + واجبات/اختبارات
+
+لوحة طالب + لوحة مشرف تعليم
+
+8) “إجراءات التشغيل اليومية” داخل الشركة (Workflow جاهز)
+
+لما عميل يطلب خدمة:
+
+يدخل Lead
+
+Support يتواصل خلال SLA
+
+لو محتاج → يحدد اجتماع
+
+PM يحوّل الطلب لمهام
+
+Specialist ينفّذ
+
+PM يرفع Update للعميل
+
+تسليم ملفات + موافقة
+
+Invoice → Payment → Completed
